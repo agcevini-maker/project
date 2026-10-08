@@ -1,0 +1,518 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sin Miedo</title>
+<style>
+  :root {
+    --bg: #f4f1ea;
+    --card: #ffffff;
+    --ink: #1d2433;
+    --muted: #5d6677;
+    --line: #e2ddd2;
+    --accent: #1f7a5a;
+    --accent-ink: #ffffff;
+    --accent-soft: #e2f2ea;
+    --warn: #b4531a;
+    --warn-soft: #fbe9dc;
+    --bad: #b3261e;
+    --lock: #b7b2a7;
+    --shadow: 0 1px 2px rgba(0,0,0,.06), 0 4px 16px rgba(0,0,0,.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #12151c; --card: #1b2029; --ink: #e9ecf2; --muted: #9aa3b4; --line: #2b3240;
+      --accent: #3fbf8f; --accent-ink: #0d1a14; --accent-soft: #173327;
+      --warn: #f0995c; --warn-soft: #3a2518; --bad: #f2867f; --lock: #4a5160;
+      --shadow: 0 1px 2px rgba(0,0,0,.4);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #12151c; --card: #1b2029; --ink: #e9ecf2; --muted: #9aa3b4; --line: #2b3240;
+    --accent: #3fbf8f; --accent-ink: #0d1a14; --accent-soft: #173327;
+    --warn: #f0995c; --warn-soft: #3a2518; --bad: #f2867f; --lock: #4a5160;
+    --shadow: 0 1px 2px rgba(0,0,0,.4);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--bg); color: var(--ink);
+    font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  .app { max-width: 440px; margin: 0 auto; padding: 16px 16px 48px; min-height: 100vh; }
+  header.top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .brand { font-weight: 800; letter-spacing: -.02em; font-size: 20px; }
+  .brand span { color: var(--accent); }
+  .link { background: none; border: 0; color: var(--muted); font: inherit; font-size: 14px; cursor: pointer; padding: 4px; }
+  h1 { font-size: 26px; line-height: 1.2; margin: 8px 0 8px; letter-spacing: -.02em; }
+  h2 { font-size: 20px; margin: 0 0 8px; }
+  p { margin: 0 0 12px; }
+  .muted { color: var(--muted); }
+  .small { font-size: 14px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px; box-shadow: var(--shadow); margin-bottom: 12px; }
+  .btn {
+    display: block; width: 100%; border: 0; border-radius: 12px; padding: 14px 16px;
+    font: inherit; font-weight: 700; cursor: pointer; background: var(--accent); color: var(--accent-ink);
+  }
+  .btn[disabled] { opacity: .45; cursor: not-allowed; }
+  .btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); font-weight: 600; }
+  .row { display: flex; gap: 8px; }
+  .row > * { flex: 1; }
+  .opt {
+    display: block; width: 100%; text-align: left; border: 1px solid var(--line); background: var(--card); color: var(--ink);
+    border-radius: 12px; padding: 12px 14px; margin-bottom: 8px; font: inherit; cursor: pointer;
+  }
+  .opt.sel { border-color: var(--accent); background: var(--accent-soft); }
+  .opt.right { border-color: var(--accent); background: var(--accent-soft); }
+  .opt.wrong { border-color: var(--bad); }
+  .progress { height: 6px; background: var(--line); border-radius: 99px; overflow: hidden; margin: 4px 0 16px; }
+  .progress > div { height: 100%; background: var(--accent); transition: width .3s; }
+  .pill { display: inline-block; font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 99px; background: var(--accent-soft); color: var(--accent); }
+  .pill.warn { background: var(--warn-soft); color: var(--warn); }
+  .level { display: flex; gap: 12px; align-items: center; cursor: pointer; }
+  .level.locked { cursor: default; opacity: .6; }
+  .dot {
+    flex: none; width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center;
+    font-weight: 800; background: var(--accent-soft); color: var(--accent); border: 2px solid var(--accent);
+  }
+  .level.done .dot { background: var(--accent); color: var(--accent-ink); }
+  .level.locked .dot { border-color: var(--lock); color: var(--lock); background: transparent; }
+  .level .t { font-weight: 700; line-height: 1.3; }
+  .lesson p { font-size: 17px; }
+  .term {
+    background: none; border: 0; padding: 0; font: inherit; color: inherit; cursor: pointer;
+    text-decoration: underline dotted var(--accent) 2px; text-underline-offset: 3px;
+  }
+  .sheet-bg { position: fixed; inset: 0; background: rgba(0,0,0,.35); display: flex; align-items: flex-end; justify-content: center; z-index: 10; }
+  .sheet { background: var(--card); color: var(--ink); width: 100%; max-width: 440px; border-radius: 20px 20px 0 0; padding: 20px 16px 28px; }
+  .sheet h3 { margin: 0 0 6px; font-size: 18px; }
+  .example { background: var(--bg); border-radius: 10px; padding: 10px 12px; font-size: 15px; }
+  .feedback { border-radius: 12px; padding: 12px 14px; margin: 8px 0 12px; }
+  .feedback.ok { background: var(--accent-soft); }
+  .feedback.no { background: var(--warn-soft); }
+  .big { font-size: 32px; font-weight: 800; letter-spacing: -.02em; }
+  .up { color: var(--accent); } .down { color: var(--bad); }
+  .alloc { margin-bottom: 14px; }
+  .alloc label { display: flex; justify-content: space-between; font-weight: 600; }
+  input[type=range] { width: 100%; accent-color: var(--accent); }
+  svg.chart { width: 100%; height: 140px; display: block; }
+  .note { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 10px; margin-top: 12px; }
+  .stack > * + * { margin-top: 8px; }
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+<div id="sheet"></div>
+
+<script>
+/* ---------- Contenido ---------- */
+
+const GLOSSARY = {
+  "inflación": ["Cuando los precios suben con el tiempo y tu plata alcanza para menos.",
+    "El año pasado con $1.000 comprabas 4 alfajores; hoy te alcanza para 3."],
+  "invertir": ["Poner tu plata en algo que, con el tiempo, te puede devolver más.",
+    "Como plantar una semilla: no la comés hoy para tener más mañana."],
+  "rendimiento": ["Lo que gana tu plata por estar invertida.",
+    "Pusiste $10.000 y al mes tenés $10.300: el rendimiento fue $300."],
+  "riesgo": ["La posibilidad de que el resultado no sea el que esperabas, incluso de perder algo.",
+    "Salir sin paraguas un día nublado: puede que no llueva, puede que sí."],
+  "volatilidad": ["Cuánto sube y baja el valor de algo en poco tiempo.",
+    "Una montaña rusa es muy volátil; una escalera mecánica, poco."],
+  "diversificar": ["Repartir tu plata en distintas cosas para no depender de una sola.",
+    "No llevar todos los huevos en la misma canasta."],
+  "plazo fijo": ["Le prestás plata al banco por un tiempo fijo y te devuelve un poco más.",
+    "Dejás $50.000 por 30 días y al final te devuelven $51.500."],
+  "fondo común de inversión": ["Una “vaquita”: mucha gente junta plata y un equipo profesional la invierte.",
+    "Como armar una vaquita para el asado, pero alguien que sabe elige qué comprar."],
+  "bono": ["Le prestás plata a un gobierno o empresa y te la devuelve con intereses.",
+    "Como prestarle a un amigo que te firma cuándo y cuánto te devuelve."],
+  "acción": ["Un pedacito de una empresa. Si a la empresa le va bien, tu pedacito vale más.",
+    "Comprar una porción de la pizzería del barrio."],
+  "liquidez": ["Qué tan rápido podés convertir una inversión en efectivo.",
+    "La plata en la billetera tiene mucha liquidez; una casa, poca."],
+  "plazo": ["El tiempo que pensás dejar la plata invertida.",
+    "No es lo mismo ahorrar para las vacaciones de enero que para dentro de 5 años."]
+};
+
+const LEVELS = [
+  {
+    title: "¿Por qué la plata guardada pierde valor?",
+    lesson: [
+      "Si guardás $10.000 en un cajón, dentro de un año seguís teniendo $10.000. El número no cambia.",
+      "Lo que cambia es lo que podés comprar con eso. Por la [[inflación]], los precios suben y tus $10.000 alcanzan para menos cosas.",
+      "Por eso “no hacer nada” con tu plata también es una decisión, y suele salir cara."
+    ],
+    q: "Tenés $10.000 guardados y en un año los precios suben un 30%. ¿Qué pasa?",
+    options: ["Tengo más plata", "Tengo la misma plata, pero me alcanza para menos", "No pasa nada"],
+    answer: 1,
+    why: "El número es el mismo, pero con precios más altos comprás menos. Eso es perder valor."
+  },
+  {
+    title: "¿Qué es invertir? (y qué no es)",
+    lesson: [
+      "[[invertir]] es poner tu plata a trabajar para que, con el tiempo, te dé un [[rendimiento]].",
+      "No es apostar ni hacerse rico de un día para el otro. Si alguien te promete ganancias enormes y seguras, desconfiá.",
+      "Invertir es más parecido a ahorrar con un plan que a jugar a la lotería."
+    ],
+    q: "¿Cuál de estas cosas NO es invertir?",
+    options: ["Dejar plata en un plazo fijo", "Comprar un número de rifa esperando ganar", "Poner plata en un fondo común"],
+    answer: 1,
+    why: "La rifa depende de pura suerte y lo más probable es perder todo. Eso es apostar, no invertir."
+  },
+  {
+    title: "Riesgo: ¿cuánto puedo perder?",
+    lesson: [
+      "Toda inversión tiene [[riesgo]]. Las que pueden ganar más suelen tener más [[volatilidad]]: suben y bajan más.",
+      "Tres reglas simples: invertí plata que no vas a necesitar pronto, empezá con poco y [[diversificar]] (repartí).",
+      "Que algo baje un día no significa que perdiste: perdés si vendés asustado en el peor momento."
+    ],
+    q: "Tu inversión bajó un 5% esta semana. ¿Qué conviene hacer primero?",
+    options: ["Vender todo ya para no perder más", "Recordar mi plazo y no decidir por miedo", "Poner todos mis ahorros para “recuperar”"],
+    answer: 1,
+    why: "Las bajas son parte del camino. Lo importante es haber invertido plata que no necesitás pronto y no decidir en pánico.",
+    unlock: "¡Desbloqueaste el modo práctica! Tenés $100.000 de mentira para probar sin riesgo."
+  },
+  {
+    title: "Tus primeras opciones",
+    lesson: [
+      "Hay opciones más tranquilas y otras más movidas. Algunas de las más comunes:",
+      "Un [[plazo fijo]] o un [[fondo común de inversión]] conservador: suben poco, pero bajan poco.",
+      "Un [[bono]]: le prestás a un gobierno o empresa. Una [[acción]]: comprás un pedacito de una empresa, sube y baja más.",
+      "Antes de elegir, mirá dos cosas: el [[plazo]] (cuándo vas a necesitar la plata) y la [[liquidez]] (qué tan rápido la podés sacar)."
+    ],
+    placeholder: true,
+    q: "Querés poder sacar tu plata en cualquier momento. ¿En qué te fijás?",
+    options: ["En la liquidez", "En el logo de la empresa", "En lo que hizo un amigo"],
+    answer: 0,
+    why: "La liquidez te dice qué tan rápido podés convertir la inversión en efectivo."
+  },
+  {
+    title: "Tu primera inversión",
+    lesson: [
+      "Ya tenés lo necesario para arrancar. Un plan en 4 pasos:",
+      "1. Definí para qué es la plata y cuál es tu [[plazo]].",
+      "2. Elegí un monto chico, que no te quite el sueño.",
+      "3. Elegí una opción acorde a tu plazo y a cuánto [[riesgo]] aceptás.",
+      "4. Seguila de vez en cuando, sin mirarla todos los días."
+    ],
+    q: "¿Cuál es un buen primer monto para invertir?",
+    options: ["Todos mis ahorros, así gano más", "Uno chico, que pueda dejar quieto sin preocuparme", "Plata que voy a necesitar el mes que viene"],
+    answer: 1,
+    why: "Empezar con poco te deja aprender con tranquilidad. Después, si te sentís con confianza, aumentás."
+  }
+];
+
+const ONBOARDING = [
+  { key: "exp", q: "¿Alguna vez invertiste?", opts: ["Nunca", "Alguna vez, pero poco", "Sí, seguido"] },
+  { key: "fear", q: "¿Qué te frena más?", opts: ["Miedo a perder plata", "No entiendo las palabras", "No sé por dónde empezar", "Creo que no me alcanza"] },
+  { key: "amount", q: "¿Cuánto podrías llegar a poner?", opts: ["Menos de $10.000", "Entre $10.000 y $50.000", "Entre $50.000 y $200.000", "Más de $200.000"] }
+];
+
+// Valores ilustrativos, NO son datos de mercado ni productos de LBO.
+const PRACTICE_OPTIONS = [
+  { id: "cons", name: "Tranquila", desc: "Tipo plazo fijo o fondo conservador. Sube poco, casi no baja.", mu: 0.0007, sigma: 0.0004 },
+  { id: "mod",  name: "Intermedia", desc: "Tipo bonos. Sube algo más, a veces baja.", mu: 0.0009, sigma: 0.005 },
+  { id: "agr",  name: "Movida", desc: "Tipo acciones. Puede subir mucho o bajar mucho.", mu: 0.0012, sigma: 0.018 }
+];
+const START_CASH = 100000;
+
+/* ---------- Estado ---------- */
+
+const KEY = "sinmiedo.v1";
+const fresh = () => ({ profile: null, done: [], practice: null });
+let S = load();
+let view = S.profile ? { name: "path" } : { name: "welcome", step: -1, answers: {} };
+
+function load() {
+  try { return Object.assign(fresh(), JSON.parse(localStorage.getItem(KEY)) || {}); }
+  catch (e) { return fresh(); }
+}
+function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+
+const money = n => "$" + Math.round(n).toLocaleString("es-AR");
+const esc = s => s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const withTerms = s => esc(s).replace(/\[\[([^\]]+)\]\]/g, (_, t) =>
+  `<button class="term" data-term="${t}">${t}</button>`);
+
+const practiceUnlocked = () => S.done.includes(2);
+const pathDone = () => S.done.length === LEVELS.length;
+
+function suggestion() {
+  const p = S.profile || {};
+  const amounts = ["$5.000", "$10.000", "$20.000", "$30.000"];
+  return amounts[p.amount ?? 0];
+}
+
+function profileTip() {
+  const p = S.profile; if (!p) return "";
+  return [
+    "Como lo que más te frena es el miedo a perder, prestá atención al nivel 3 y al modo práctica: ahí probás sin arriesgar nada.",
+    "Como las palabras te frenan, fijate: todas las palabras subrayadas se pueden tocar y te explican qué significan.",
+    "Como no sabés por dónde empezar, seguí el camino en orden: en el nivel 5 armamos juntos tu primer paso.",
+    "No hace falta mucha plata: se puede empezar con montos chicos. Lo vemos en el nivel 5."
+  ][p.fear];
+}
+
+/* ---------- Render ---------- */
+
+const app = document.getElementById("app");
+function go(v) { view = v; render(); window.scrollTo(0, 0); }
+
+function render() {
+  const top = `<header class="top"><div class="brand">Sin <span>Miedo</span></div>${
+    S.profile && view.name !== "path" ? `<button class="link" data-act="path">← Camino</button>` :
+    S.profile ? `<button class="link" data-act="reset">Reiniciar</button>` : ""}</header>`;
+  app.innerHTML = top + ({ welcome, path, lesson, quiz, practice, leap })[view.name]();
+}
+
+function welcome() {
+  const { step, answers } = view;
+  if (step < 0) return `
+    <h1>Invertir, sin miedo.</h1>
+    <p class="muted">Aprendé en lecciones de 1 minuto, entendé las palabras raras y practicá con plata de mentira antes de poner la real.</p>
+    <div class="card stack small">
+      <div>📘 <b>Aprendé</b> en 5 niveles cortos</div>
+      <div>💬 <b>Entendé</b>: tocá las palabras subrayadas</div>
+      <div>🎮 <b>Practicá</b> con $100.000 de mentira</div>
+      <div>🚀 <b>Animate</b> a dar el primer paso real</div>
+    </div>
+    <button class="btn" data-act="start">Empezar</button>
+    <p class="note">Te hacemos 3 preguntas rápidas para adaptar el camino.</p>`;
+  const o = ONBOARDING[step];
+  return `
+    <div class="small muted">Pregunta ${step + 1} de 3</div>
+    <div class="progress"><div style="width:${(step + 1) / 3 * 100}%"></div></div>
+    <h1>${o.q}</h1>
+    ${o.opts.map((t, i) => `<button class="opt ${answers[o.key] === i ? "sel" : ""}" data-act="onb" data-i="${i}">${t}</button>`).join("")}
+  `;
+}
+
+function path() {
+  const p = S.profile;
+  const skippable = p && p.exp === 2;
+  const levels = LEVELS.map((l, i) => {
+    const done = S.done.includes(i);
+    const open = i === 0 || S.done.includes(i - 1) || (skippable && i === 1) || done;
+    const cls = done ? "done" : open ? "" : "locked";
+    const tag = done ? `<span class="pill">Hecho</span>` :
+      (skippable && i === 0) ? `<span class="pill warn">Opcional para vos</span>` :
+      i === 2 ? `<span class="pill warn">Desbloquea la práctica</span>` : "";
+    return `<div class="card level ${cls}" data-act="${open ? "lesson" : ""}" data-i="${i}">
+      <div class="dot">${done ? "✓" : i + 1}</div>
+      <div><div class="small muted">Nivel ${i + 1} · 1 min</div><div class="t">${l.title}</div>${tag}</div>
+    </div>`;
+  }).join("");
+  const pct = S.done.length / LEVELS.length * 100;
+  return `
+    <h1>Tu camino</h1>
+    <div class="progress"><div style="width:${pct}%"></div></div>
+    ${profileTip() ? `<p class="small muted">${profileTip()}</p>` : ""}
+    ${levels}
+    <div class="card ${practiceUnlocked() ? "" : "level locked"}">
+      <h2>🎮 Modo práctica</h2>
+      <p class="small muted">${practiceUnlocked()
+        ? "Invertí $100.000 de mentira y mirá cómo te iría día a día."
+        : "Se desbloquea al terminar el nivel 3."}</p>
+      ${practiceUnlocked() ? `<button class="btn ghost" data-act="practice">Ir a practicar</button>` : ""}
+    </div>
+    ${pathDone() ? `<button class="btn" data-act="leap">🚀 Dar el salto</button>` : ""}
+  `;
+}
+
+function lesson() {
+  const l = LEVELS[view.i];
+  return `
+    <div class="small muted">Nivel ${view.i + 1} de ${LEVELS.length}</div>
+    <h1>${l.title}</h1>
+    <div class="card lesson">${l.lesson.map(p => `<p>${withTerms(p)}</p>`).join("")}</div>
+    ${l.placeholder ? `<p class="small"><span class="pill warn">Borrador</span> Las opciones concretas se definen con los productos reales de LBO.</p>` : ""}
+    <p class="small muted">💡 Tocá las palabras subrayadas para ver qué significan.</p>
+    <button class="btn" data-act="quiz" data-i="${view.i}">Probá lo que aprendiste</button>
+  `;
+}
+
+function quiz() {
+  const l = LEVELS[view.i], picked = view.picked;
+  const answered = picked !== undefined, ok = picked === l.answer;
+  return `
+    <div class="small muted">Nivel ${view.i + 1} · Pregunta de práctica</div>
+    <h1>${l.q}</h1>
+    ${l.options.map((t, i) => {
+      const cls = !answered ? "" : i === l.answer ? "right" : i === picked ? "wrong" : "";
+      return `<button class="opt ${cls}" data-act="pick" data-i="${i}" ${answered ? "disabled" : ""}>${t}</button>`;
+    }).join("")}
+    ${answered ? `
+      <div class="feedback ${ok ? "ok" : "no"}"><b>${ok ? "¡Bien!" : "Casi."}</b> ${l.why}</div>
+      ${ok && l.unlock ? `<div class="feedback ok">🎉 ${l.unlock}</div>` : ""}
+      ${ok ? `<button class="btn" data-act="finish">Seguir</button>`
+           : `<button class="btn" data-act="retry">Intentar de nuevo</button>`}
+    ` : ""}
+  `;
+}
+
+function practice() {
+  const P = S.practice;
+  if (!P) {
+    const a = view.alloc || { cons: 40000, mod: 40000, agr: 20000 };
+    const used = a.cons + a.mod + a.agr;
+    return `
+      <h1>Modo práctica</h1>
+      <p class="muted">Tenés <b>${money(START_CASH)}</b> de mentira. Repartilos como quieras. Nada de esto es plata real.</p>
+      ${PRACTICE_OPTIONS.map(o => `
+        <div class="card alloc">
+          <label><span>${o.name}</span><span data-amt="${o.id}">${money(a[o.id])}</span></label>
+          <div class="small muted">${o.desc}</div>
+          <input type="range" min="0" max="${START_CASH}" step="5000" value="${a[o.id]}" data-alloc="${o.id}">
+        </div>`).join("")}
+      <p class="small" id="used">${usedText(used)}</p>
+      <button class="btn" id="investBtn" data-act="invest" ${used > START_CASH || used === 0 ? "disabled" : ""}>“Invertir”</button>
+      <p class="note">Simulación con valores inventados para aprender. No es una recomendación ni refleja productos ni precios reales.</p>`;
+  }
+  const total = portfolioValue(P), diff = total - START_CASH;
+  const last = P.history.length > 1 ? total - P.history[P.history.length - 2] : 0;
+  return `
+    <h1>Modo práctica</h1>
+    <div class="card">
+      <div class="small muted">Día ${P.day} · Tu plata de mentira</div>
+      <div class="big">${money(total)}</div>
+      <div class="${diff >= 0 ? "up" : "down"}">${diff >= 0 ? "▲" : "▼"} ${money(Math.abs(diff))} (${(diff / START_CASH * 100).toFixed(2)}%) desde el inicio</div>
+      ${chart(P.history)}
+      ${PRACTICE_OPTIONS.filter(o => P.holdings[o.id] > 0).map(o =>
+        `<div class="row small"><span>${o.name}</span><span style="text-align:right">${money(P.holdings[o.id])}</span></div>`).join("")}
+      ${P.cash > 0 ? `<div class="row small muted"><span>Sin invertir</span><span style="text-align:right">${money(P.cash)}</span></div>` : ""}
+    </div>
+    ${P.day > 0 ? coach(last, diff) : ""}
+    <div class="row">
+      <button class="btn ghost" data-act="tick" data-n="1">+1 día</button>
+      <button class="btn" data-act="tick" data-n="30">+1 mes</button>
+    </div>
+    <p></p>
+    <button class="link" data-act="resetPractice">Empezar la práctica de nuevo</button>
+    <p class="note">Simulación con valores inventados para aprender. No es una recomendación ni refleja productos ni precios reales.</p>`;
+}
+
+function usedText(used) {
+  return used > START_CASH ? `<span class="down">Asignado: ${money(used)} de ${money(START_CASH)} — te pasaste</span>`
+    : `<span class="muted">Asignado: ${money(used)} de ${money(START_CASH)}</span>`;
+}
+
+function coach(last, diff) {
+  if (last < -START_CASH * 0.01) return `<div class="feedback no">📉 Hoy bajó bastante. Así se siente la volatilidad. En la vida real, la clave es no vender por miedo.</div>`;
+  if (diff < 0) return `<div class="feedback no">Vas un poco abajo. Es normal: avanzá unos días más y mirá qué pasa.</div>`;
+  if (S.practice.day >= 60) return `<div class="feedback ok">Llevás ${S.practice.day} días practicando. ¿Ves cómo las bajas se van mezclando con las subas?</div>`;
+  return "";
+}
+
+function chart(h) {
+  if (h.length < 2) return `<p class="small muted">Avanzá el tiempo para ver cómo se mueve.</p>`;
+  const W = 300, H = 120, min = Math.min(...h, START_CASH), max = Math.max(...h, START_CASH);
+  const span = max - min || 1;
+  const x = i => i / (h.length - 1) * W, y = v => H - 6 - (v - min) / span * (H - 12);
+  const pts = h.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(" ");
+  const up = h[h.length - 1] >= START_CASH;
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="Evolución de tu inversión">
+    <line x1="0" x2="${W}" y1="${y(START_CASH)}" y2="${y(START_CASH)}" stroke="var(--line)" stroke-dasharray="4 4" vector-effect="non-scaling-stroke"/>
+    <polyline points="${pts}" fill="none" stroke="${up ? "var(--accent)" : "var(--bad)"}" stroke-width="2" vector-effect="non-scaling-stroke"/>
+  </svg>`;
+}
+
+function leap() {
+  return `
+    <h1>🚀 ¡Ya podés dar el primer paso!</h1>
+    <p>Entendiste por qué la plata guardada pierde valor, qué es invertir, cómo funciona el riesgo y practicaste sin arriesgar nada.</p>
+    <div class="card">
+      <h2>Tu primer paso sugerido</h2>
+      <p class="big">${suggestion()}</p>
+      <p class="small muted">Un monto chico, según lo que nos dijiste al principio. Lo mismo que practicaste, ahora con plata real.</p>
+    </div>
+    <button class="btn" data-act="lbo">Hacerlo en LBO</button>
+    <p></p>
+    <button class="btn ghost" data-act="practice">Seguir practicando un poco más</button>
+    <p class="note">Prototipo: el botón todavía no lleva a ningún lado. Antes de invertir plata real, revisá las condiciones de cada producto.</p>`;
+}
+
+/* ---------- Simulación ---------- */
+
+function portfolioValue(P) { return P.cash + Object.values(P.holdings).reduce((a, b) => a + b, 0); }
+function gauss() { let u = 0, v = 0; while (!u) u = Math.random(); while (!v) v = Math.random(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); }
+function tick(n) {
+  const P = S.practice;
+  for (let d = 0; d < n; d++) {
+    PRACTICE_OPTIONS.forEach(o => { P.holdings[o.id] *= Math.max(0, 1 + o.mu + o.sigma * gauss()); });
+    P.day++;
+    P.history.push(portfolioValue(P));
+  }
+  save(); render();
+}
+
+/* ---------- Glosario ---------- */
+
+const sheet = document.getElementById("sheet");
+function openTerm(t) {
+  const g = GLOSSARY[t.toLowerCase()];
+  if (!g) return;
+  sheet.innerHTML = `<div class="sheet-bg" data-act="close"><div class="sheet" role="dialog" aria-label="${t}">
+    <h3>${t[0].toUpperCase() + t.slice(1)}</h3><p>${g[0]}</p>
+    <div class="example">👉 ${g[1]}</div><p></p>
+    <button class="btn ghost" data-act="close">Entendido</button></div></div>`;
+}
+
+/* ---------- Eventos ---------- */
+
+document.addEventListener("click", e => {
+  const term = e.target.closest(".term");
+  if (term) return openTerm(term.dataset.term);
+  const el = e.target.closest("[data-act]");
+  if (!el) return;
+  const act = el.dataset.act, i = +el.dataset.i;
+  if (act === "close") { if (e.target === el) sheet.innerHTML = ""; return; }
+  switch (act) {
+    case "start": go({ ...view, step: 0 }); break;
+    case "onb": {
+      view.answers[ONBOARDING[view.step].key] = i;
+      if (view.step < 2) go({ ...view, step: view.step + 1 });
+      else { S.profile = view.answers; save(); go({ name: "path" }); }
+      break;
+    }
+    case "path": go({ name: "path" }); break;
+    case "lesson": go({ name: "lesson", i }); break;
+    case "quiz": go({ name: "quiz", i }); break;
+    case "pick": view.picked = i; render(); break;
+    case "retry": go({ name: "quiz", i: view.i }); break;
+    case "finish":
+      if (!S.done.includes(view.i)) S.done.push(view.i);
+      save();
+      go(view.i === 2 ? { name: "practice" } : view.i === LEVELS.length - 1 ? { name: "leap" } : { name: "path" });
+      break;
+    case "practice": go({ name: "practice" }); break;
+    case "invest": {
+      const a = view.alloc || { cons: 40000, mod: 40000, agr: 20000 };
+      const used = a.cons + a.mod + a.agr;
+      S.practice = { cash: START_CASH - used, holdings: { ...a }, day: 0, history: [START_CASH] };
+      save(); render(); break;
+    }
+    case "tick": tick(+el.dataset.n); break;
+    case "resetPractice": S.practice = null; save(); go({ name: "practice" }); break;
+    case "leap": go({ name: "leap" }); break;
+    case "lbo": alert("Prototipo: acá se abriría el alta en LBO con el monto sugerido."); break;
+    case "reset":
+      if (confirm("¿Borrar tu progreso y empezar de cero?")) { S = fresh(); save(); go({ name: "welcome", step: -1, answers: {} }); }
+      break;
+  }
+});
+
+document.addEventListener("input", e => {
+  const id = e.target.dataset.alloc;
+  if (!id) return;
+  view.alloc = { ...(view.alloc || { cons: 40000, mod: 40000, agr: 20000 }), [id]: +e.target.value };
+  const used = view.alloc.cons + view.alloc.mod + view.alloc.agr;
+  app.querySelector(`[data-amt="${id}"]`).textContent = money(view.alloc[id]);
+  app.querySelector("#used").innerHTML = usedText(used);
+  app.querySelector("#investBtn").disabled = used > START_CASH || used === 0;
+});
+
+render();
+</script>
+</body>
+</html>
