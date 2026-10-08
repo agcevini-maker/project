@@ -2,137 +2,201 @@
 <html lang="es-AR">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Sin Miedo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
 <style>
+  /* Layout: app de celular, una columna; barra de navegación inferior como en un broker. */
   :root {
-    --bg: #f4f1ea;
+    --bg: #eef1f4;
     --card: #ffffff;
-    --ink: #1d2433;
-    --muted: #5d6677;
-    --line: #e2ddd2;
-    --accent: #1f7a5a;
+    --ink: #0f1a24;
+    --muted: #5b6876;
+    --line: #dde3e9;
+    --accent: #0b6e4f;
     --accent-ink: #ffffff;
-    --accent-soft: #e2f2ea;
-    --warn: #b4531a;
-    --warn-soft: #fbe9dc;
-    --bad: #b3261e;
-    --lock: #b7b2a7;
-    --shadow: 0 1px 2px rgba(0,0,0,.06), 0 4px 16px rgba(0,0,0,.06);
+    --accent-soft: #e1f1ea;
+    --up: #0a8a56;
+    --up-soft: #e0f3ea;
+    --down: #cc3535;
+    --down-soft: #fbe6e6;
+    --warn: #9a5b00;
+    --warn-soft: #fbefdc;
+    --shadow: 0 1px 2px rgba(15,26,36,.05), 0 6px 18px rgba(15,26,36,.05);
+    --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --bg: #12151c; --card: #1b2029; --ink: #e9ecf2; --muted: #9aa3b4; --line: #2b3240;
-      --accent: #3fbf8f; --accent-ink: #0d1a14; --accent-soft: #173327;
-      --warn: #f0995c; --warn-soft: #3a2518; --bad: #f2867f; --lock: #4a5160;
-      --shadow: 0 1px 2px rgba(0,0,0,.4);
+      --bg: #0c1117; --card: #151c24; --ink: #e6edf3; --muted: #8b98a6; --line: #26303b;
+      --accent: #34c38f; --accent-ink: #06150f; --accent-soft: #12302a;
+      --up: #34c38f; --up-soft: #12302a; --down: #ff7070; --down-soft: #3a1b1d;
+      --warn: #f2b25c; --warn-soft: #3a2a14; --shadow: 0 1px 2px rgba(0,0,0,.4);
+      color-scheme: dark;
     }
   }
   :root[data-theme="dark"] {
-    --bg: #12151c; --card: #1b2029; --ink: #e9ecf2; --muted: #9aa3b4; --line: #2b3240;
-    --accent: #3fbf8f; --accent-ink: #0d1a14; --accent-soft: #173327;
-    --warn: #f0995c; --warn-soft: #3a2518; --bad: #f2867f; --lock: #4a5160;
-    --shadow: 0 1px 2px rgba(0,0,0,.4);
+    --bg: #0c1117; --card: #151c24; --ink: #e6edf3; --muted: #8b98a6; --line: #26303b;
+    --accent: #34c38f; --accent-ink: #06150f; --accent-soft: #12302a;
+    --up: #34c38f; --up-soft: #12302a; --down: #ff7070; --down-soft: #3a1b1d;
+    --warn: #f2b25c; --warn-soft: #3a2a14; --shadow: 0 1px 2px rgba(0,0,0,.4);
+    color-scheme: dark;
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; }
-  body {
-    background: var(--bg); color: var(--ink);
-    font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  }
-  .app { max-width: 440px; margin: 0 auto; padding: 16px 16px 48px; min-height: 100vh; }
-  header.top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-  .brand { font-weight: 800; letter-spacing: -.02em; font-size: 20px; }
+  body { background: var(--bg); color: var(--ink); font: 16px/1.5 var(--sans); }
+  .app { max-width: 460px; margin: 0 auto; padding: 12px 16px 104px; min-height: 100vh; }
+  .app.no-nav { padding-bottom: 40px; }
+  header.top { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 12px; }
+  .brand { font-weight: 700; letter-spacing: -.02em; font-size: 19px; }
   .brand span { color: var(--accent); }
+  .sim-badge { font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--warn); background: var(--warn-soft); padding: 3px 8px; border-radius: 99px; }
   .link { background: none; border: 0; color: var(--muted); font: inherit; font-size: 14px; cursor: pointer; padding: 4px; }
-  h1 { font-size: 26px; line-height: 1.2; margin: 8px 0 8px; letter-spacing: -.02em; }
-  h2 { font-size: 20px; margin: 0 0 8px; }
+  .link:hover { color: var(--ink); }
+  h1 { font-size: 24px; line-height: 1.2; margin: 6px 0 8px; letter-spacing: -.02em; text-wrap: balance; }
+  h2 { font-size: 17px; margin: 0 0 8px; text-wrap: balance; }
   p { margin: 0 0 12px; }
   .muted { color: var(--muted); }
   .small { font-size: 14px; }
-  .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px; box-shadow: var(--shadow); margin-bottom: 12px; }
-  .btn {
-    display: block; width: 100%; border: 0; border-radius: 12px; padding: 14px 16px;
-    font: inherit; font-weight: 700; cursor: pointer; background: var(--accent); color: var(--accent-ink);
-  }
-  .btn[disabled] { opacity: .45; cursor: not-allowed; }
-  .btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); font-weight: 600; }
+  .xs { font-size: 12px; }
+  .num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px; box-shadow: var(--shadow); margin-bottom: 12px; }
+  .card.flat { box-shadow: none; }
+  .btn { display: block; width: 100%; border: 0; border-radius: 12px; padding: 13px 16px; font: inherit; font-weight: 600; cursor: pointer; background: var(--accent); color: var(--accent-ink); text-align: center; }
+  .btn[disabled] { opacity: .4; cursor: not-allowed; }
+  .btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+  .btn.buy { background: var(--up); color: var(--accent-ink); }
+  .btn.sell { background: var(--down); color: #fff; }
+  button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   .row { display: flex; gap: 8px; }
-  .row > * { flex: 1; }
-  .opt {
-    display: block; width: 100%; text-align: left; border: 1px solid var(--line); background: var(--card); color: var(--ink);
-    border-radius: 12px; padding: 12px 14px; margin-bottom: 8px; font: inherit; cursor: pointer;
-  }
-  .opt.sel { border-color: var(--accent); background: var(--accent-soft); }
-  .opt.right { border-color: var(--accent); background: var(--accent-soft); }
-  .opt.wrong { border-color: var(--bad); }
+  .row > * { flex: 1; min-width: 0; }
+  .between { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+  .opt { display: block; width: 100%; text-align: left; border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 12px; padding: 12px 14px; margin-bottom: 8px; font: inherit; cursor: pointer; }
+  .opt.sel, .opt.right { border-color: var(--accent); background: var(--accent-soft); }
+  .opt.wrong { border-color: var(--down); }
   .progress { height: 6px; background: var(--line); border-radius: 99px; overflow: hidden; margin: 4px 0 16px; }
   .progress > div { height: 100%; background: var(--accent); transition: width .3s; }
-  .pill { display: inline-block; font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 99px; background: var(--accent-soft); color: var(--accent); }
+  .pill { display: inline-block; font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 99px; background: var(--accent-soft); color: var(--accent); white-space: nowrap; }
   .pill.warn { background: var(--warn-soft); color: var(--warn); }
+  .pill.up { background: var(--up-soft); color: var(--up); }
+  .pill.down { background: var(--down-soft); color: var(--down); }
+  .pill.grey { background: var(--bg); color: var(--muted); }
+  .up { color: var(--up); } .down { color: var(--down); }
+
+  /* Camino */
   .level { display: flex; gap: 12px; align-items: center; cursor: pointer; }
-  .level.locked { cursor: default; opacity: .6; }
-  .dot {
-    flex: none; width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center;
-    font-weight: 800; background: var(--accent-soft); color: var(--accent); border: 2px solid var(--accent);
-  }
+  .level.locked { cursor: default; opacity: .55; }
+  .dot { flex: none; width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; background: var(--accent-soft); color: var(--accent); border: 2px solid var(--accent); }
   .level.done .dot { background: var(--accent); color: var(--accent-ink); }
-  .level.locked .dot { border-color: var(--lock); color: var(--lock); background: transparent; }
-  .level .t { font-weight: 700; line-height: 1.3; }
+  .level.locked .dot { border-color: var(--line); color: var(--muted); background: transparent; }
+  .level .t { font-weight: 600; line-height: 1.3; }
   .lesson p { font-size: 17px; }
-  .term {
-    background: none; border: 0; padding: 0; font: inherit; color: inherit; cursor: pointer;
-    text-decoration: underline dotted var(--accent) 2px; text-underline-offset: 3px;
-  }
-  .sheet-bg { position: fixed; inset: 0; background: rgba(0,0,0,.35); display: flex; align-items: flex-end; justify-content: center; z-index: 10; }
-  .sheet { background: var(--card); color: var(--ink); width: 100%; max-width: 440px; border-radius: 20px 20px 0 0; padding: 20px 16px 28px; }
+  .term { background: none; border: 0; padding: 0; font: inherit; color: inherit; cursor: pointer; text-decoration: underline dotted var(--accent) 2px; text-underline-offset: 3px; }
+
+  /* Hojas y diálogos */
+  .sheet-bg { position: fixed; inset: 0; background: rgba(5,10,15,.45); display: flex; align-items: flex-end; justify-content: center; z-index: 30; }
+  .sheet { background: var(--card); color: var(--ink); width: 100%; max-width: 460px; border-radius: 20px 20px 0 0; padding: 20px 16px calc(24px + env(safe-area-inset-bottom, 0px)); }
   .sheet h3 { margin: 0 0 6px; font-size: 18px; }
-  .example { background: var(--bg); border-radius: 10px; padding: 10px 12px; font-size: 15px; }
+  .example { background: var(--bg); border-radius: 10px; padding: 10px 12px; font-size: 15px; margin-bottom: 14px; }
   .feedback { border-radius: 12px; padding: 12px 14px; margin: 8px 0 12px; }
   .feedback.ok { background: var(--accent-soft); }
   .feedback.no { background: var(--warn-soft); }
-  .big { font-size: 32px; font-weight: 800; letter-spacing: -.02em; }
-  .up { color: var(--accent); } .down { color: var(--bad); }
-  .alloc { margin-bottom: 14px; }
-  .alloc label { display: flex; justify-content: space-between; font-weight: 600; }
-  input[type=range] { width: 100%; accent-color: var(--accent); }
-  svg.chart { width: 100%; height: 140px; display: block; }
-  .note { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 10px; margin-top: 12px; }
-  .stack > * + * { margin-top: 8px; }
+  .tip { background: var(--accent-soft); border-radius: 12px; padding: 12px 14px; margin-bottom: 12px; font-size: 14px; display: flex; gap: 10px; align-items: flex-start; }
+  .tip > div { flex: 1; min-width: 0; }
+  .tip .link { font-size: 13px; flex: none; }
+
+  /* Broker */
+  .big { font-size: 30px; font-weight: 600; letter-spacing: -.02em; line-height: 1.15; }
+  .label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; font-weight: 600; }
+  .chips { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 10px; scrollbar-width: none; }
+  .chip { flex: none; border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 99px; padding: 6px 12px; font: inherit; font-size: 14px; cursor: pointer; }
+  .chip.on { background: var(--ink); color: var(--card); border-color: var(--ink); }
+  .search { width: 100%; border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 12px; padding: 11px 14px; font: inherit; margin-bottom: 10px; }
+  .list { background: var(--card); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; margin-bottom: 12px; }
+  .list-h { padding: 10px 14px 6px; }
+  .tick { display: grid; grid-template-columns: 1fr 56px auto; gap: 10px; align-items: center; padding: 11px 14px; border-top: 1px solid var(--line); cursor: pointer; background: none; border-left: 0; border-right: 0; border-bottom: 0; width: 100%; text-align: left; font: inherit; color: inherit; }
+  .tick:first-child { border-top: 0; }
+  .tick:hover { background: var(--bg); }
+  .sym { font-weight: 700; font-family: var(--mono); letter-spacing: .01em; }
+  .tname { font-size: 13px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tright { text-align: right; }
+  .tright .num { display: block; font-size: 15px; }
+  .flash-up { animation: fu .8s; } .flash-down { animation: fd .8s; }
+  @keyframes fu { from { background: var(--up-soft); } to { background: transparent; } }
+  @keyframes fd { from { background: var(--down-soft); } to { background: transparent; } }
+  @media (prefers-reduced-motion: reduce) { .flash-up, .flash-down { animation: none; } }
+  svg.chart { width: 100%; height: 160px; display: block; }
+  svg.spark { width: 56px; height: 24px; display: block; }
+  .kv { display: flex; justify-content: space-between; gap: 12px; padding: 7px 0; border-top: 1px solid var(--line); font-size: 15px; }
+  .kv:first-child { border-top: 0; }
+  .kv b { font-weight: 600; }
+  .seg { display: flex; background: var(--bg); border-radius: 10px; padding: 3px; gap: 3px; margin-bottom: 12px; }
+  .seg button { flex: 1; border: 0; background: transparent; color: var(--muted); border-radius: 8px; padding: 8px; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
+  .seg button.on { background: var(--card); color: var(--ink); box-shadow: var(--shadow); }
+  .seg button.on.buy { color: var(--up); } .seg button.on.sell { color: var(--down); }
+  .field { margin-bottom: 12px; }
+  .field > .label { display: block; margin-bottom: 4px; }
+  .stepper { display: flex; align-items: stretch; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--card); }
+  .stepper button { width: 48px; border: 0; background: var(--bg); color: var(--ink); font: inherit; font-size: 20px; cursor: pointer; }
+  .stepper input { flex: 1; min-width: 0; border: 0; background: transparent; color: var(--ink); text-align: center; font: 600 18px var(--mono); padding: 10px; }
+  .alloc-bar { display: flex; height: 10px; border-radius: 99px; overflow: hidden; background: var(--line); margin: 10px 0 8px; gap: 2px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13px; color: var(--muted); }
+  .legend i { display: inline-block; width: 9px; height: 9px; border-radius: 3px; margin-right: 5px; vertical-align: 0; }
+  .time { display: flex; gap: 6px; }
+  .time button { flex: 1; font-size: 14px; padding: 12px 6px; white-space: nowrap; }
+  .empty { text-align: center; padding: 28px 16px; color: var(--muted); }
+  .note { font-size: 12px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 10px; margin-top: 12px; }
+  .stack { display: flex; flex-direction: column; gap: 8px; }
+  .done-ic { width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; font-size: 28px; margin: 8px auto 12px; background: var(--up-soft); color: var(--up); }
+  .done-ic.pend { background: var(--warn-soft); color: var(--warn); }
+
+  nav.bottom { position: fixed; left: 0; right: 0; bottom: 0; background: var(--card); border-top: 1px solid var(--line); z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px); }
+  nav.bottom .in { max-width: 460px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); }
+  nav.bottom button { border: 0; background: none; color: var(--muted); font: inherit; font-size: 12px; font-weight: 600; padding: 9px 4px 10px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  nav.bottom button.on { color: var(--accent); }
+  nav.bottom svg { width: 22px; height: 22px; }
 </style>
 </head>
 <body>
 <div class="app" id="app"></div>
+<div id="nav"></div>
 <div id="sheet"></div>
 
 <script>
-/* ---------- Contenido ---------- */
+/* =========================================================
+   Contenido educativo
+   ========================================================= */
 
 const GLOSSARY = {
-  "inflación": ["Cuando los precios suben con el tiempo y tu plata alcanza para menos.",
-    "El año pasado con $1.000 comprabas 4 alfajores; hoy te alcanza para 3."],
-  "invertir": ["Poner tu plata en algo que, con el tiempo, te puede devolver más.",
-    "Como plantar una semilla: no la comés hoy para tener más mañana."],
-  "rendimiento": ["Lo que gana tu plata por estar invertida.",
-    "Pusiste $10.000 y al mes tenés $10.300: el rendimiento fue $300."],
-  "riesgo": ["La posibilidad de que el resultado no sea el que esperabas, incluso de perder algo.",
-    "Salir sin paraguas un día nublado: puede que no llueva, puede que sí."],
-  "volatilidad": ["Cuánto sube y baja el valor de algo en poco tiempo.",
-    "Una montaña rusa es muy volátil; una escalera mecánica, poco."],
-  "diversificar": ["Repartir tu plata en distintas cosas para no depender de una sola.",
-    "No llevar todos los huevos en la misma canasta."],
-  "plazo fijo": ["Le prestás plata al banco por un tiempo fijo y te devuelve un poco más.",
-    "Dejás $50.000 por 30 días y al final te devuelven $51.500."],
-  "fondo común de inversión": ["Una “vaquita”: mucha gente junta plata y un equipo profesional la invierte.",
-    "Como armar una vaquita para el asado, pero alguien que sabe elige qué comprar."],
-  "bono": ["Le prestás plata a un gobierno o empresa y te la devuelve con intereses.",
-    "Como prestarle a un amigo que te firma cuándo y cuánto te devuelve."],
-  "acción": ["Un pedacito de una empresa. Si a la empresa le va bien, tu pedacito vale más.",
-    "Comprar una porción de la pizzería del barrio."],
-  "liquidez": ["Qué tan rápido podés convertir una inversión en efectivo.",
-    "La plata en la billetera tiene mucha liquidez; una casa, poca."],
-  "plazo": ["El tiempo que pensás dejar la plata invertida.",
-    "No es lo mismo ahorrar para las vacaciones de enero que para dentro de 5 años."]
+  "inflación": ["Cuando los precios suben con el tiempo y tu plata alcanza para menos.", "El año pasado con $1.000 comprabas 4 alfajores; hoy te alcanza para 3."],
+  "invertir": ["Poner tu plata en algo que, con el tiempo, te puede devolver más.", "Como plantar una semilla: no la comés hoy para tener más mañana."],
+  "rendimiento": ["Lo que gana tu plata por estar invertida.", "Pusiste $10.000 y al mes tenés $10.300: el rendimiento fue $300."],
+  "riesgo": ["La posibilidad de que el resultado no sea el que esperabas, incluso de perder algo.", "Salir sin paraguas un día nublado: puede que no llueva, puede que sí."],
+  "volatilidad": ["Cuánto sube y baja el valor de algo en poco tiempo.", "Una montaña rusa es muy volátil; una escalera mecánica, poco."],
+  "diversificar": ["Repartir tu plata en distintas cosas para no depender de una sola.", "No llevar todos los huevos en la misma canasta."],
+  "plazo fijo": ["Le prestás plata al banco por un tiempo fijo y te devuelve un poco más.", "Dejás $50.000 por 30 días y al final te devuelven $51.500."],
+  "fci": ["Fondo común de inversión: una “vaquita” donde mucha gente junta plata y un equipo profesional la invierte.", "Como armar una vaquita para el asado, pero alguien que sabe elige qué comprar."],
+  "bono": ["Le prestás plata a un gobierno o empresa y te la devuelve con intereses.", "Como prestarle a un amigo que te firma cuándo y cuánto te devuelve."],
+  "acción": ["Un pedacito de una empresa. Si a la empresa le va bien, tu pedacito vale más.", "Comprar una porción de la pizzería del barrio."],
+  "cedear": ["Un certificado que se compra en pesos en Argentina y representa acciones de empresas de afuera.", "Comprás “un pedacito” de Apple o Coca-Cola sin abrir una cuenta en otro país."],
+  "liquidez": ["Qué tan rápido podés convertir una inversión en efectivo.", "La plata en la billetera tiene mucha liquidez; una casa, poca."],
+  "plazo": ["El tiempo que pensás dejar la plata invertida.", "No es lo mismo ahorrar para las vacaciones de enero que para dentro de 5 años."],
+  "cotización": ["El precio al que se está comprando y vendiendo algo en este momento.", "Como el precio del dólar que ves en la pizarra: cambia durante el día."],
+  "variación": ["Cuánto subió o bajó el precio desde el cierre del día anterior, en porcentaje.", "Ayer cerró en $100 y hoy está en $102: la variación es +2%."],
+  "cartera": ["Todo lo que tenés invertido, junto.", "Como tu placard: ahí ves todo lo que compraste."],
+  "orden a mercado": ["Comprás o vendés ya, al precio que haya en ese momento.", "Como comprar en el súper: pagás el precio de la góndola."],
+  "orden límite": ["Ponés el precio máximo al que querés comprar (o el mínimo al que querés vender). Se ejecuta solo si el precio llega.", "“Compro la remera si baja a $20.000”. Si no baja, no la comprás."],
+  "ci": ["Contado inmediato: la operación se paga y se recibe en el día.", "Pagás y te llevás el producto en el momento."],
+  "24hs": ["La operación se paga y se recibe al día hábil siguiente. Suele tener un precio un poco distinto que CI.", "Comprás hoy y te lo entregan mañana."],
+  "comisión": ["Lo que cobra el broker (y el mercado) por hacer la operación.", "Como el costo de envío de una compra online."],
+  "suscribir": ["Poner plata en un fondo común de inversión. A cambio recibís “cuotapartes”.", "Sumarte a la vaquita."],
+  "rescatar": ["Sacar tu plata de un fondo común de inversión.", "Pedir que te devuelvan tu parte de la vaquita."],
+  "cuotaparte": ["Cada “porción” de un fondo común. Su valor sube o baja según cómo le vaya al fondo.", "Si la vaquita es una torta, cada cuotaparte es una porción."],
+  "precio promedio": ["Lo que pagaste, en promedio, por cada unidad que tenés (con comisiones).", "Compraste 1 a $100 y 1 a $120: tu precio promedio es $110."],
+  "ganancia o pérdida": ["La diferencia entre lo que vale hoy lo que tenés y lo que pagaste. Mientras no vendas, es “en los papeles”.", "Compraste a $100 y hoy vale $90: vas perdiendo $10, pero solo se vuelve real si vendés."],
+  "saldo disponible": ["La plata que tenés en la cuenta lista para invertir.", "La plata que está en tu billetera, todavía sin gastar."]
 };
 
 const LEVELS = [
@@ -164,21 +228,21 @@ const LEVELS = [
     title: "Riesgo: ¿cuánto puedo perder?",
     lesson: [
       "Toda inversión tiene [[riesgo]]. Las que pueden ganar más suelen tener más [[volatilidad]]: suben y bajan más.",
-      "Tres reglas simples: invertí plata que no vas a necesitar pronto, empezá con poco y [[diversificar]] (repartí).",
+      "Tres reglas simples: invertí plata que no vas a necesitar pronto, empezá con poco y [[diversificar|diversificá]] (repartí).",
       "Que algo baje un día no significa que perdiste: perdés si vendés asustado en el peor momento."
     ],
     q: "Tu inversión bajó un 5% esta semana. ¿Qué conviene hacer primero?",
     options: ["Vender todo ya para no perder más", "Recordar mi plazo y no decidir por miedo", "Poner todos mis ahorros para “recuperar”"],
     answer: 1,
     why: "Las bajas son parte del camino. Lo importante es haber invertido plata que no necesitás pronto y no decidir en pánico.",
-    unlock: "¡Desbloqueaste el modo práctica! Tenés $100.000 de mentira para probar sin riesgo."
+    unlock: "¡Desbloqueaste el simulador! Tenés $100.000 de mentira en una cuenta igual a la de un broker."
   },
   {
     title: "Tus primeras opciones",
     lesson: [
-      "Hay opciones más tranquilas y otras más movidas. Algunas de las más comunes:",
-      "Un [[plazo fijo]] o un [[fondo común de inversión]] conservador: suben poco, pero bajan poco.",
-      "Un [[bono]]: le prestás a un gobierno o empresa. Una [[acción]]: comprás un pedacito de una empresa, sube y baja más.",
+      "Hay opciones más tranquilas y otras más movidas. Las más comunes en un broker:",
+      "Un [[fci|fondo común de inversión]] conservador: sube poco, pero baja poco, y podés sacar la plata rápido.",
+      "Un [[bono]]: le prestás a un gobierno o empresa. Una [[acción]]: comprás un pedacito de una empresa argentina. Un [[cedear|CEDEAR]]: un pedacito de una empresa de afuera, en pesos.",
       "Antes de elegir, mirá dos cosas: el [[plazo]] (cuándo vas a necesitar la plata) y la [[liquidez]] (qué tan rápido la podés sacar)."
     ],
     placeholder: true,
@@ -194,7 +258,7 @@ const LEVELS = [
       "1. Definí para qué es la plata y cuál es tu [[plazo]].",
       "2. Elegí un monto chico, que no te quite el sueño.",
       "3. Elegí una opción acorde a tu plazo y a cuánto [[riesgo]] aceptás.",
-      "4. Seguila de vez en cuando, sin mirarla todos los días."
+      "4. Hacé la [[orden a mercado|orden]] y seguila de vez en cuando, sin mirarla todos los días."
     ],
     q: "¿Cuál es un buen primer monto para invertir?",
     options: ["Todos mis ahorros, así gano más", "Uno chico, que pueda dejar quieto sin preocuparme", "Plata que voy a necesitar el mes que viene"],
@@ -209,20 +273,52 @@ const ONBOARDING = [
   { key: "amount", q: "¿Cuánto podrías llegar a poner?", opts: ["Menos de $10.000", "Entre $10.000 y $50.000", "Entre $50.000 y $200.000", "Más de $200.000"] }
 ];
 
-// Valores ilustrativos, NO son datos de mercado ni productos de LBO.
-const PRACTICE_OPTIONS = [
-  { id: "cons", name: "Tranquila", desc: "Tipo plazo fijo o fondo conservador. Sube poco, casi no baja.", mu: 0.0007, sigma: 0.0004 },
-  { id: "mod",  name: "Intermedia", desc: "Tipo bonos. Sube algo más, a veces baja.", mu: 0.0009, sigma: 0.005 },
-  { id: "agr",  name: "Movida", desc: "Tipo acciones. Puede subir mucho o bajar mucho.", mu: 0.0012, sigma: 0.018 }
+/* =========================================================
+   Mercado simulado
+   Precios y comportamiento INVENTADOS. No son cotizaciones reales
+   ni la oferta de productos de LBO (pendiente de definir).
+   ========================================================= */
+
+const TYPES = {
+  fci:    { name: "Fondos (FCI)", short: "FCI", term: "fci", color: "#2f8f7a", risk: 1,
+            simple: "Juntás tu plata con la de otras personas y un equipo profesional la invierte. Podés sacarla rápido." },
+  bono:   { name: "Bonos", short: "Bono", term: "bono", color: "#c08a1e", risk: 2,
+            simple: "Le prestás plata a un gobierno o empresa y te la devuelve con intereses. Su precio sube y baja." },
+  cedear: { name: "CEDEARs", short: "CEDEAR", term: "cedear", color: "#4b6fd1", risk: 2,
+            simple: "Representa acciones de una empresa de afuera, pero lo comprás en pesos. Se mueve con esa empresa y con el dólar." },
+  accion: { name: "Acciones", short: "Acción", term: "acción", color: "#c4497a", risk: 3,
+            simple: "Un pedacito de una empresa argentina. Puede subir o bajar mucho en pocos días." }
+};
+const RISK = ["", "Riesgo bajo", "Riesgo medio", "Riesgo alto"];
+
+const INSTRUMENTS = [
+  { sym: "MM",   name: "Fondo Money Market (ejemplo)",  type: "fci",    base: 118,   mu: 0.0010, sigma: 0.0002 },
+  { sym: "RF",   name: "Fondo Renta Fija (ejemplo)",    type: "fci",    base: 245,   mu: 0.0011, sigma: 0.0030 },
+  { sym: "AL30", name: "Bono Argentina 2030",           type: "bono",   base: 812,   mu: 0.0008, sigma: 0.0120 },
+  { sym: "GD30", name: "Bono Argentina 2030 (ley NY)",  type: "bono",   base: 845,   mu: 0.0008, sigma: 0.0110 },
+  { sym: "SPY",  name: "S&P 500 (500 empresas de EE.UU.)", type: "cedear", base: 41850, mu: 0.0009, sigma: 0.0110 },
+  { sym: "KO",   name: "Coca-Cola",                     type: "cedear", base: 18920, mu: 0.0007, sigma: 0.0110 },
+  { sym: "AAPL", name: "Apple",                         type: "cedear", base: 16340, mu: 0.0009, sigma: 0.0170 },
+  { sym: "MELI", name: "MercadoLibre",                  type: "cedear", base: 21480, mu: 0.0010, sigma: 0.0220 },
+  { sym: "YPFD", name: "YPF",                           type: "accion", base: 41200, mu: 0.0010, sigma: 0.0270 },
+  { sym: "GGAL", name: "Grupo Financiero Galicia",      type: "accion", base: 6180,  mu: 0.0010, sigma: 0.0280 },
+  { sym: "PAMP", name: "Pampa Energía",                 type: "accion", base: 3290,  mu: 0.0010, sigma: 0.0250 },
+  { sym: "ALUA", name: "Aluar",                         type: "accion", base: 905,   mu: 0.0009, sigma: 0.0240 }
 ];
+const INS = Object.fromEntries(INSTRUMENTS.map(i => [i.sym, i]));
 const START_CASH = 100000;
+const FEE = 0.006; // comisión + derechos de mercado, valor de ejemplo
+const HIST_DAYS = 90;
 
-/* ---------- Estado ---------- */
+/* =========================================================
+   Estado
+   ========================================================= */
 
-const KEY = "sinmiedo.v1";
-const fresh = () => ({ profile: null, done: [], practice: null });
+const KEY = "sinmiedo.v2";
+const fresh = () => ({ profile: null, done: [], demo: false, tips: {}, broker: null, market: null });
 let S = load();
 let view = S.profile ? { name: "path" } : { name: "welcome", step: -1, answers: {} };
+let modal = null;
 
 function load() {
   try { return Object.assign(fresh(), JSON.parse(localStorage.getItem(KEY)) || {}); }
@@ -230,52 +326,116 @@ function load() {
 }
 function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
 
-const money = n => "$" + Math.round(n).toLocaleString("es-AR");
-const esc = s => s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-const withTerms = s => esc(s).replace(/\[\[([^\]]+)\]\]/g, (_, t) =>
-  `<button class="term" data-term="${t}">${t}</button>`);
+function gauss() { let u = 0, v = 0; while (!u) u = Math.random(); while (!v) v = Math.random(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); }
 
-const practiceUnlocked = () => S.done.includes(2);
-const pathDone = () => S.done.length === LEVELS.length;
-
-function suggestion() {
-  const p = S.profile || {};
-  const amounts = ["$5.000", "$10.000", "$20.000", "$30.000"];
-  return amounts[p.amount ?? 0];
+function ensureMarket() {
+  if (S.market) return;
+  const m = {};
+  INSTRUMENTS.forEach(i => {
+    const hist = [i.base];
+    for (let d = 1; d < HIST_DAYS; d++) hist.push(hist[d - 1] * (1 + i.mu + i.sigma * gauss()));
+    m[i.sym] = { hist, px: hist[HIST_DAYS - 1] * (1 + i.mu + i.sigma * gauss()) };
+  });
+  S.market = m;
+}
+function ensureBroker() {
+  ensureMarket();
+  if (!S.broker) S.broker = { cash: START_CASH, day: 1, pos: {}, orders: [], equity: [START_CASH], nextId: 1 };
 }
 
+const px = sym => S.market[sym].px;
+const prevClose = sym => { const h = S.market[sym].hist; return h[h.length - 1]; };
+const dayVar = sym => px(sym) / prevClose(sym) - 1;
+const isFci = sym => INS[sym].type === "fci";
+const posValue = () => Object.entries(S.broker.pos).reduce((a, [s, p]) => a + p.qty * px(s), 0);
+const equity = () => S.broker.cash + posValue();
+
+/* =========================================================
+   Formato
+   ========================================================= */
+
+const nf2 = new Intl.NumberFormat("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const money = n => (n < -0.005 ? "−$" : "$") + nf2.format(Math.abs(n));
+const money0 = n => "$" + Math.round(n).toLocaleString("es-AR");
+const pct = n => (n >= 0 ? "+" : "−") + nf2.format(Math.abs(n * 100)) + "%";
+const qtyFmt = (sym, q) => isFci(sym) ? nf2.format(q) : Math.round(q).toLocaleString("es-AR");
+const cls = n => n >= 0 ? "up" : "down";
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const T = (key, label) => `<button class="term" data-term="${key}">${label || key}</button>`;
+const withTerms = s => esc(s).replace(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g, (_, k, l) => T(k, l));
+
+const brokerOpen = () => S.demo || S.done.includes(2);
+const pathDone = () => S.done.length === LEVELS.length;
+
+function suggestion() { return ["$5.000", "$10.000", "$20.000", "$30.000"][(S.profile || {}).amount ?? 0]; }
 function profileTip() {
   const p = S.profile; if (!p) return "";
   return [
-    "Como lo que más te frena es el miedo a perder, prestá atención al nivel 3 y al modo práctica: ahí probás sin arriesgar nada.",
-    "Como las palabras te frenan, fijate: todas las palabras subrayadas se pueden tocar y te explican qué significan.",
+    "Como lo que más te frena es el miedo a perder, prestá atención al nivel 3 y al simulador: ahí probás sin arriesgar nada.",
+    "Como las palabras te frenan, fijate: todas las palabras subrayadas se pueden tocar, también adentro del simulador.",
     "Como no sabés por dónde empezar, seguí el camino en orden: en el nivel 5 armamos juntos tu primer paso.",
     "No hace falta mucha plata: se puede empezar con montos chicos. Lo vemos en el nivel 5."
   ][p.fear];
 }
 
-/* ---------- Render ---------- */
+/* =========================================================
+   Render
+   ========================================================= */
 
 const app = document.getElementById("app");
+const navEl = document.getElementById("nav");
+const sheet = document.getElementById("sheet");
+const TAB_OF = { path: "learn", lesson: "learn", quiz: "learn", leap: "learn", market: "market", detail: "market", order: "market", portfolio: "portfolio", activity: "activity" };
+
 function go(v) { view = v; render(); window.scrollTo(0, 0); }
 
 function render() {
-  const top = `<header class="top"><div class="brand">Sin <span>Miedo</span></div>${
-    S.profile && view.name !== "path" ? `<button class="link" data-act="path">← Camino</button>` :
-    S.profile ? `<button class="link" data-act="reset">Reiniciar</button>` : ""}</header>`;
-  app.innerHTML = top + ({ welcome, path, lesson, quiz, practice, leap })[view.name]();
+  const hasNav = !!S.profile;
+  app.classList.toggle("no-nav", !hasNav);
+  const inBroker = ["market", "detail", "order", "portfolio", "activity"].includes(view.name);
+  const back = view.name === "lesson" || view.name === "quiz" || view.name === "leap" ? `<button class="link" data-act="path">← Camino</button>`
+    : view.name === "detail" ? `<button class="link" data-act="market">← Mercado</button>`
+    : view.name === "order" && view.step !== "done" ? `<button class="link" data-act="detail" data-sym="${view.sym}">← Volver</button>`
+    : inBroker ? `<span class="sim-badge">Simulador · plata de mentira</span>`
+    : S.profile ? `<button class="link" data-act="reset">Reiniciar</button>` : "";
+  const top = `<header class="top"><div class="brand">Sin <span>Miedo</span></div>${back}</header>`;
+  const views = { welcome, path, lesson, quiz, leap, market, detail, order, portfolio, activity };
+  const needsBroker = inBroker && !brokerOpen();
+  app.innerHTML = top + (needsBroker ? lockedBroker() : views[view.name]());
+  navEl.innerHTML = hasNav ? nav() : "";
+  renderModal();
 }
+
+const ICONS = {
+  learn: '<path d="M4 6.5 12 3l8 3.5-8 3.5L4 6.5Z"/><path d="M7 8v5c0 1.7 2.2 3 5 3s5-1.3 5-3V8"/><path d="M20 6.5V12"/>',
+  market: '<path d="M4 19V5"/><path d="M4 19h16"/><path d="m7 14 4-4 3 3 5-6"/>',
+  portfolio: '<rect x="3.5" y="7" width="17" height="12" rx="2"/><path d="M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7"/><path d="M3.5 12h17"/>',
+  activity: '<path d="M8 6h12"/><path d="M8 12h12"/><path d="M8 18h12"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/>'
+};
+function nav() {
+  const tab = TAB_OF[view.name];
+  const item = (id, label) => `<button class="${tab === id ? "on" : ""}" data-act="tab" data-tab="${id}" aria-label="${label}">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICONS[id]}</svg>${label}</button>`;
+  return `<nav class="bottom"><div class="in">${item("learn", "Aprender")}${item("market", "Mercado")}${item("portfolio", "Cartera")}${item("activity", "Movimientos")}</div></nav>`;
+}
+
+function tip(id, html) {
+  if (S.tips[id]) return "";
+  return `<div class="tip"><div>${html}</div><button class="link" data-act="tipOk" data-id="${id}">Entendido</button></div>`;
+}
+
+/* ---------- Aprender ---------- */
 
 function welcome() {
   const { step, answers } = view;
   if (step < 0) return `
     <h1>Invertir, sin miedo.</h1>
-    <p class="muted">Aprendé en lecciones de 1 minuto, entendé las palabras raras y practicá con plata de mentira antes de poner la real.</p>
+    <p class="muted">Aprendé en lecciones de 1 minuto, entendé las palabras raras y practicá en un broker de mentira antes de poner plata real.</p>
     <div class="card stack small">
-      <div>📘 <b>Aprendé</b> en 5 niveles cortos</div>
-      <div>💬 <b>Entendé</b>: tocá las palabras subrayadas</div>
-      <div>🎮 <b>Practicá</b> con $100.000 de mentira</div>
-      <div>🚀 <b>Animate</b> a dar el primer paso real</div>
+      <div><b>Aprendé</b> en 5 niveles cortos.</div>
+      <div><b>Entendé</b>: tocá las palabras subrayadas.</div>
+      <div><b>Practicá</b> con $100.000 de mentira en un simulador igual a un broker.</div>
+      <div><b>Animate</b> a dar el primer paso real.</div>
     </div>
     <button class="btn" data-act="start">Empezar</button>
     <p class="note">Te hacemos 3 preguntas rápidas para adaptar el camino.</p>`;
@@ -284,8 +444,7 @@ function welcome() {
     <div class="small muted">Pregunta ${step + 1} de 3</div>
     <div class="progress"><div style="width:${(step + 1) / 3 * 100}%"></div></div>
     <h1>${o.q}</h1>
-    ${o.opts.map((t, i) => `<button class="opt ${answers[o.key] === i ? "sel" : ""}" data-act="onb" data-i="${i}">${t}</button>`).join("")}
-  `;
+    ${o.opts.map((t, i) => `<button class="opt ${answers[o.key] === i ? "sel" : ""}" data-act="onb" data-i="${i}">${t}</button>`).join("")}`;
 }
 
 function path() {
@@ -294,30 +453,27 @@ function path() {
   const levels = LEVELS.map((l, i) => {
     const done = S.done.includes(i);
     const open = i === 0 || S.done.includes(i - 1) || (skippable && i === 1) || done;
-    const cls = done ? "done" : open ? "" : "locked";
     const tag = done ? `<span class="pill">Hecho</span>` :
       (skippable && i === 0) ? `<span class="pill warn">Opcional para vos</span>` :
-      i === 2 ? `<span class="pill warn">Desbloquea la práctica</span>` : "";
-    return `<div class="card level ${cls}" data-act="${open ? "lesson" : ""}" data-i="${i}">
+      i === 2 ? `<span class="pill warn">Desbloquea el simulador</span>` : "";
+    return `<div class="card level ${done ? "done" : open ? "" : "locked"}" data-act="${open ? "lesson" : ""}" data-i="${i}">
       <div class="dot">${done ? "✓" : i + 1}</div>
-      <div><div class="small muted">Nivel ${i + 1} · 1 min</div><div class="t">${l.title}</div>${tag}</div>
+      <div><div class="xs muted">Nivel ${i + 1} · 1 min</div><div class="t">${l.title}</div>${tag}</div>
     </div>`;
   }).join("");
-  const pct = S.done.length / LEVELS.length * 100;
   return `
     <h1>Tu camino</h1>
-    <div class="progress"><div style="width:${pct}%"></div></div>
+    <div class="progress"><div style="width:${S.done.length / LEVELS.length * 100}%"></div></div>
     ${profileTip() ? `<p class="small muted">${profileTip()}</p>` : ""}
     ${levels}
-    <div class="card ${practiceUnlocked() ? "" : "level locked"}">
-      <h2>🎮 Modo práctica</h2>
-      <p class="small muted">${practiceUnlocked()
-        ? "Invertí $100.000 de mentira y mirá cómo te iría día a día."
-        : "Se desbloquea al terminar el nivel 3."}</p>
-      ${practiceUnlocked() ? `<button class="btn ghost" data-act="practice">Ir a practicar</button>` : ""}
+    <div class="card">
+      <h2>Simulador de broker</h2>
+      <p class="small muted">${brokerOpen()
+        ? "Mercado, órdenes de compra y venta, cartera y movimientos, igual que en un broker real. Con $100.000 de mentira."
+        : "Se desbloquea al terminar el nivel 3. Vas a operar como en un broker real, con $100.000 de mentira."}</p>
+      ${brokerOpen() ? `<button class="btn ghost" data-act="tab" data-tab="market">Ir al simulador</button>` : ""}
     </div>
-    ${pathDone() ? `<button class="btn" data-act="leap">🚀 Dar el salto</button>` : ""}
-  `;
+    ${pathDone() ? `<button class="btn" data-act="leap">Dar el salto</button>` : ""}`;
 }
 
 function lesson() {
@@ -327,9 +483,8 @@ function lesson() {
     <h1>${l.title}</h1>
     <div class="card lesson">${l.lesson.map(p => `<p>${withTerms(p)}</p>`).join("")}</div>
     ${l.placeholder ? `<p class="small"><span class="pill warn">Borrador</span> Las opciones concretas se definen con los productos reales de LBO.</p>` : ""}
-    <p class="small muted">💡 Tocá las palabras subrayadas para ver qué significan.</p>
-    <button class="btn" data-act="quiz" data-i="${view.i}">Probá lo que aprendiste</button>
-  `;
+    <p class="small muted">Tocá las palabras subrayadas para ver qué significan.</p>
+    <button class="btn" data-act="quiz" data-i="${view.i}">Probá lo que aprendiste</button>`;
 }
 
 function quiz() {
@@ -339,142 +494,501 @@ function quiz() {
     <div class="small muted">Nivel ${view.i + 1} · Pregunta de práctica</div>
     <h1>${l.q}</h1>
     ${l.options.map((t, i) => {
-      const cls = !answered ? "" : i === l.answer ? "right" : i === picked ? "wrong" : "";
-      return `<button class="opt ${cls}" data-act="pick" data-i="${i}" ${answered ? "disabled" : ""}>${t}</button>`;
+      const c = !answered ? "" : i === l.answer ? "right" : i === picked ? "wrong" : "";
+      return `<button class="opt ${c}" data-act="pick" data-i="${i}" ${answered ? "disabled" : ""}>${t}</button>`;
     }).join("")}
     ${answered ? `
       <div class="feedback ${ok ? "ok" : "no"}"><b>${ok ? "¡Bien!" : "Casi."}</b> ${l.why}</div>
-      ${ok && l.unlock ? `<div class="feedback ok">🎉 ${l.unlock}</div>` : ""}
-      ${ok ? `<button class="btn" data-act="finish">Seguir</button>`
-           : `<button class="btn" data-act="retry">Intentar de nuevo</button>`}
-    ` : ""}
-  `;
-}
-
-function practice() {
-  const P = S.practice;
-  if (!P) {
-    const a = view.alloc || { cons: 40000, mod: 40000, agr: 20000 };
-    const used = a.cons + a.mod + a.agr;
-    return `
-      <h1>Modo práctica</h1>
-      <p class="muted">Tenés <b>${money(START_CASH)}</b> de mentira. Repartilos como quieras. Nada de esto es plata real.</p>
-      ${PRACTICE_OPTIONS.map(o => `
-        <div class="card alloc">
-          <label><span>${o.name}</span><span data-amt="${o.id}">${money(a[o.id])}</span></label>
-          <div class="small muted">${o.desc}</div>
-          <input type="range" min="0" max="${START_CASH}" step="5000" value="${a[o.id]}" data-alloc="${o.id}">
-        </div>`).join("")}
-      <p class="small" id="used">${usedText(used)}</p>
-      <button class="btn" id="investBtn" data-act="invest" ${used > START_CASH || used === 0 ? "disabled" : ""}>“Invertir”</button>
-      <p class="note">Simulación con valores inventados para aprender. No es una recomendación ni refleja productos ni precios reales.</p>`;
-  }
-  const total = portfolioValue(P), diff = total - START_CASH;
-  const last = P.history.length > 1 ? total - P.history[P.history.length - 2] : 0;
-  return `
-    <h1>Modo práctica</h1>
-    <div class="card">
-      <div class="small muted">Día ${P.day} · Tu plata de mentira</div>
-      <div class="big">${money(total)}</div>
-      <div class="${diff >= 0 ? "up" : "down"}">${diff >= 0 ? "▲" : "▼"} ${money(Math.abs(diff))} (${(diff / START_CASH * 100).toFixed(2)}%) desde el inicio</div>
-      ${chart(P.history)}
-      ${PRACTICE_OPTIONS.filter(o => P.holdings[o.id] > 0).map(o =>
-        `<div class="row small"><span>${o.name}</span><span style="text-align:right">${money(P.holdings[o.id])}</span></div>`).join("")}
-      ${P.cash > 0 ? `<div class="row small muted"><span>Sin invertir</span><span style="text-align:right">${money(P.cash)}</span></div>` : ""}
-    </div>
-    ${P.day > 0 ? coach(last, diff) : ""}
-    <div class="row">
-      <button class="btn ghost" data-act="tick" data-n="1">+1 día</button>
-      <button class="btn" data-act="tick" data-n="30">+1 mes</button>
-    </div>
-    <p></p>
-    <button class="link" data-act="resetPractice">Empezar la práctica de nuevo</button>
-    <p class="note">Simulación con valores inventados para aprender. No es una recomendación ni refleja productos ni precios reales.</p>`;
-}
-
-function usedText(used) {
-  return used > START_CASH ? `<span class="down">Asignado: ${money(used)} de ${money(START_CASH)} — te pasaste</span>`
-    : `<span class="muted">Asignado: ${money(used)} de ${money(START_CASH)}</span>`;
-}
-
-function coach(last, diff) {
-  if (last < -START_CASH * 0.01) return `<div class="feedback no">📉 Hoy bajó bastante. Así se siente la volatilidad. En la vida real, la clave es no vender por miedo.</div>`;
-  if (diff < 0) return `<div class="feedback no">Vas un poco abajo. Es normal: avanzá unos días más y mirá qué pasa.</div>`;
-  if (S.practice.day >= 60) return `<div class="feedback ok">Llevás ${S.practice.day} días practicando. ¿Ves cómo las bajas se van mezclando con las subas?</div>`;
-  return "";
-}
-
-function chart(h) {
-  if (h.length < 2) return `<p class="small muted">Avanzá el tiempo para ver cómo se mueve.</p>`;
-  const W = 300, H = 120, min = Math.min(...h, START_CASH), max = Math.max(...h, START_CASH);
-  const span = max - min || 1;
-  const x = i => i / (h.length - 1) * W, y = v => H - 6 - (v - min) / span * (H - 12);
-  const pts = h.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(" ");
-  const up = h[h.length - 1] >= START_CASH;
-  return `<svg class="chart" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="Evolución de tu inversión">
-    <line x1="0" x2="${W}" y1="${y(START_CASH)}" y2="${y(START_CASH)}" stroke="var(--line)" stroke-dasharray="4 4" vector-effect="non-scaling-stroke"/>
-    <polyline points="${pts}" fill="none" stroke="${up ? "var(--accent)" : "var(--bad)"}" stroke-width="2" vector-effect="non-scaling-stroke"/>
-  </svg>`;
+      ${ok && l.unlock ? `<div class="feedback ok">${l.unlock}</div>` : ""}
+      ${ok ? `<button class="btn" data-act="finish">Seguir</button>` : `<button class="btn" data-act="retry">Intentar de nuevo</button>`}` : ""}`;
 }
 
 function leap() {
   return `
-    <h1>🚀 ¡Ya podés dar el primer paso!</h1>
-    <p>Entendiste por qué la plata guardada pierde valor, qué es invertir, cómo funciona el riesgo y practicaste sin arriesgar nada.</p>
+    <h1>¡Ya podés dar el primer paso!</h1>
+    <p>Entendiste por qué la plata guardada pierde valor, qué es invertir, cómo funciona el riesgo y operaste en un broker sin arriesgar nada.</p>
     <div class="card">
-      <h2>Tu primer paso sugerido</h2>
-      <p class="big">${suggestion()}</p>
-      <p class="small muted">Un monto chico, según lo que nos dijiste al principio. Lo mismo que practicaste, ahora con plata real.</p>
+      <div class="label">Tu primer paso sugerido</div>
+      <p class="big num">${suggestion()}</p>
+      <p class="small muted">Un monto chico, según lo que nos dijiste al principio. Lo mismo que hiciste en el simulador, ahora con plata real.</p>
     </div>
-    <button class="btn" data-act="lbo">Hacerlo en LBO</button>
-    <p></p>
-    <button class="btn ghost" data-act="practice">Seguir practicando un poco más</button>
+    <div class="stack">
+      <button class="btn" data-act="lbo">Hacerlo en LBO</button>
+      <button class="btn ghost" data-act="tab" data-tab="market">Seguir practicando</button>
+    </div>
     <p class="note">Prototipo: el botón todavía no lleva a ningún lado. Antes de invertir plata real, revisá las condiciones de cada producto.</p>`;
 }
 
-/* ---------- Simulación ---------- */
+/* ---------- Broker ---------- */
 
-function portfolioValue(P) { return P.cash + Object.values(P.holdings).reduce((a, b) => a + b, 0); }
-function gauss() { let u = 0, v = 0; while (!u) u = Math.random(); while (!v) v = Math.random(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); }
-function tick(n) {
-  const P = S.practice;
+function lockedBroker() {
+  return `
+    <h1>Simulador de broker</h1>
+    <div class="card">
+      <p>Acá vas a operar como en un broker real: ver precios, comprar, vender y seguir tu cartera. Con $100.000 de mentira.</p>
+      <p class="small muted">Se desbloquea al terminar el nivel 3 del camino, así llegás sabiendo qué es el riesgo.</p>
+      <div class="stack">
+        <button class="btn" data-act="path">Ir al camino</button>
+        <button class="btn ghost" data-act="demo">Abrirlo igual (modo presentación)</button>
+      </div>
+    </div>`;
+}
+
+function spark(sym) {
+  const h = S.market[sym].hist.slice(-20).concat(px(sym));
+  const min = Math.min(...h), max = Math.max(...h), span = max - min || 1;
+  const pts = h.map((v, i) => `${(i / (h.length - 1) * 56).toFixed(1)},${(22 - (v - min) / span * 20).toFixed(1)}`).join(" ");
+  const up = h[h.length - 1] >= h[0];
+  return `<svg class="spark" viewBox="0 0 56 24" aria-hidden="true"><polyline points="${pts}" fill="none" stroke="var(--${up ? "up" : "down"})" stroke-width="1.5" vector-effect="non-scaling-stroke"/></svg>`;
+}
+
+function tickRow(sym) {
+  const i = INS[sym], v = dayVar(sym);
+  const key = (sym + " " + i.name).toLowerCase(), q = (view.q || "").trim().toLowerCase();
+  return `<button class="tick" data-act="detail" data-sym="${sym}" data-row="${sym}" data-search="${key}" ${q && !key.includes(q) ? "hidden" : ""}>
+    <div style="min-width:0"><div class="sym">${sym}</div><div class="tname">${i.name}</div></div>
+    ${spark(sym)}
+    <div class="tright"><span class="num" data-px="${sym}">${money(px(sym))}</span><span class="pill ${cls(v)} num" data-var="${sym}">${pct(v)}</span></div>
+  </button>`;
+}
+
+function market() {
+  const f = view.filter || "all";
+  const groups = Object.keys(TYPES).filter(t => f === "all" || f === t);
+  return `
+    <div class="between"><h1>Mercado</h1><span class="xs muted">Día ${S.broker.day}</span></div>
+    ${tip("market", `Así se ve el mercado en un broker. Cada fila es algo que podés comprar: el código, la ${T("cotización")} y la ${T("variación")} del día. Los precios se mueven solos mientras mirás.`)}
+    <input class="search" id="search" type="search" placeholder="Buscar por nombre o código" value="${esc(view.q || "")}" autocomplete="off">
+    <div class="chips">
+      <button class="chip ${f === "all" ? "on" : ""}" data-act="filter" data-f="all">Todos</button>
+      ${Object.entries(TYPES).map(([k, t]) => `<button class="chip ${f === k ? "on" : ""}" data-act="filter" data-f="${k}">${t.name}</button>`).join("")}
+    </div>
+    ${groups.map(t => `
+      <div class="list">
+        <div class="list-h between"><span class="label">${TYPES[t].name}</span><span class="pill ${["", "", "warn", "down"][TYPES[t].risk]}">${RISK[TYPES[t].risk]}</span></div>
+        ${INSTRUMENTS.filter(i => i.type === t).map(i => tickRow(i.sym)).join("")}
+      </div>`).join("")}
+    <p class="note">Precios simulados con fines educativos. No son cotizaciones reales ni una recomendación de inversión.</p>`;
+}
+
+function chart(values, opts = {}) {
+  if (values.length < 2) return "";
+  const W = 320, H = 160, P = 6;
+  const min = Math.min(...values), max = Math.max(...values), span = max - min || 1;
+  const x = i => i / (values.length - 1) * W, y = v => P + (1 - (v - min) / span) * (H - 2 * P - 14);
+  const pts = values.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`);
+  const up = values[values.length - 1] >= (opts.base ?? values[0]);
+  const col = `var(--${up ? "up" : "down"})`;
+  const grid = [0.25, 0.5, 0.75].map(f => `<line x1="0" x2="${W}" y1="${(P + f * (H - 2 * P - 14)).toFixed(1)}" y2="${(P + f * (H - 2 * P - 14)).toFixed(1)}" stroke="var(--line)" stroke-width="1" vector-effect="non-scaling-stroke"/>`).join("");
+  const baseLine = opts.base != null ? `<line x1="0" x2="${W}" y1="${y(Math.min(Math.max(opts.base, min), max)).toFixed(1)}" y2="${y(Math.min(Math.max(opts.base, min), max)).toFixed(1)}" stroke="var(--muted)" stroke-dasharray="3 4" stroke-width="1" vector-effect="non-scaling-stroke"/>` : "";
+  const last = pts[pts.length - 1].split(",");
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="${opts.label || "Gráfico de precio"}">
+    ${grid}${baseLine}
+    <polygon points="0,${H - 14} ${pts.join(" ")} ${W},${H - 14}" fill="${col}" fill-opacity=".1"/>
+    <polyline points="${pts.join(" ")}" fill="none" stroke="${col}" stroke-width="2" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+    <circle cx="${last[0]}" cy="${last[1]}" r="3.5" fill="${col}"/>
+  </svg>
+  <div class="between xs muted num"><span>Mín ${money(min)}</span><span>Máx ${money(max)}</span></div>`;
+}
+
+const RANGES = { "1S": 5, "1M": 21, "3M": 63 };
+
+function detail() {
+  const sym = view.sym, i = INS[sym], t = TYPES[i.type], v = dayVar(sym);
+  const range = view.range || "1M";
+  const values = S.market[sym].hist.slice(-RANGES[range]).concat(px(sym));
+  const rv = values[values.length - 1] / values[0] - 1;
+  const pos = S.broker.pos[sym];
+  return `
+    <div class="xs muted">${t.name} · Pesos (ARS)</div>
+    <h1 style="margin-bottom:2px"><span class="sym">${sym}</span> <span class="muted" style="font-weight:500;font-size:17px">${i.name}</span></h1>
+    <div class="big num" data-px="${sym}">${money(px(sym))}</div>
+    <div class="small"><span class="pill ${cls(v)} num" data-var="${sym}">${pct(v)}</span> <span class="muted">hoy · </span><span class="${cls(rv)} num">${pct(rv)}</span> <span class="muted">en ${range}</span></div>
+    <div class="card" style="margin-top:12px">
+      <div class="seg">${Object.keys(RANGES).map(r => `<button class="${r === range ? "on" : ""}" data-act="range" data-r="${r}">${r}</button>`).join("")}</div>
+      ${chart(values, { label: `Precio de ${sym} en ${range}` })}
+    </div>
+    ${pos ? `
+    <div class="card">
+      <div class="label">Tu tenencia</div>
+      <div class="kv"><span>Cantidad</span><b class="num">${qtyFmt(sym, pos.qty)}</b></div>
+      <div class="kv"><span>${T("precio promedio", "Precio promedio")}</span><b class="num">${money(pos.cost / pos.qty)}</b></div>
+      <div class="kv"><span>Valor hoy</span><b class="num">${money(pos.qty * px(sym))}</b></div>
+      <div class="kv"><span>${T("ganancia o pérdida", "Ganancia / pérdida")}</span><b class="num ${cls(pos.qty * px(sym) - pos.cost)}">${money(pos.qty * px(sym) - pos.cost)}</b></div>
+    </div>` : ""}
+    <div class="card">
+      <div class="between"><span class="label">En palabras simples</span><span class="pill ${["", "", "warn", "down"][t.risk]}">${RISK[t.risk]}</span></div>
+      <p style="margin-top:8px">${t.simple}</p>
+      <div class="kv"><span>Tipo</span><b>${T(t.term, t.short)}</b></div>
+      <div class="kv"><span>${T("liquidez", "Liquidez")}</span><b>${i.type === "fci" ? "Alta (24hs)" : "Alta, en horario de mercado"}</b></div>
+      <div class="kv"><span>${T("volatilidad", "Volatilidad")}</span><b>${i.sigma < .005 ? "Muy baja" : i.sigma < .015 ? "Media" : "Alta"}</b></div>
+    </div>
+    <div class="row">
+      <button class="btn buy" data-act="order" data-sym="${sym}" data-side="buy">${isFci(sym) ? "Suscribir" : "Comprar"}</button>
+      ${pos ? `<button class="btn sell" data-act="order" data-sym="${sym}" data-side="sell">${isFci(sym) ? "Rescatar" : "Vender"}</button>` : ""}
+    </div>
+    <p class="note">Precios simulados con fines educativos. No son cotizaciones reales ni una recomendación de inversión.</p>`;
+}
+
+/* ---------- Órdenes ---------- */
+
+function newOrder(sym, side) {
+  const fci = isFci(sym), held = S.broker.pos[sym]?.qty || 0;
+  return {
+    name: "order", sym, side, step: "form",
+    type: "mkt", plazo: fci ? "24hs" : "CI",
+    qty: fci ? 0 : side === "sell" ? Math.max(1, Math.floor(held)) : 1,
+    amount: fci ? (side === "sell" ? Math.floor(held * px(sym)) : 10000) : 0,
+    limit: +px(sym).toFixed(2)
+  };
+}
+
+function calc(o) {
+  const fci = isFci(o.sym);
+  const price = o.type === "lim" ? o.limit : px(o.sym);
+  const qty = fci ? (price > 0 ? o.amount / price : 0) : o.qty;
+  const gross = qty * price;
+  const fee = fci ? 0 : gross * FEE;
+  const total = o.side === "buy" ? gross + fee : gross - fee;
+  const held = S.broker.pos[o.sym]?.qty || 0;
+  let err = "";
+  if (!(qty > 0) || !(price > 0)) err = "Ingresá una cantidad mayor a cero.";
+  else if (!fci && !Number.isInteger(qty)) err = "La cantidad tiene que ser un número entero.";
+  else if (o.side === "buy" && total > S.broker.cash + 1e-6) err = `No te alcanza el saldo disponible (${money(S.broker.cash)}).`;
+  else if (o.side === "sell" && qty > held + 1e-6) err = `Tenés ${qtyFmt(o.sym, held)} para ${fci ? "rescatar" : "vender"}.`;
+  return { price, qty, gross, fee, total, err };
+}
+
+function summaryRows(o, c) {
+  const fci = isFci(o.sym);
+  return `
+    <div class="kv"><span>${fci ? T("cuotaparte", "Cuotapartes") + " (aprox.)" : "Cantidad"}</span><b class="num" data-c="qty">${qtyFmt(o.sym, c.qty)}</b></div>
+    <div class="kv"><span>Precio ${o.type === "lim" ? "límite" : "estimado"}</span><b class="num" data-c="price">${money(c.price)}</b></div>
+    <div class="kv"><span>Monto</span><b class="num" data-c="gross">${money(c.gross)}</b></div>
+    <div class="kv"><span>${T("comisión", "Comisión y derechos")}</span><b class="num" data-c="fee">${fci ? "Incluida en el fondo" : money(c.fee)}</b></div>
+    <div class="kv"><span><b>${o.side === "buy" ? "Total a pagar" : "Total a recibir"}</b></span><b class="num" data-c="total">${money(c.total)}</b></div>`;
+}
+
+function order() {
+  const o = view, sym = o.sym, fci = isFci(sym), c = calc(o);
+  const verb = o.side === "buy" ? (fci ? "Suscribir" : "Comprar") : (fci ? "Rescatar" : "Vender");
+  const held = S.broker.pos[sym]?.qty || 0;
+
+  if (o.step === "done") {
+    const r = o.result, pend = r.status === "Pendiente";
+    return `
+      <div class="done-ic ${pend ? "pend" : ""}">${pend ? "⏳" : "✓"}</div>
+      <h1 style="text-align:center">${pend ? "Orden enviada" : "Orden ejecutada"}</h1>
+      <p class="muted" style="text-align:center">${pend
+        ? `Tu ${T("orden límite")} queda esperando. Se ejecuta sola si el precio llega a ${money(r.limit)}.`
+        : `${verb === "Comprar" ? "Compraste" : verb === "Vender" ? "Vendiste" : verb === "Suscribir" ? "Suscribiste" : "Rescataste"} ${qtyFmt(sym, r.qty)} ${fci ? "cuotapartes de" : ""} ${sym} a ${money(r.price)}.`}</p>
+      <div class="card">
+        <div class="kv"><span>Orden N.º</span><b class="num">${String(r.id).padStart(6, "0")}</b></div>
+        <div class="kv"><span>Estado</span><b><span class="pill ${pend ? "warn" : "up"}">${r.status}</span></b></div>
+        <div class="kv"><span>${o.side === "buy" ? "Total pagado" : "Total recibido"}</span><b class="num">${pend ? "—" : money(r.total)}</b></div>
+        <div class="kv"><span>${T("saldo disponible", "Saldo disponible")}</span><b class="num">${money(S.broker.cash)}</b></div>
+      </div>
+      <div class="stack">
+        <button class="btn" data-act="tab" data-tab="portfolio">Ver mi cartera</button>
+        <button class="btn ghost" data-act="tab" data-tab="activity">Ver movimientos</button>
+      </div>`;
+  }
+
+  if (o.step === "review") return `
+    <h1>Revisá tu orden</h1>
+    ${tip("review", "En un broker real siempre hay un paso para revisar antes de confirmar. Mirá bien el total: incluye la comisión.")}
+    <div class="card">
+      <div class="kv"><span>Operación</span><b class="${o.side === "buy" ? "up" : "down"}">${verb}</b></div>
+      <div class="kv"><span>Activo</span><b><span class="sym">${sym}</span></b></div>
+      <div class="kv"><span>Tipo de orden</span><b>${o.type === "mkt" ? T("orden a mercado", "A mercado") : T("orden límite", "Límite")}</b></div>
+      <div class="kv"><span>Plazo</span><b>${T(o.plazo.toLowerCase(), o.plazo)}</b></div>
+      ${summaryRows(o, c)}
+    </div>
+    ${c.err ? `<div class="feedback no">${c.err}</div>` : ""}
+    <div class="stack">
+      <button class="btn ${o.side === "buy" ? "buy" : "sell"}" data-act="confirm" ${c.err ? "disabled" : ""}>Confirmar ${verb.toLowerCase()}</button>
+      <button class="btn ghost" data-act="editOrder">Modificar</button>
+    </div>`;
+
+  return `
+    <div class="between"><h1><span class="sym">${sym}</span></h1><span class="num" data-px="${sym}">${money(px(sym))}</span></div>
+    ${tip("order", `Esto es una orden: le decís al broker qué querés comprar o vender, cuánto y cómo. Tocá las palabras subrayadas si alguna no la conocés.`)}
+    <div class="seg">
+      <button class="buy ${o.side === "buy" ? "on" : ""}" data-act="side" data-side="buy">${fci ? "Suscribir" : "Comprar"}</button>
+      <button class="sell ${o.side === "sell" ? "on" : ""}" data-act="side" data-side="sell" ${held ? "" : "disabled"}>${fci ? "Rescatar" : "Vender"}</button>
+    </div>
+    ${fci ? "" : `
+    <div class="field">
+      <span class="label">Tipo de orden</span>
+      <div class="seg" style="margin:0">
+        <button class="${o.type === "mkt" ? "on" : ""}" data-act="otype" data-t="mkt">A mercado</button>
+        <button class="${o.type === "lim" ? "on" : ""}" data-act="otype" data-t="lim">Límite</button>
+      </div>
+      <div class="xs muted" style="margin-top:4px">¿Qué es? ${T("orden a mercado", "A mercado")} · ${T("orden límite", "Límite")}</div>
+    </div>
+    <div class="field">
+      <span class="label">Plazo de liquidación</span>
+      <div class="seg" style="margin:0">
+        <button class="${o.plazo === "CI" ? "on" : ""}" data-act="plazo" data-p="CI">CI</button>
+        <button class="${o.plazo === "24hs" ? "on" : ""}" data-act="plazo" data-p="24hs">24hs</button>
+      </div>
+      <div class="xs muted" style="margin-top:4px">¿Qué es? ${T("ci", "CI")} · ${T("24hs")}</div>
+    </div>`}
+    <div class="field">
+      <label class="label" for="q">${fci ? "Monto en pesos" : "Cantidad"}</label>
+      <div class="stepper">
+        <button data-act="step" data-d="-1" aria-label="Restar">−</button>
+        <input id="q" inputmode="decimal" value="${fci ? o.amount : o.qty}" data-field="${fci ? "amount" : "qty"}">
+        <button data-act="step" data-d="1" aria-label="Sumar">+</button>
+      </div>
+      ${o.side === "sell" ? `<div class="xs muted" style="margin-top:4px">Tenés ${qtyFmt(sym, held)}${fci ? " cuotapartes (" + money(held * px(sym)) + ")" : ""}.</div>` : ""}
+    </div>
+    ${o.type === "lim" ? `
+    <div class="field">
+      <label class="label" for="lim">Precio límite</label>
+      <div class="stepper"><input id="lim" inputmode="decimal" value="${o.limit}" data-field="limit"></div>
+      <div class="xs muted" style="margin-top:4px">${o.side === "buy" ? "Se compra solo si el precio baja hasta este valor." : "Se vende solo si el precio sube hasta este valor."}</div>
+    </div>` : ""}
+    <div class="card flat">${summaryRows(o, c)}
+      <div class="kv"><span>${T("saldo disponible", "Saldo disponible")}</span><b class="num">${money(S.broker.cash)}</b></div>
+    </div>
+    <div class="feedback no" id="oerr" ${c.err ? "" : "hidden"}>${c.err}</div>
+    <button class="btn ${o.side === "buy" ? "buy" : "sell"}" id="review" data-act="review" ${c.err ? "disabled" : ""}>Revisar orden</button>`;
+}
+
+function updateTicket() {
+  if (view.name !== "order" || view.step !== "form") return;
+  const c = calc(view), fci = isFci(view.sym);
+  const set = (k, v) => { const el = app.querySelector(`[data-c="${k}"]`); if (el) el.textContent = v; };
+  set("qty", qtyFmt(view.sym, c.qty)); set("price", money(c.price)); set("gross", money(c.gross));
+  set("fee", fci ? "Incluida en el fondo" : money(c.fee)); set("total", money(c.total));
+  const err = app.querySelector("#oerr"); err.textContent = c.err; err.hidden = !c.err;
+  app.querySelector("#review").disabled = !!c.err;
+}
+
+function execute(o, price) {
+  const B = S.broker, fci = isFci(o.sym);
+  const qty = fci ? o.amount / price : o.qty;
+  const gross = qty * price, fee = fci ? 0 : gross * FEE;
+  if (o.side === "buy") {
+    if (gross + fee > B.cash + 1e-6) return { ok: false, why: "Saldo insuficiente" };
+    B.cash -= gross + fee;
+    const p = B.pos[o.sym] || (B.pos[o.sym] = { qty: 0, cost: 0 });
+    p.qty += qty; p.cost += gross + fee;
+    return { ok: true, qty, price, fee, total: gross + fee };
+  }
+  const p = B.pos[o.sym];
+  if (!p || qty > p.qty + 1e-6) return { ok: false, why: "No tenés esa cantidad" };
+  p.cost -= p.cost * (qty / p.qty);
+  p.qty -= qty;
+  if (p.qty < 1e-6) delete B.pos[o.sym];
+  B.cash += gross - fee;
+  return { ok: true, qty, price, fee, total: gross - fee };
+}
+
+function placeOrder() {
+  const o = view, c = calc(o), B = S.broker;
+  if (c.err) return;
+  const rec = { id: B.nextId++, sym: o.sym, side: o.side, type: o.type, plazo: o.plazo, qty: c.qty, amount: o.amount, limit: o.limit, day: B.day, status: "Pendiente" };
+  const marketable = o.type === "mkt" || (o.side === "buy" ? px(o.sym) <= o.limit : px(o.sym) >= o.limit);
+  if (marketable) {
+    const r = execute(o, px(o.sym));
+    Object.assign(rec, r.ok ? { status: "Ejecutada", price: r.price, qty: r.qty, fee: r.fee, total: r.total } : { status: "Rechazada", why: r.why });
+  }
+  B.orders.unshift(rec);
+  save();
+  view = { ...o, step: "done", result: rec };
+  render(); window.scrollTo(0, 0);
+}
+
+function checkLimits() {
+  S.broker.orders.filter(o => o.status === "Pendiente").forEach(o => {
+    const p = px(o.sym);
+    if (o.side === "buy" ? p <= o.limit : p >= o.limit) {
+      const r = execute(o, p);
+      Object.assign(o, r.ok ? { status: "Ejecutada", price: r.price, qty: r.qty, fee: r.fee, total: r.total, execDay: S.broker.day } : { status: "Rechazada", why: r.why });
+    }
+  });
+}
+
+/* ---------- Cartera y movimientos ---------- */
+
+function portfolio() {
+  const B = S.broker, total = equity(), inv = posValue();
+  const pnl = total - START_CASH;
+  const syms = Object.keys(B.pos);
+  const byType = {};
+  syms.forEach(s => byType[INS[s].type] = (byType[INS[s].type] || 0) + B.pos[s].qty * px(s));
+  const dayPnl = syms.reduce((a, s) => a + B.pos[s].qty * (px(s) - prevClose(s)), 0);
+  return `
+    <h1>Mi cartera</h1>
+    ${tip("portfolio", `Esta es tu ${T("cartera")}: todo lo que tenés, cuánto vale hoy y cuánto ganás o perdés. Usá “Avanzar el tiempo” para ver qué pasa en días o meses.`)}
+    <div class="card">
+      <div class="label">Valor total</div>
+      <div class="big num" data-total>${money(total)}</div>
+      <div class="small"><span class="${cls(pnl)} num" data-pnl>${money(pnl)} (${pct(pnl / START_CASH)})</span> <span class="muted">desde el inicio</span></div>
+      ${B.equity.length > 1 ? chart(B.equity.concat(total), { base: START_CASH, label: "Evolución de tu cartera" }) : ""}
+      <div class="alloc-bar">
+        ${Object.entries(byType).map(([t, v]) => `<div style="width:${v / total * 100}%;background:${TYPES[t].color}" title="${TYPES[t].name}"></div>`).join("")}
+        <div style="width:${B.cash / total * 100}%;background:var(--muted);opacity:.35" title="Pesos"></div>
+      </div>
+      <div class="legend">
+        ${Object.entries(byType).map(([t, v]) => `<span><i style="background:${TYPES[t].color}"></i>${TYPES[t].short} ${nf2.format(v / total * 100)}%</span>`).join("")}
+        <span><i style="background:var(--muted);opacity:.35"></i>Pesos ${nf2.format(B.cash / total * 100)}%</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="kv"><span>${T("saldo disponible", "Saldo disponible")}</span><b class="num">${money(B.cash)}</b></div>
+      <div class="kv"><span>Invertido</span><b class="num">${money(inv)}</b></div>
+      <div class="kv"><span>Resultado del día</span><b class="num ${cls(dayPnl)}">${money(dayPnl)}</b></div>
+    </div>
+    ${coach(dayPnl, pnl)}
+    <div class="list">
+      <div class="list-h between"><span class="label">Tenencias</span><span class="xs muted">Valor · ${T("ganancia o pérdida", "Ganancia")}</span></div>
+      ${syms.length ? syms.map(s => {
+        const p = B.pos[s], val = p.qty * px(s), g = val - p.cost;
+        return `<button class="tick" data-act="detail" data-sym="${s}" style="grid-template-columns:1fr auto">
+          <div style="min-width:0"><div class="sym">${s}</div><div class="tname">${qtyFmt(s, p.qty)} × ${money(px(s))}</div></div>
+          <div class="tright"><span class="num">${money(val)}</span><span class="pill ${cls(g)} num">${pct(g / p.cost)}</span></div>
+        </button>`;
+      }).join("") : `<div class="empty small">Todavía no compraste nada.<br><button class="btn" style="margin-top:12px" data-act="tab" data-tab="market">Ir al mercado</button></div>`}
+    </div>
+    <div class="card">
+      <div class="between"><span class="label">Avanzar el tiempo</span><span class="xs muted">Día ${B.day}</span></div>
+      <p class="small muted" style="margin-top:6px">En la vida real esperás. Acá podés adelantar para ver cómo se mueve tu plata.</p>
+      <div class="time">
+        <button class="btn ghost" data-act="adv" data-n="1">1 día</button>
+        <button class="btn ghost" data-act="adv" data-n="5">1 semana</button>
+        <button class="btn" data-act="adv" data-n="21">1 mes</button>
+      </div>
+    </div>
+    <button class="link" data-act="resetBroker">Reiniciar el simulador con $100.000</button>
+    <p class="note">Simulación con valores inventados para aprender. No es una recomendación ni refleja productos ni precios reales.</p>`;
+}
+
+function coach(dayPnl, pnl) {
+  if (!Object.keys(S.broker.pos).length) return "";
+  if (dayPnl < -equity() * 0.01) return `<div class="feedback no">Hoy bajó bastante. Así se siente la ${T("volatilidad")}. En la vida real, la clave es no vender por miedo.</div>`;
+  if (pnl < 0) return `<div class="feedback no">Vas un poco abajo. Es normal: adelantá unos días y mirá qué pasa.</div>`;
+  if (S.broker.day >= 40) return `<div class="feedback ok">Llevás ${S.broker.day} días en el simulador. ¿Ves cómo las bajas se mezclan con las subas?</div>`;
+  return "";
+}
+
+function activity() {
+  const os = S.broker.orders;
+  const st = { "Ejecutada": "up", "Pendiente": "warn", "Cancelada": "grey", "Rechazada": "down" };
+  return `
+    <h1>Movimientos</h1>
+    ${tip("activity", "Acá queda registrada cada orden: las ejecutadas, las que esperan un precio y las canceladas. En un broker real también te llega por mail.")}
+    <div class="list">
+      ${os.length ? os.map(o => {
+        const fci = isFci(o.sym);
+        const verb = o.side === "buy" ? (fci ? "Suscripción" : "Compra") : (fci ? "Rescate" : "Venta");
+        return `<div class="tick" style="grid-template-columns:1fr auto;cursor:default">
+          <div style="min-width:0">
+            <div><b>${verb}</b> <span class="sym">${o.sym}</span></div>
+            <div class="tname">Día ${o.day} · ${o.type === "mkt" ? "A mercado" : "Límite " + money(o.limit)} · ${o.plazo} · N.º ${String(o.id).padStart(6, "0")}</div>
+            ${o.status === "Pendiente" ? `<button class="link" style="padding:4px 0" data-act="cancel" data-id="${o.id}">Cancelar orden</button>` : ""}
+            ${o.why ? `<div class="xs down">${o.why}</div>` : ""}
+          </div>
+          <div class="tright">
+            <span class="num">${o.total != null ? money(o.side === "buy" ? -o.total : o.total) : "—"}</span>
+            <span class="pill ${st[o.status]}">${o.status}</span>
+          </div>
+        </div>`;
+      }).join("") : `<div class="empty small">Todavía no hiciste ninguna operación.</div>`}
+    </div>
+    <p class="note">Simulación con valores inventados para aprender.</p>`;
+}
+
+/* ---------- Simulación del tiempo ---------- */
+
+function advance(n) {
+  const B = S.broker;
   for (let d = 0; d < n; d++) {
-    PRACTICE_OPTIONS.forEach(o => { P.holdings[o.id] *= Math.max(0, 1 + o.mu + o.sigma * gauss()); });
-    P.day++;
-    P.history.push(portfolioValue(P));
+    INSTRUMENTS.forEach(i => {
+      const m = S.market[i.sym];
+      m.hist.push(m.px);
+      if (m.hist.length > 260) m.hist.shift();
+      m.px = m.px * (1 + i.mu + i.sigma * gauss());
+    });
+    B.day++;
+    checkLimits();
+    B.equity.push(equity());
   }
   save(); render();
 }
 
-/* ---------- Glosario ---------- */
+function liveTick() {
+  if (!S.market || !S.broker || document.hidden || modal) return;
+  if (!["market", "detail", "order", "portfolio"].includes(view.name)) return;
+  INSTRUMENTS.forEach(i => {
+    if (i.type === "fci") return;
+    S.market[i.sym].px *= 1 + i.sigma * 0.08 * gauss();
+  });
+  checkLimits();
+  app.querySelectorAll("[data-px]").forEach(el => {
+    const s = el.dataset.px, old = parseFloat(el.dataset.last || px(s));
+    el.textContent = money(px(s));
+    const row = el.closest(".tick") || el;
+    row.classList.remove("flash-up", "flash-down"); void row.offsetWidth;
+    row.classList.add(px(s) >= old ? "flash-up" : "flash-down");
+    el.dataset.last = px(s);
+  });
+  app.querySelectorAll("[data-var]").forEach(el => {
+    const v = dayVar(el.dataset.var);
+    el.textContent = pct(v); el.className = `pill ${cls(v)} num`;
+  });
+  const t = app.querySelector("[data-total]");
+  if (t) {
+    const total = equity(), pnl = total - START_CASH;
+    t.textContent = money(total);
+    const pe = app.querySelector("[data-pnl]");
+    pe.textContent = `${money(pnl)} (${pct(pnl / START_CASH)})`; pe.className = `${cls(pnl)} num`;
+  }
+  updateTicket();
+  save();
+}
+setInterval(liveTick, 2500);
 
-const sheet = document.getElementById("sheet");
+/* ---------- Glosario y diálogos ---------- */
+
 function openTerm(t) {
   const g = GLOSSARY[t.toLowerCase()];
   if (!g) return;
-  sheet.innerHTML = `<div class="sheet-bg" data-act="close"><div class="sheet" role="dialog" aria-label="${t}">
-    <h3>${t[0].toUpperCase() + t.slice(1)}</h3><p>${g[0]}</p>
-    <div class="example">👉 ${g[1]}</div><p></p>
-    <button class="btn ghost" data-act="close">Entendido</button></div></div>`;
+  const title = { "fci": "Fondo común de inversión (FCI)", "ci": "CI (contado inmediato)", "cedear": "CEDEAR" }[t] || t[0].toUpperCase() + t.slice(1);
+  modal = { html: `<h3>${title}</h3><p>${g[0]}</p><div class="example">Ejemplo: ${g[1]}</div><button class="btn ghost" data-act="close">Entendido</button>` };
+  renderModal();
+}
+function ask(title, text, okLabel, onOk) {
+  modal = { onOk, html: `<h3>${title}</h3><p class="muted">${text}</p><div class="stack">
+    ${onOk ? `<button class="btn" data-act="modalOk">${okLabel}</button><button class="btn ghost" data-act="close">Cancelar</button>`
+           : `<button class="btn" data-act="close">${okLabel}</button>`}</div>` };
+  renderModal();
+}
+function renderModal() {
+  sheet.innerHTML = modal ? `<div class="sheet-bg" data-act="close"><div class="sheet" role="dialog" aria-modal="true">${modal.html}</div></div>` : "";
 }
 
-/* ---------- Eventos ---------- */
+/* =========================================================
+   Eventos
+   ========================================================= */
 
 document.addEventListener("click", e => {
   const term = e.target.closest(".term");
-  if (term) return openTerm(term.dataset.term);
+  if (term) { e.stopPropagation(); return openTerm(term.dataset.term); }
   const el = e.target.closest("[data-act]");
-  if (!el) return;
+  if (!el || el.disabled) return;
   const act = el.dataset.act, i = +el.dataset.i;
-  if (act === "close") { if (e.target === el) sheet.innerHTML = ""; return; }
   switch (act) {
+    case "close": if (e.target === el) { modal = null; renderModal(); } break;
+    case "modalOk": { const f = modal.onOk; modal = null; renderModal(); f(); break; }
     case "start": go({ ...view, step: 0 }); break;
-    case "onb": {
+    case "onb":
       view.answers[ONBOARDING[view.step].key] = i;
       if (view.step < 2) go({ ...view, step: view.step + 1 });
       else { S.profile = view.answers; save(); go({ name: "path" }); }
       break;
-    }
     case "path": go({ name: "path" }); break;
     case "lesson": go({ name: "lesson", i }); break;
     case "quiz": go({ name: "quiz", i }); break;
@@ -482,36 +996,76 @@ document.addEventListener("click", e => {
     case "retry": go({ name: "quiz", i: view.i }); break;
     case "finish":
       if (!S.done.includes(view.i)) S.done.push(view.i);
+      if (view.i === 2) ensureBroker();
       save();
-      go(view.i === 2 ? { name: "practice" } : view.i === LEVELS.length - 1 ? { name: "leap" } : { name: "path" });
+      go(view.i === 2 ? { name: "market" } : view.i === LEVELS.length - 1 ? { name: "leap" } : { name: "path" });
       break;
-    case "practice": go({ name: "practice" }); break;
-    case "invest": {
-      const a = view.alloc || { cons: 40000, mod: 40000, agr: 20000 };
-      const used = a.cons + a.mod + a.agr;
-      S.practice = { cash: START_CASH - used, holdings: { ...a }, day: 0, history: [START_CASH] };
-      save(); render(); break;
-    }
-    case "tick": tick(+el.dataset.n); break;
-    case "resetPractice": S.practice = null; save(); go({ name: "practice" }); break;
     case "leap": go({ name: "leap" }); break;
-    case "lbo": alert("Prototipo: acá se abriría el alta en LBO con el monto sugerido."); break;
+    case "lbo": ask("Próximamente", "Acá se abriría el alta en LBO con el monto sugerido. En este prototipo todavía no está conectado.", "Entendido"); break;
     case "reset":
-      if (confirm("¿Borrar tu progreso y empezar de cero?")) { S = fresh(); save(); go({ name: "welcome", step: -1, answers: {} }); }
+      ask("¿Empezar de cero?", "Se borra tu progreso del camino y el simulador.", "Borrar todo", () => {
+        S = fresh(); save(); go({ name: "welcome", step: -1, answers: {} });
+      });
+      break;
+    case "demo": S.demo = true; ensureBroker(); save(); go({ name: "market" }); break;
+    case "tab": {
+      const t = el.dataset.tab;
+      if (t !== "learn" && brokerOpen()) ensureBroker();
+      go({ name: t === "learn" ? "path" : t });
+      break;
+    }
+    case "tipOk": S.tips[el.dataset.id] = true; save(); render(); break;
+    case "market": go({ name: "market", filter: view.filter }); break;
+    case "filter": go({ name: "market", filter: el.dataset.f, q: view.q }); break;
+    case "detail": go({ name: "detail", sym: el.dataset.sym }); break;
+    case "range": view.range = el.dataset.r; render(); break;
+    case "order": go(newOrder(el.dataset.sym, el.dataset.side)); break;
+    case "side": view = newOrder(view.sym, el.dataset.side); render(); break;
+    case "otype": view.type = el.dataset.t; if (view.type === "lim") view.limit = +px(view.sym).toFixed(2); render(); break;
+    case "plazo": view.plazo = el.dataset.p; render(); break;
+    case "step": {
+      const fci = isFci(view.sym), d = +el.dataset.d;
+      if (fci) view.amount = Math.max(0, Math.round(view.amount + d * 1000));
+      else view.qty = Math.max(0, Math.round(view.qty) + d);
+      app.querySelector("#q").value = fci ? view.amount : view.qty;
+      updateTicket(); break;
+    }
+    case "review": if (!calc(view).err) go({ ...view, step: "review" }); break;
+    case "editOrder": go({ ...view, step: "form" }); break;
+    case "confirm": placeOrder(); break;
+    case "cancel": {
+      const o = S.broker.orders.find(x => x.id === +el.dataset.id);
+      if (o && o.status === "Pendiente") { o.status = "Cancelada"; save(); render(); }
+      break;
+    }
+    case "adv": advance(+el.dataset.n); break;
+    case "resetBroker":
+      ask("¿Reiniciar el simulador?", "Vuelve todo a $100.000 de mentira y se borran tus operaciones.", "Reiniciar", () => {
+        S.broker = null; S.market = null; ensureBroker(); save(); go({ name: "portfolio" });
+      });
       break;
   }
 });
 
 document.addEventListener("input", e => {
-  const id = e.target.dataset.alloc;
-  if (!id) return;
-  view.alloc = { ...(view.alloc || { cons: 40000, mod: 40000, agr: 20000 }), [id]: +e.target.value };
-  const used = view.alloc.cons + view.alloc.mod + view.alloc.agr;
-  app.querySelector(`[data-amt="${id}"]`).textContent = money(view.alloc[id]);
-  app.querySelector("#used").innerHTML = usedText(used);
-  app.querySelector("#investBtn").disabled = used > START_CASH || used === 0;
+  if (e.target.id === "search") {
+    view.q = e.target.value;
+    const q = view.q.trim().toLowerCase();
+    app.querySelectorAll("[data-row]").forEach(r => r.hidden = q && !r.dataset.search.includes(q));
+    return;
+  }
+  const f = e.target.dataset.field;
+  if (f && view.name === "order") {
+    const raw = e.target.value.trim();
+    const v = parseFloat(raw.includes(",") ? raw.replace(/\./g, "").replace(",", ".") : raw);
+    view[f] = isNaN(v) ? 0 : v;
+    updateTicket();
+  }
 });
 
+document.addEventListener("keydown", e => { if (e.key === "Escape" && modal) { modal = null; renderModal(); } });
+
+if (brokerOpen()) ensureBroker();
 render();
 </script>
 </body>
