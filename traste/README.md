@@ -34,7 +34,22 @@ Una vez publicada en una dirección con `https`:
 
 Queda con su ícono, se abre a pantalla completa y funciona sin conexión después de la primera visita.
 
-## Convertirla en app nativa (opcional)
+## Programa para Windows
+
+La app se puede instalar en la computadora como un programa común (con Electron): se abre desde el menú Inicio o el escritorio, sin navegador y sin internet.
+
+En pantallas anchas (computadora) la app muestra una barra lateral con las secciones, el progreso y el selector de tema claro/oscuro. Atajos de teclado: `1` a `6` cambian de sección y `Esc` detiene todo lo que esté sonando.
+
+```bash
+npm run app        # la abre en una ventana, para probarla
+npm run dist:win   # crea release/Traste-Setup-1.0.0.exe
+```
+
+- `dist:win` funciona directo en Windows. En Linux o Mac necesita [Wine](https://www.winehq.org) instalado.
+- También se puede generar desde GitHub, sin instalar nada: pestaña **Actions** → **Traste para Windows** → **Run workflow**. El `.exe` queda en "Artifacts" al terminar.
+- El instalador no está firmado digitalmente, así que Windows puede mostrar el aviso "Windows protegió tu PC". Se sigue con **Más información** → **Ejecutar de todas formas**. Para que no aparezca hace falta un certificado de firma de código.
+
+## Convertirla en app nativa para celular (opcional)
 
 Para publicarla en Google Play o App Store podés envolverla con Capacitor:
 
@@ -57,6 +72,7 @@ src/styles.css             Estilos con tema claro y oscuro
 public/manifest.webmanifest  Datos para instalarla como app
 public/sw.js               Caché para usarla sin conexión
 public/icons/              Íconos
+electron/main.cjs          Ventana del programa de escritorio
 ```
 
 ## Seguir desarrollándola con Claude Code

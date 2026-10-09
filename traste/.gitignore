@@ -6,3 +6,4 @@ ios
 
 # Los íconos de la PWA sí se versionan (el .gitignore raíz ignora *.png)
 !*.png
+release

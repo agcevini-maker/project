@@ -1,0 +1,27 @@
+# Genera el instalador de Traste para Windows (Traste-Setup-x.y.z.exe).
+# Se corre a mano desde la pestaña Actions de GitHub ("Run workflow").
+# El .exe queda para descargar en la sección "Artifacts" de la ejecución.
+name: Traste para Windows
+
+on:
+  workflow_dispatch:
+
+jobs:
+  instalador:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: traste
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: traste/package-lock.json
+      - run: npm ci
+      - run: npm run dist:win
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Traste-Windows
+          path: traste/release/Traste-Setup-*.exe

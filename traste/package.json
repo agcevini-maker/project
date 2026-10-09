@@ -2,16 +2,61 @@
   "name": "traste",
   "version": "1.0.0",
   "description": "App para aprender guitarra desde cero: acordes, teoría, oído y punteo.",
+  "author": "LBO",
   "private": true,
   "type": "module",
+  "main": "electron/main.cjs",
   "scripts": {
     "dev": "vite --host",
     "build": "vite build",
-    "preview": "vite preview --host"
+    "preview": "vite preview --host",
+    "app": "vite build && electron .",
+    "dist:win": "vite build && electron-builder --win nsis --publish never"
   },
   "devDependencies": {
     "@fontsource-variable/bricolage-grotesque": "^5.3.0",
     "@fontsource/atkinson-hyperlegible": "^5.3.0",
+    "electron": "^44.7.0",
+    "electron-builder": "^26.15.3",
     "vite": "5.4.11"
+  },
+  "build": {
+    "appId": "ar.traste.app",
+    "productName": "Traste",
+    "copyright": "LBO",
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "dist/**",
+      "electron/**",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "public/icons/icon-512.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Traste",
+      "installerLanguages": [
+        "es_ES"
+      ],
+      "language": "3082",
+      "artifactName": "Traste-Setup-${version}.${ext}"
+    },
+    "publish": null
   }
 }
