@@ -236,8 +236,9 @@
   .thesis { border-left: 3px solid var(--accent); padding-left: 14px; font-size: 17px; margin: 0 0 20px; max-width: 46ch; }
   .status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--up); margin-right: 6px; box-shadow: 0 0 0 3px var(--up-soft); }
 
-  /* Navegación inferior (solo celular) */
+  /* Navegación inferior y saldo (solo celular) */
   nav.bottom { display: none; }
+  .acct-m { display: none; }
 
   @media (max-width: 1360px) { .hide-l { display: none; } }
   @media (max-width: 1100px) {
@@ -259,6 +260,24 @@
     .split:not(.has-sel) .side { display: none; }
     .side { position: static; }
     .mobile-back { display: block; }
+    .acct-m { display: block; background: var(--head); color: var(--head-ink); font-size: 13px; border-top: 1px solid rgba(255,255,255,.08); }
+    .acct-m .wrap { display: flex; gap: 14px; align-items: center; padding-block: 6px 8px; }
+    .acct-m .k { color: var(--head-muted); }
+    .acct-m .sim-badge { margin-left: auto; font-size: 10px; padding: 2px 6px; }
+    /* Tablas: cada fila pasa a ser una tarjeta con todos los datos */
+    table.resp thead { display: none; }
+    table.resp, .resp tbody, .resp tr, .resp td { display: block; }
+    .resp tbody tr:not(.group) { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px 12px; padding: 14px; border-bottom: 1px solid var(--line); }
+    .resp tbody tr:last-child { border-bottom: 0; }
+    .resp td { padding: 0; border: 0; white-space: normal; text-align: left; min-width: 0; }
+    .resp td.hide-l { display: block; }
+    .resp td.head { grid-column: 1 / -1; order: -1; }
+    .resp td.act { align-self: end; }
+    .resp td.act.full { grid-column: 1 / -1; }
+    .resp td.act .btn { display: block; width: 100%; padding: 8px; }
+    .resp td[data-label]::before { content: attr(data-label); display: block; font-size: 10px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 600; margin-bottom: 2px; }
+    .resp .tname { max-width: none; white-space: normal; }
+    .resp svg.spark { width: 100%; max-width: 90px; }
     .hide-m { display: none; }
     .kpis, .stats { grid-template-columns: 1fr 1fr; }
     .toasts { bottom: 80px; right: 16px; }
@@ -711,7 +730,12 @@ function topbar() {
     <button class="brand" data-act="${S.profile ? "path" : ""}">Sin <span>Miedo</span></button>
     ${S.profile ? `<nav class="topnav">${TABS.map(([id, l]) => `<button class="${tab === id ? "on" : ""}" data-act="tab" data-tab="${id}">${l}</button>`).join("")}</nav>` : ""}
     ${acct}
-  </div></header>`;
+  </div></header>
+  ${S.broker && brokerOpen() ? `<div class="acct-m"><div class="wrap">
+    <span><span class="k">Disponible</span> <b class="num" data-cash-h>${money(S.broker.cash)}</b></span>
+    <span><span class="k">Total</span> <b class="num" data-total-h>${money(equity())}</b></span>
+    <span class="sim-badge">Simulador</span>
+  </div></div>` : ""}`;
 }
 
 function tape() {
@@ -910,13 +934,13 @@ function market() {
     ${INSTRUMENTS.filter(i => i.type === t).map(i => {
       const v = dayVar(i.sym), key = (i.sym + " " + i.name).toLowerCase();
       return `<tr class="click ${view.sel === i.sym ? "sel" : ""}" data-act="select" data-sym="${i.sym}" data-search="${key}" ${q && !key.includes(q) ? "hidden" : ""}>
-        <td><div class="sym">${i.sym}</div><div class="tname">${i.name}</div></td>
-        <td class="r num" data-px="${i.sym}">${money(px(i.sym))}</td>
-        <td class="r"><span class="pill ${cls(v)} num" data-var="${i.sym}">${pct(v)}</span></td>
-        <td class="r num hide-m hide-l">${money(S.market[i.sym].hist.slice(-1)[0])}</td>
-        <td class="hide-m">${spark(i.sym)}</td>
-        <td class="hide-m">${riskPill(TYPES[t].risk)}</td>
-        <td class="r hide-m"><button class="btn sm" data-act="select" data-sym="${i.sym}">Operar</button></td>
+        <td class="head"><div class="sym">${i.sym}</div><div class="tname">${i.name}</div></td>
+        <td class="r num" data-label="Último" data-px="${i.sym}">${money(px(i.sym))}</td>
+        <td class="r" data-label="Var. día"><span class="pill ${cls(v)} num" data-var="${i.sym}">${pct(v)}</span></td>
+        <td class="r num hide-l" data-label="Cierre ant.">${money(S.market[i.sym].hist.slice(-1)[0])}</td>
+        <td data-label="20 días">${spark(i.sym)}</td>
+        <td data-label="Riesgo">${riskPill(TYPES[t].risk)}</td>
+        <td class="r act"><button class="btn sm" data-act="select" data-sym="${i.sym}">Operar</button></td>
       </tr>`;
     }).join("")}`).join("");
   return `
@@ -933,7 +957,7 @@ function market() {
     ${tip("market", `Así se ve el mercado en un broker. Cada fila es algo que podés comprar: el código, la ${T("cotización")} y la ${T("variación")} del día. Los precios se mueven solos mientras mirás. Elegí uno para ver su gráfico y operar.`)}
     <div class="split ${view.sel ? "has-sel" : ""}">
       <div class="main-col">
-        <div class="tbl-wrap"><table>
+        <div class="tbl-wrap"><table class="resp">
           <thead><tr><th>Activo</th><th class="r">${T("cotización", "Último")}</th><th class="r">${T("variación", "Var. día")}</th><th class="r hide-m hide-l">Cierre anterior</th><th class="hide-m">20 días</th><th class="hide-m">${T("riesgo", "Riesgo")}</th><th class="hide-m"></th></tr></thead>
           <tbody>${rows}</tbody>
         </table></div>
@@ -1151,19 +1175,19 @@ function portfolio() {
     </div>
     <div class="between" style="margin-bottom:8px"><h2 style="margin:0">Tenencias</h2></div>
     <div class="tbl-wrap">
-      ${syms.length ? `<table>
+      ${syms.length ? `<table class="resp">
         <thead><tr><th>Activo</th><th class="r">Cantidad</th><th class="r hide-m">${T("precio promedio", "Precio prom.")}</th><th class="r">Último</th><th class="r hide-m">Var. día</th><th class="r">Valor</th><th class="r">${T("ganancia o pérdida", "Resultado")}</th><th class="hide-m"></th></tr></thead>
         <tbody>${syms.map(s => {
           const p = B.pos[s], val = p.qty * px(s), g = val - p.cost, v = dayVar(s);
           return `<tr class="click" data-act="select" data-sym="${s}">
-            <td><div class="sym">${s}</div><div class="tname">${INS[s].name}</div></td>
-            <td class="r num">${qtyFmt(s, p.qty)}</td>
-            <td class="r num hide-m">${money(p.cost / p.qty)}</td>
-            <td class="r num">${money(px(s))}</td>
-            <td class="r hide-m"><span class="pill ${cls(v)} num">${pct(v)}</span></td>
-            <td class="r num">${money(val)}</td>
-            <td class="r"><div class="num ${cls(g)}">${money(g)}</div><div class="xs num ${cls(g)}">${pct(g / p.cost)}</div></td>
-            <td class="r hide-m"><button class="btn sm ghost" data-act="sellFrom" data-sym="${s}">${isFci(s) ? "Rescatar" : "Vender"}</button></td>
+            <td class="head"><div class="sym">${s}</div><div class="tname">${INS[s].name}</div></td>
+            <td class="r num" data-label="Cantidad">${qtyFmt(s, p.qty)}</td>
+            <td class="r num" data-label="Precio prom.">${money(p.cost / p.qty)}</td>
+            <td class="r num" data-label="Último">${money(px(s))}</td>
+            <td class="r" data-label="Var. día"><span class="pill ${cls(v)} num">${pct(v)}</span></td>
+            <td class="r num" data-label="Valor">${money(val)}</td>
+            <td class="r" data-label="Resultado"><div class="num ${cls(g)}">${money(g)}</div><div class="xs num ${cls(g)}">${pct(g / p.cost)}</div></td>
+            <td class="r act full"><button class="btn sm ghost" data-act="sellFrom" data-sym="${s}">${isFci(s) ? "Rescatar" : "Vender"}</button></td>
           </tr>`;
         }).join("")}</tbody>
       </table>` : `<div class="empty small">Todavía no compraste nada.<p></p><button class="btn inline" data-act="tab" data-tab="market">Ir al mercado</button></div>`}
@@ -1180,21 +1204,21 @@ function activity() {
     <div class="page-h"><div><h1>Movimientos</h1><p class="small muted">Todas tus órdenes en el simulador</p></div></div>
     ${tip("activity", "Acá queda registrada cada orden: las ejecutadas, las que esperan un precio y las canceladas. En un broker real también te llega por mail.")}
     <div class="tbl-wrap">
-      ${os.length ? `<table>
+      ${os.length ? `<table class="resp">
         <thead><tr><th class="hide-m">N.º</th><th class="hide-m">Día</th><th>Operación</th><th class="hide-m">Tipo</th><th class="hide-m">Plazo</th><th class="r hide-m">Cantidad</th><th class="r hide-m">Precio</th><th class="r">Importe</th><th>Estado</th></tr></thead>
         <tbody>${os.map(o => {
           const fci = isFci(o.sym);
           const verb = o.side === "buy" ? (fci ? "Suscripción" : "Compra") : (fci ? "Rescate" : "Venta");
           return `<tr>
-            <td class="num xs hide-m">${String(o.id).padStart(6, "0")}</td>
-            <td class="hide-m">${o.day}</td>
-            <td><b class="${o.side === "buy" ? "up" : "down"}">${verb}</b> <span class="sym">${o.sym}</span></td>
-            <td class="hide-m">${fci ? "—" : o.type === "mkt" ? "A mercado" : "Límite " + money(o.limit)}</td>
-            <td class="hide-m">${o.plazo}</td>
-            <td class="r num hide-m">${qtyFmt(o.sym, o.qty)}</td>
-            <td class="r num hide-m">${o.price != null ? money(o.price) : "—"}</td>
-            <td class="r num">${o.total != null ? money(o.side === "buy" ? -o.total : o.total) : "—"}</td>
-            <td><span class="pill ${st[o.status]}">${o.status}</span>
+            <td class="num xs" data-label="N.º">${String(o.id).padStart(6, "0")}</td>
+            <td data-label="Día">${o.day}</td>
+            <td class="head"><b class="${o.side === "buy" ? "up" : "down"}">${verb}</b> <span class="sym">${o.sym}</span></td>
+            <td data-label="Tipo">${fci ? "—" : o.type === "mkt" ? "A mercado" : "Límite " + money(o.limit)}</td>
+            <td data-label="Plazo">${o.plazo}</td>
+            <td class="r num" data-label="Cantidad">${qtyFmt(o.sym, o.qty)}</td>
+            <td class="r num" data-label="Precio">${o.price != null ? money(o.price) : "—"}</td>
+            <td class="r num" data-label="Importe">${o.total != null ? money(o.side === "buy" ? -o.total : o.total) : "—"}</td>
+            <td data-label="Estado"><span class="pill ${st[o.status]}">${o.status}</span>
               ${o.status === "Pendiente" ? ` <button class="link xs" data-act="cancel" data-id="${o.id}">Cancelar</button>` : ""}
               ${o.why ? `<div class="xs down">${o.why}</div>` : ""}</td>
           </tr>`;
