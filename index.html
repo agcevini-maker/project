@@ -157,7 +157,7 @@
   .chip { flex: none; border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 99px; padding: 6px 12px; font: inherit; font-size: 13px; cursor: pointer; }
   .chip.on { background: var(--ink); color: var(--card); border-color: var(--ink); }
   .split { display: grid; grid-template-columns: minmax(0, 1fr) 400px; gap: 20px; align-items: start; }
-  .side { position: sticky; top: 76px; display: flex; flex-direction: column; gap: 14px; }
+  .side { display: flex; flex-direction: column; gap: 14px; }
   .tbl-wrap { background: var(--card); border: 1px solid var(--line); border-radius: 12px; overflow-x: auto; box-shadow: var(--shadow); }
   table { width: 100%; border-collapse: collapse; font-size: 14px; }
   th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 600; padding: 10px 14px; border-bottom: 1px solid var(--line); white-space: nowrap; background: var(--card); }
@@ -213,6 +213,29 @@
   .sheet h3 { margin: 0 0 6px; font-size: 18px; }
   .example { background: var(--bg); border-radius: 10px; padding: 10px 12px; font-size: 14px; margin-bottom: 14px; }
 
+  /* Avisos, pie y extras */
+  .toasts { position: fixed; right: 20px; bottom: 20px; z-index: 50; display: flex; flex-direction: column; gap: 8px; max-width: min(360px, calc(100vw - 32px)); }
+  .toast { background: var(--ink); color: var(--card); border-radius: 10px; padding: 12px 14px; font-size: 14px; box-shadow: 0 10px 30px rgba(0,0,0,.25); animation: tin .25s ease-out; }
+  @keyframes tin { from { transform: translateY(8px); opacity: 0; } to { transform: none; opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) { .toast { animation: none; } }
+  footer.foot { border-top: 1px solid var(--line); margin-top: 32px; padding-block: 18px 28px; font-size: 12px; color: var(--muted); display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  footer.foot .link { font-size: 12px; padding: 0; }
+  .ack { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; background: var(--warn-soft); border-radius: 10px; padding: 10px 12px; }
+  .ack input { margin-top: 3px; accent-color: var(--warn); }
+  .mstat { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
+  .mstat div { background: var(--bg); border-radius: 8px; padding: 6px 10px; }
+  .mstat .label { font-size: 10px; }
+  .legend-line { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12px; color: var(--muted); margin-top: 6px; }
+  .legend-line i { display: inline-block; width: 16px; height: 0; border-top: 2px solid; margin-right: 6px; vertical-align: middle; }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 16px 0; }
+  .stats .card { box-shadow: none; padding: 14px; }
+  .stats .v { font-family: var(--mono); font-size: 20px; font-weight: 600; }
+  .gl { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+  .gl .card { box-shadow: none; }
+  .gl h3 { margin: 0 0 4px; font-size: 16px; }
+  .thesis { border-left: 3px solid var(--accent); padding-left: 14px; font-size: 17px; margin: 0 0 20px; max-width: 46ch; }
+  .status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--up); margin-right: 6px; box-shadow: 0 0 0 3px var(--up-soft); }
+
   /* Navegación inferior (solo celular) */
   nav.bottom { display: none; }
 
@@ -237,7 +260,8 @@
     .side { position: static; }
     .mobile-back { display: block; }
     .hide-m { display: none; }
-    .kpis { grid-template-columns: 1fr 1fr; }
+    .kpis, .stats { grid-template-columns: 1fr 1fr; }
+    .toasts { bottom: 80px; right: 16px; }
     .grid-2 { grid-template-columns: 1fr; }
     .fields { grid-template-columns: 1fr; }
     .sheet-bg { align-items: flex-end; padding: 0; }
@@ -255,6 +279,7 @@
 <main class="wrap" id="app"></main>
 <div id="nav"></div>
 <div id="sheet"></div>
+<div class="toasts" id="toasts" aria-live="polite"></div>
 
 <script>
 /* =========================================================
@@ -288,6 +313,8 @@ const GLOSSARY = {
   "cuotaparte": ["Cada “porción” de un fondo común. Su valor sube o baja según cómo le vaya al fondo.", "Si la vaquita es una torta, cada cuotaparte es una porción."],
   "precio promedio": ["Lo que pagaste, en promedio, por cada unidad que tenés (con comisiones).", "Compraste 1 a $100 y 1 a $120: tu precio promedio es $110."],
   "ganancia o pérdida": ["La diferencia entre lo que vale hoy lo que tenés y lo que pagaste. Mientras no vendas, es “en los papeles”.", "Compraste a $100 y hoy vale $90: vas perdiendo $10, pero solo se vuelve real si vendés."],
+  "perfil de inversor": ["Cuánto riesgo estás dispuesto a aceptar. Los brokers te lo preguntan antes de operar, porque así lo pide la regulación.", "Conservador: prefiere ganar poco y dormir tranquilo. Agresivo: acepta subidas y bajadas fuertes."],
+  "apertura": ["El precio con el que arrancó el día.", "Como el precio del dólar a primera hora de la mañana."],
   "saldo disponible": ["La plata que tenés en la cuenta lista para invertir.", "La plata que está en tu billetera, todavía sin gastar."]
 };
 
@@ -401,6 +428,7 @@ const INS = Object.fromEntries(INSTRUMENTS.map(i => [i.sym, i]));
 const START_CASH = 100000;
 const FEE = 0.006; // comisión + derechos de mercado, valor de ejemplo
 const HIST_DAYS = 90;
+const INFL = 0.0011; // inflación simulada por día hábil (~2,3% por mes), valor de ejemplo
 
 /* =========================================================
    Estado
@@ -426,7 +454,8 @@ function ensureMarket() {
   INSTRUMENTS.forEach(i => {
     const hist = [i.base];
     for (let d = 1; d < HIST_DAYS; d++) hist.push(hist[d - 1] * (1 + i.mu + i.sigma * gauss()));
-    m[i.sym] = { hist, px: hist[HIST_DAYS - 1] * (1 + i.mu + i.sigma * gauss()) };
+    const p = hist[HIST_DAYS - 1] * (1 + i.mu + i.sigma * gauss());
+    m[i.sym] = { hist, px: p, hi: Math.max(p, hist[HIST_DAYS - 1]), lo: Math.min(p, hist[HIST_DAYS - 1]) };
   });
   S.market = m;
 }
@@ -459,6 +488,12 @@ const withTerms = s => esc(s).replace(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g, (_, k
 const brokerOpen = () => S.demo || S.done.includes(2);
 const pathDone = () => S.done.length === LEVELS.length;
 
+const PROFILES = ["", "Conservador", "Moderado", "Agresivo"];
+function profileRisk() {
+  const p = S.profile; if (!p) return 2;
+  const score = p.exp + (p.fear === 0 ? 0 : 1) + (p.amount >= 2 ? 1 : 0);
+  return score <= 1 ? 1 : score <= 2 ? 2 : 3;
+}
 function suggestion() { return ["$5.000", "$10.000", "$20.000", "$30.000"][(S.profile || {}).amount ?? 0]; }
 function profileTip() {
   const p = S.profile; if (!p) return "";
@@ -484,19 +519,19 @@ function spark(sym) {
 function chart(values, opts = {}) {
   if (values.length < 2) return "";
   const W = 320, H = 160, P = 6;
-  const min = Math.min(...values), max = Math.max(...values), span = max - min || 1;
+  const all = opts.ref ? values.concat(opts.ref) : values;
+  const min = Math.min(...all), max = Math.max(...all), span = max - min || 1;
   const x = i => i / (values.length - 1) * W, y = v => P + (1 - (v - min) / span) * (H - 2 * P - 14);
   const pts = values.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`);
   const up = values[values.length - 1] >= (opts.base ?? values[0]);
   const col = `var(--${up ? "up" : "down"})`;
   const grid = [0.25, 0.5, 0.75].map(f => `<line x1="0" x2="${W}" y1="${(P + f * (H - 2 * P - 14)).toFixed(1)}" y2="${(P + f * (H - 2 * P - 14)).toFixed(1)}" stroke="var(--line)" stroke-width="1" vector-effect="non-scaling-stroke"/>`).join("");
   const baseLine = opts.base != null ? `<line x1="0" x2="${W}" y1="${y(Math.min(Math.max(opts.base, min), max)).toFixed(1)}" y2="${y(Math.min(Math.max(opts.base, min), max)).toFixed(1)}" stroke="var(--muted)" stroke-dasharray="3 4" stroke-width="1" vector-effect="non-scaling-stroke"/>` : "";
-  const last = pts[pts.length - 1].split(",");
   return `<svg class="chart${opts.tall ? " tall" : ""}" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="${opts.label || "Gráfico de precio"}">
     ${grid}${baseLine}
     <polygon points="0,${H - 14} ${pts.join(" ")} ${W},${H - 14}" fill="${col}" fill-opacity=".1"/>
     <polyline points="${pts.join(" ")}" fill="none" stroke="${col}" stroke-width="2" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
-    <circle cx="${last[0]}" cy="${last[1]}" r="3.5" fill="${col}"/>
+    ${opts.ref ? `<polyline points="${opts.ref.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(" ")}" fill="none" stroke="var(--warn)" stroke-width="1.5" stroke-dasharray="6 4" vector-effect="non-scaling-stroke"/>` : ""}
   </svg>
   <div class="between xs muted num"><span>Mín ${money(min)}</span><span>Máx ${money(max)}</span></div>`;
 }
@@ -563,13 +598,30 @@ function execute(o, price) {
 }
 
 function checkLimits() {
+  const filled = [];
   S.broker.orders.filter(o => o.status === "Pendiente").forEach(o => {
     const p = px(o.sym);
     if (o.side === "buy" ? p <= o.limit : p >= o.limit) {
       const r = execute(o, p);
       Object.assign(o, r.ok ? { status: "Ejecutada", price: r.price, qty: r.qty, fee: r.fee, total: r.total, execDay: S.broker.day } : { status: "Rechazada", why: r.why });
+      filled.push(o);
     }
   });
+  return filled;
+}
+
+function notifyFills(list) {
+  list.forEach(o => toast(o.status === "Ejecutada"
+    ? `Se ejecutó tu orden límite: ${o.side === "buy" ? "compraste" : "vendiste"} ${qtyFmt(o.sym, o.qty)} ${o.sym} a ${money(o.price)}.`
+    : `Tu orden límite de ${o.sym} fue rechazada: ${o.why}.`));
+}
+
+function toast(text) {
+  const box = document.getElementById("toasts");
+  const el = document.createElement("div");
+  el.className = "toast"; el.textContent = text;
+  box.appendChild(el);
+  setTimeout(() => el.remove(), 5000);
 }
 
 function coach(dayPnl, pnl) {
@@ -582,7 +634,7 @@ function coach(dayPnl, pnl) {
 
 /* ---------- Simulación del tiempo ---------- */
 
-function advance(n) {
+function advance(n, opts = {}) {
   const B = S.broker;
   for (let d = 0; d < n; d++) {
     INSTRUMENTS.forEach(i => {
@@ -590,12 +642,13 @@ function advance(n) {
       m.hist.push(m.px);
       if (m.hist.length > 260) m.hist.shift();
       m.px = m.px * (1 + i.mu + i.sigma * gauss());
+      m.hi = Math.max(m.px, m.hist[m.hist.length - 1]); m.lo = Math.min(m.px, m.hist[m.hist.length - 1]);
     });
     B.day++;
-    checkLimits();
+    notifyFills(checkLimits());
     B.equity.push(equity());
   }
-  save(); render();
+  if (!opts.silent) { save(); render(); }
 }
 
 /* ---------- Glosario y diálogos ---------- */
@@ -625,7 +678,7 @@ const topEl = document.getElementById("top");
 const app = document.getElementById("app");
 const navEl = document.getElementById("nav");
 const sheet = document.getElementById("sheet");
-const TAB_OF = { path: "learn", lesson: "learn", quiz: "learn", leap: "learn", market: "market", portfolio: "portfolio", activity: "activity" };
+const TAB_OF = { glossary: "learn", path: "learn", lesson: "learn", quiz: "learn", leap: "learn", market: "market", portfolio: "portfolio", activity: "activity" };
 const TABS = [["learn", "Aprender"], ["market", "Mercado"], ["portfolio", "Cartera"], ["activity", "Movimientos"]];
 const wide = () => window.innerWidth > 900;
 
@@ -634,9 +687,16 @@ function go(v) { view = v; render(); window.scrollTo(0, 0); }
 function render() {
   const inBroker = ["market", "portfolio", "activity"].includes(view.name);
   topEl.innerHTML = topbar() + (S.profile && S.broker && brokerOpen() ? tape() : "");
-  app.innerHTML = inBroker && !brokerOpen() ? lockedBroker() : ({ welcome, path, lesson, quiz, leap, market, portfolio, activity })[view.name]();
+  app.innerHTML = inBroker && !brokerOpen() ? lockedBroker() : ({ welcome, path, lesson, quiz, leap, market, portfolio, activity, glossary })[view.name]() + footer();
   navEl.innerHTML = S.profile ? bottomNav() : "";
   renderModal();
+}
+
+function footer() {
+  return `<footer class="foot">
+    <span>Sin Miedo · Prototipo educativo. No es una plataforma real ni ofrece productos financieros. Los precios son simulados.</span>
+    <span>${S.profile ? `<button class="link" data-act="reset">Reiniciar todo</button> · ` : ""}<button class="link" data-act="loadDemo">Cargar ejemplo para presentar</button></span>
+  </footer>`;
 }
 
 function topbar() {
@@ -690,6 +750,7 @@ function welcome() {
       <div>
         <h1>Invertir, sin miedo.</h1>
         <p class="lead">Aprendé en lecciones de 1 minuto, entendé las palabras raras y practicá en un broker de mentira antes de poner plata real.</p>
+        <p class="thesis">El miedo no se va con más información: se va practicando. Primero entendés, después probás sin riesgo y recién ahí ponés plata.</p>
         <button class="btn inline" data-act="start" style="padding-inline:28px">Empezar</button>
         <p class="small muted" style="margin-top:12px">Te hacemos 3 preguntas rápidas para adaptar el camino.</p>
       </div>
@@ -725,7 +786,8 @@ function path() {
   return `
     <div class="page-h">
       <div><h1>Tu camino</h1>${profileTip() ? `<p class="muted" style="max-width:70ch">${profileTip()}</p>` : ""}</div>
-      <div class="small muted">${S.done.length} de ${LEVELS.length} niveles</div>
+      <div style="text-align:right"><div class="small">Tu ${T("perfil de inversor")}: <span class="pill">${PROFILES[profileRisk()]}</span></div>
+      <div class="small muted" style="margin-top:4px">${S.done.length} de ${LEVELS.length} niveles</div></div>
     </div>
     <div class="progress"><div style="width:${S.done.length / LEVELS.length * 100}%"></div></div>
     <div class="levels">${levels}</div>
@@ -739,7 +801,25 @@ function path() {
       ${brokerOpen() ? `<button class="btn inline" data-act="tab" data-tab="market">Ir al simulador</button>`
                      : `<button class="btn ghost inline" data-act="demo">Abrirlo igual (modo presentación)</button>`}
     </div>
+    <div class="card banner" style="margin-top:12px">
+      <div><h2>Diccionario de palabras raras</h2><p class="small muted" style="margin:0">Las ${Object.keys(GLOSSARY).length} palabras que aparecen en la app, explicadas en una línea y con un ejemplo de todos los días.</p></div>
+      <button class="btn ghost inline" data-act="glossary">Abrir diccionario</button>
+    </div>
     ${pathDone() ? `<p></p><button class="btn inline" data-act="leap">Dar el salto</button>` : ""}`;
+}
+
+function glossary() {
+  const q = (view.q || "").trim().toLowerCase();
+  const nice = t => ({ "fci": "Fondo común de inversión (FCI)", "ci": "CI (contado inmediato)", "cedear": "CEDEAR" }[t] || t[0].toUpperCase() + t.slice(1));
+  return `
+    <div class="page-h">
+      <div><button class="link" data-act="path">← Tu camino</button><h1>Diccionario</h1><p class="small muted">Sin palabras raras: cada término en una línea y con un ejemplo.</p></div>
+      <input class="search" id="gsearch" type="search" placeholder="Buscar una palabra" value="${esc(view.q || "")}" autocomplete="off">
+    </div>
+    <div class="gl">${Object.entries(GLOSSARY).sort((a, b) => nice(a[0]).localeCompare(nice(b[0]), "es")).map(([k, [d, ex]]) => `
+      <div class="card" data-g="${esc((k + " " + d).toLowerCase())}" ${q && !(k + " " + d).toLowerCase().includes(q) ? "hidden" : ""}>
+        <h3>${nice(k)}</h3><p class="small" style="margin-bottom:8px">${d}</p><div class="example" style="margin:0">Ejemplo: ${ex}</div>
+      </div>`).join("")}</div>`;
 }
 
 function lesson() {
@@ -773,10 +853,27 @@ function quiz() {
   </div>`;
 }
 
+function practiceStats() {
+  const B = S.broker; if (!B) return "";
+  const done = B.orders.filter(o => o.status === "Ejecutada").length;
+  let peak = -Infinity, dd = 0;
+  B.equity.concat(equity()).forEach(v => { peak = Math.max(peak, v); dd = Math.min(dd, v / peak - 1); });
+  const pnl = equity() - START_CASH;
+  return `<div class="label" style="margin-top:8px">Tu práctica en números</div>
+    <div class="stats">
+      <div class="card"><div class="xs muted">Días practicados</div><div class="v">${B.day}</div></div>
+      <div class="card"><div class="xs muted">Operaciones hechas</div><div class="v">${done}</div></div>
+      <div class="card"><div class="xs muted">Peor caída que viviste</div><div class="v down">${pct(dd)}</div></div>
+      <div class="card"><div class="xs muted">Resultado final</div><div class="v ${cls(pnl)}">${pct(pnl / START_CASH)}</div></div>
+    </div>
+    ${dd < -0.02 ? `<p class="small">Viviste una caída de ${pct(dd)} sin arriesgar un peso. Ya sabés cómo se siente, y que no es el fin del mundo.</p>` : ""}`;
+}
+
 function leap() {
   return `<div class="narrow">
     <h1>¡Ya podés dar el primer paso!</h1>
     <p class="muted">Entendiste por qué la plata guardada pierde valor, qué es invertir, cómo funciona el riesgo y operaste en un broker sin arriesgar nada.</p>
+    ${practiceStats()}
     <div class="card" style="margin:16px 0">
       <div class="label">Tu primer paso sugerido</div>
       <p class="big num" style="margin:6px 0">${suggestion()}</p>
@@ -824,7 +921,7 @@ function market() {
     }).join("")}`).join("");
   return `
     <div class="page-h">
-      <div><h1>Mercado</h1><p class="small muted">Día ${S.broker.day} de simulación · Precios en pesos</p></div>
+      <div><h1>Mercado</h1><p class="small muted"><span class="status-dot"></span>Mercado abierto (simulado) · Día ${S.broker.day} · Precios en pesos</p></div>
       <div class="tools">
         <input class="search" id="search" type="search" placeholder="Buscar por nombre o código" value="${esc(view.q || "")}" autocomplete="off">
         <div class="chips">
@@ -861,6 +958,11 @@ function sidePanel() {
       </div>
       <div style="margin-top:10px"><span class="big num" data-px="${sym}">${money(px(sym))}</span></div>
       <div class="small"><span class="pill ${cls(v)} num" data-var="${sym}">${pct(v)}</span> <span class="muted">hoy ·</span> <span class="${cls(rv)} num">${pct(rv)}</span> <span class="muted">en ${range}</span></div>
+      <div class="mstat">
+        <div><div class="label">${T("apertura", "Apertura")}</div><div class="num small">${money(prevClose(sym))}</div></div>
+        <div><div class="label">Máx. día</div><div class="num small" data-hi="${sym}">${money(S.market[sym].hi ?? px(sym))}</div></div>
+        <div><div class="label">Mín. día</div><div class="num small" data-lo="${sym}">${money(S.market[sym].lo ?? px(sym))}</div></div>
+      </div>
       <div class="seg" style="margin:12px 0 8px">${Object.keys(RANGES).map(r => `<button class="${r === range ? "on" : ""}" data-act="range" data-r="${r}">${r}</button>`).join("")}</div>
       ${chart(values, { label: `Precio de ${sym} en ${range}` })}
     </div>
@@ -883,6 +985,9 @@ function sidePanel() {
 }
 
 /* ---------- Boleta de órdenes ---------- */
+
+function needsAck(o) { return o.side === "buy" && TYPES[INS[o.sym].type].risk > profileRisk(); }
+function blocked(o, c) { return !!c.err || (needsAck(o) && !o.ack); }
 
 function ticketHtml() {
   const o = view.ticket, sym = o.sym, fci = isFci(sym), c = calc(o);
@@ -970,7 +1075,9 @@ function ticketHtml() {
     ${o.type === "lim" ? `<div class="xs muted">${o.side === "buy" ? "Se compra solo si el precio baja hasta este valor." : "Se vende solo si el precio sube hasta este valor."}</div>` : ""}
     <div class="card flat" style="padding:10px 14px">${summaryRows(o, c)}</div>
     <div class="feedback no" id="oerr" style="margin:0" ${c.err ? "" : "hidden"}>${c.err}</div>
-    <button class="btn ${o.side === "buy" ? "buy" : "sell"}" id="review" data-act="review" ${c.err ? "disabled" : ""}>Revisar orden</button>
+    ${needsAck(o) ? `<label class="ack"><input type="checkbox" id="ack" ${o.ack ? "checked" : ""}>
+      <span>Esto es <b>${RISK[TYPES[INS[sym].type].risk].toLowerCase()}</b> y tu ${T("perfil de inversor")} es <b>${PROFILES[profileRisk()].toLowerCase()}</b>. Entiendo que puedo perder parte de lo que invierto.</span></label>` : ""}
+    <button class="btn ${o.side === "buy" ? "buy" : "sell"}" id="review" data-act="review" ${blocked(o, c) ? "disabled" : ""}>Revisar orden</button>
   </div>`;
 }
 
@@ -982,7 +1089,7 @@ function updateTicket() {
   set("qty", qtyFmt(o.sym, c.qty)); set("price", money(c.price)); set("gross", money(c.gross));
   set("fee", fci ? "Incluida en el fondo" : money(c.fee)); set("total", money(c.total));
   const err = app.querySelector("#oerr"); if (err) { err.textContent = c.err; err.hidden = !c.err; }
-  const btn = app.querySelector("#review"); if (btn) btn.disabled = !!c.err;
+  const btn = app.querySelector("#review"); if (btn) btn.disabled = blocked(o, c);
 }
 
 function placeOrder() {
@@ -1029,8 +1136,10 @@ function portfolio() {
     ${coach(dayPnl, pnl)}
     <div class="grid-2">
       <div class="card">
-        <div class="between"><span class="label">Evolución de tu cartera</span><span class="xs muted">La línea punteada es lo que pusiste: $100.000</span></div>
-        ${B.equity.length > 1 ? chart(B.equity.concat(total), { base: START_CASH, label: "Evolución de tu cartera", tall: true })
+        <div class="between"><span class="label">Evolución de tu cartera</span><span class="xs muted">Día 1 a día ${B.day}</span></div>
+        ${B.equity.length > 1 ? chart(B.equity.concat(total), { base: START_CASH, label: "Evolución de tu cartera", tall: true,
+            ref: B.equity.concat(total).map((_, i) => START_CASH * (1 + INFL) ** Math.min(i, B.day - 1)) }) + `
+          <div class="legend-line"><span><i style="border-color:var(--up)"></i>Tu cartera</span><span><i style="border-color:var(--muted);border-top-style:dashed"></i>Lo que pusiste ($100.000)</span><span><i style="border-color:var(--warn);border-top-style:dashed"></i>Lo que necesitás para no perder contra la ${T("inflación")}</span></div>`
           : `<div class="empty small">Comprá algo y adelantá el tiempo para ver cómo se mueve tu plata.</div>`}
       </div>
       <div class="card">
@@ -1101,11 +1210,12 @@ function liveTick() {
   if (!S.market || !S.broker || !brokerOpen() || document.hidden || modal) return;
   INSTRUMENTS.forEach(i => {
     if (i.type === "fci") return;
-    S.market[i.sym].px *= 1 + i.sigma * 0.08 * gauss();
+    const m = S.market[i.sym];
+    m.px *= 1 + i.sigma * 0.08 * gauss();
+    m.hi = Math.max(m.hi ?? m.px, m.px); m.lo = Math.min(m.lo ?? m.px, m.px);
   });
-  const before = S.broker.orders.filter(o => o.status === "Pendiente").length;
-  checkLimits();
-  const after = S.broker.orders.filter(o => o.status === "Pendiente").length;
+  const filled = checkLimits();
+  notifyFills(filled);
   document.querySelectorAll("[data-px]").forEach(el => {
     const s = el.dataset.px, old = parseFloat(el.dataset.last || px(s));
     el.textContent = money(px(s));
@@ -1121,7 +1231,9 @@ function liveTick() {
   document.querySelectorAll("[data-pnl]").forEach(el => { el.textContent = money(pnl); el.className = `v ${cls(pnl)}`; });
   updateTicket();
   save();
-  if (after !== before && view.name === "activity") render();
+  document.querySelectorAll("[data-hi]").forEach(el => el.textContent = money(S.market[el.dataset.hi].hi ?? px(el.dataset.hi)));
+  document.querySelectorAll("[data-lo]").forEach(el => el.textContent = money(S.market[el.dataset.lo].lo ?? px(el.dataset.lo)));
+  if (filled.length && view.name !== "market") render();
 }
 setInterval(liveTick, 2500);
 
@@ -1162,6 +1274,8 @@ document.addEventListener("click", e => {
       go(view.i === 2 ? { name: "market" } : view.i === LEVELS.length - 1 ? { name: "leap" } : { name: "path" });
       break;
     case "leap": go({ name: "leap" }); break;
+    case "glossary": go({ name: "glossary" }); break;
+    case "loadDemo": ask("Cargar ejemplo para presentar", "Se reemplaza lo que haya ahora por un ejemplo: perfil completo, 3 niveles hechos y una cartera con dos meses de historia.", "Cargar ejemplo", loadDemo); break;
     case "lbo": ask("Próximamente", "Acá se abriría el alta en LBO con el monto sugerido. En este prototipo todavía no está conectado.", "Entendido"); break;
     case "reset":
       ask("¿Empezar de cero?", "Se borra tu progreso del camino y el simulador.", "Borrar todo", () => {
@@ -1192,7 +1306,7 @@ document.addEventListener("click", e => {
       app.querySelector("#q").value = fci ? tk.amount : tk.qty;
       updateTicket(); break;
     }
-    case "review": if (!calc(tk).err) { tk.step = "review"; render(); } break;
+    case "review": if (!blocked(tk, calc(tk))) { tk.step = "review"; render(); } break;
     case "editOrder": tk.step = "form"; render(); break;
     case "confirm": placeOrder(); break;
     case "cancel": {
@@ -1210,6 +1324,13 @@ document.addEventListener("click", e => {
 });
 
 document.addEventListener("input", e => {
+  if (e.target.id === "gsearch") {
+    view.q = e.target.value;
+    const q = view.q.trim().toLowerCase();
+    app.querySelectorAll("[data-g]").forEach(c => c.hidden = !!q && !c.dataset.g.includes(q));
+    return;
+  }
+  if (e.target.id === "ack") { view.ticket.ack = e.target.checked; updateTicket(); return; }
   if (e.target.id === "search") {
     view.q = e.target.value;
     const q = view.q.trim().toLowerCase();
@@ -1224,6 +1345,25 @@ document.addEventListener("input", e => {
     updateTicket();
   }
 });
+
+function loadDemo() {
+  S = fresh();
+  S.profile = { exp: 0, fear: 0, amount: 1 };
+  S.done = [0, 1, 2];
+  ensureBroker();
+  const buy = (sym, qty, amount) => {
+    const o = { sym, side: "buy", type: "mkt", plazo: isFci(sym) ? "24hs" : "CI", qty, amount };
+    const r = execute(o, px(sym));
+    if (r.ok) S.broker.orders.unshift({ id: S.broker.nextId++, ...o, day: S.broker.day, status: "Ejecutada", price: r.price, qty: r.qty, fee: r.fee, total: r.total });
+  };
+  buy("MM", 0, 20000); buy("AL30", 15, 0); buy("KO", 1, 0);
+  advance(25, { silent: true });
+  buy("GGAL", 2, 0);
+  advance(15, { silent: true });
+  S.broker.orders.unshift({ id: S.broker.nextId++, sym: "YPFD", side: "buy", type: "lim", plazo: "CI", qty: 1, amount: 0,
+    limit: +(px("YPFD") * 0.93).toFixed(2), day: S.broker.day, status: "Pendiente" });
+  save(); go({ name: "portfolio" });
+}
 
 document.addEventListener("keydown", e => { if (e.key === "Escape" && modal) { modal = null; renderModal(); } });
 

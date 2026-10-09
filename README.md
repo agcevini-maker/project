@@ -21,11 +21,21 @@ Abrí `index.html` en el navegador (no necesita instalar nada). En la compu se v
    - Las palabras técnicas del broker (CI, 24hs, orden límite, cuotaparte, comisión…) también se pueden tocar para ver qué significan.
 5. **El salto**: al terminar el camino, propone un monto chico para hacer lo mismo con plata real en LBO.
 
-El progreso se guarda en el navegador (localStorage). "Reiniciar" lo borra.
+También incluye:
+- **Perfil de inversor** según las 3 preguntas; si comprás algo con más riesgo que tu perfil, la boleta pide confirmar que entendés el riesgo.
+- **Diccionario** con todas las palabras raras y buscador.
+- **Línea de inflación** en el gráfico de la cartera (inflación simulada ~2,3% por mes).
+- **Avisos** cuando se ejecuta una orden límite.
+- **Resumen de la práctica** en "El salto" (días, operaciones, peor caída vivida, resultado).
+- **"Cargar ejemplo para presentar"** (abajo de todo): deja la app lista con una cartera de dos meses.
+
+El progreso se guarda en el navegador (localStorage). "Reiniciar todo" lo borra.
+
+Para presentar, ver [PRESENTACION.md](PRESENTACION.md).
 
 ## Pendientes antes de mostrarlo
 
 - **El simulador usa activos de ejemplo** (fondos genéricos y algunos bonos, CEDEARs y acciones conocidos). Ajustar la lista a los productos reales de LBO después de la reunión con Lautaro.
-- **Los precios, la comisión (0,6%) y los movimientos son inventados** y aleatorios; no son cotizaciones reales.
+- **Los precios, la comisión (0,6%), la inflación y los movimientos son inventados** y aleatorios; no son cotizaciones reales.
 - El botón "Hacerlo en LBO" no lleva a ningún lado todavía.
 - El contenido de las lecciones es un borrador: conviene que alguien de LBO lo revise antes de usarlo.
