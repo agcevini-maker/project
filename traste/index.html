@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Traste: aprendé guitarra desde cero</title>
+<meta name="description" content="Aprendé guitarra desde cero: acordes, teoría, oído y punteo de rock.">
+<meta name="theme-color" content="#1F6F8B">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./icons/icon-192.png">
+<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Traste">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+</head>
+<body>
+<header class="top">
+  <div class="bar">
+    <div class="logo" aria-label="Traste">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="3" width="20" height="18" rx="3" fill="var(--wood)"/><g stroke="var(--fret)" stroke-width="1.5"><line x1="8" y1="3" x2="8" y2="21"/><line x1="14" y1="3" x2="14" y2="21"/></g><circle cx="11" cy="12" r="2.4" fill="var(--amber)"/></svg>
+      Traste
+    </div>
+    <nav class="tabs" role="tablist">
+      <button role="tab" data-tab="ruta" aria-selected="true">Ruta</button>
+      <button role="tab" data-tab="acordes" aria-selected="false">Acordes</button>
+      <button role="tab" data-tab="teoria" aria-selected="false">Teoría</button>
+      <button role="tab" data-tab="oido" aria-selected="false">Oído</button>
+      <button role="tab" data-tab="punteo" aria-selected="false">Punteo</button>
+      <button role="tab" data-tab="practica" aria-selected="false">Práctica</button>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <!-- RUTA -->
+  <section class="view on" id="v-ruta">
+    <div class="hero">
+      <h1>Aprendé guitarra desde la primera cuerda</h1>
+      <p class="lede">Veinte lecciones en orden, del primer acorde a la cejilla. Tocá el diapasón para escuchar cada nota: la cuerda de arriba es la más aguda, igual que en una tablatura.</p>
+      <div class="board-wrap" id="heroBoard"></div>
+      <div class="board-info">
+        <div class="note-big" id="heroNote">Tocá un traste</div>
+        <div class="note-sub" id="heroSub"></div>
+        <label class="toggle"><input type="checkbox" id="showAll"> Mostrar todas las notas</label>
+      </div>
+    </div>
+
+    <div class="sec-head">
+      <h2>Tu ruta</h2>
+      <p>Marcá cada lección cuando la puedas tocar sin mirar. Tu avance queda guardado en este navegador.</p>
+    </div>
+    <div class="progress"><div class="track"><div class="fill" id="progFill"></div></div><span id="progText">0 de 20</span></div>
+    <div id="levels"></div>
+  </section>
+
+  <!-- ACORDES -->
+  <section class="view" id="v-acordes">
+    <div class="sec-head">
+      <h2>Diccionario de acordes</h2>
+      <p>Tocá un acorde para escucharlo rasgueado. Los números son los dedos: 1 índice, 2 mayor, 3 anular, 4 meñique. Una x es una cuerda que no se toca y un círculo, una cuerda al aire.</p>
+    </div>
+    <div class="chips" id="catChips"></div>
+    <div class="grid" id="chordGrid"></div>
+  </section>
+
+  <!-- TEORÍA -->
+  <section class="view" id="v-teoria">
+    <div class="sec-head">
+      <h2>Teoría que se toca</h2>
+      <p>Lo justo para entender por qué suenan bien los acordes que ya sabés, y para armar los que no.</p>
+    </div>
+
+    <div class="panel">
+      <h3>Las 12 notas</h3>
+      <p>La música occidental usa doce sonidos que se repiten. Cada traste sube un semitono. Entre Mi y Fa, y entre Si y Do, no hay sostenido: están a un solo traste de distancia.</p>
+      <div class="notes12" id="notes12"></div>
+    </div>
+
+    <div class="panel">
+      <h3>Explorador del diapasón</h3>
+      <p>Elegí una tónica y una escala o un tipo de acorde para ver dónde están sus notas en todo el mástil. La tónica aparece en azul.</p>
+      <div class="controls">
+        <label>Tónica<select id="exRoot"></select></label>
+        <label>Ver<select id="exType"></select></label>
+        <label>Etiquetas<select id="exLabel"><option value="note">Nombre de nota</option><option value="deg">Grado</option></select></label>
+        <button class="btn" id="exPlay">Escuchar</button>
+      </div>
+      <div class="board-wrap" id="exBoard" style="margin-top:0"></div>
+      <div class="degrees" id="exDegrees"></div>
+    </div>
+
+    <div class="panel">
+      <h3>Cómo se arma un acorde</h3>
+      <p>Un acorde es un grupo de notas que suenan juntas. Se cuentan en semitonos desde la tónica. La diferencia entre mayor y menor es una sola nota: la tercera.</p>
+      <div class="tablewrap">
+      <table class="formula">
+        <thead><tr><th>Tipo</th><th>Grados</th><th>Semitonos</th><th>Ejemplo en Do</th><th>Suena</th></tr></thead>
+        <tbody id="formulaBody"></tbody>
+      </table>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>Campo armónico mayor</h3>
+      <p>Si armás un acorde sobre cada nota de una escala mayor, obtenés los siete acordes de esa tonalidad. Casi todas las canciones populares usan el I, IV, V y vi. Tocá uno para escucharlo.</p>
+      <div class="controls"><label>Tonalidad<select id="keySel"></select></label></div>
+      <div class="field" id="field"></div>
+      <div class="field-detail" id="fieldDetail"></div>
+    </div>
+  </section>
+
+  <!-- PRÁCTICA -->
+  <section class="view" id="v-practica">
+    <div class="sec-head">
+      <h2>Práctica</h2>
+      <p>Herramientas para afinar, llevar el ritmo y ganar velocidad en los cambios.</p>
+    </div>
+
+    <div class="panel">
+      <h3>Afinación de referencia</h3>
+      <p>Tocá una cuerda acá y la misma en tu guitarra. Girá la clavija hasta que las dos suenen iguales, sin ese "temblor" entre ellas. Para mayor precisión, usá además un afinador con micrófono.</p>
+      <div class="strings6" id="tuner"></div>
+      <label class="toggle" style="margin:14px 0 0"><input type="checkbox" id="tuneLoop"> Repetir la nota elegida</label>
+    </div>
+
+    <div class="panel">
+      <h3>Metrónomo y rasgueo</h3>
+      <p>Elegí un patrón y, si querés, un acorde para que suene en cada golpe. Empezá lento: la velocidad llega sola cuando el movimiento es parejo.</p>
+      <div class="bpm"><output id="bpmOut">70</output><span class="muted">bpm</span><input type="range" id="bpm" min="40" max="160" value="70" aria-label="Tempo"></div>
+      <div class="controls" style="margin-top:14px">
+        <label>Patrón<select id="patSel"></select></label>
+        <label>Acorde<select id="patChord"><option value="">Solo click</option></select></label>
+        <button class="btn primary" id="metroBtn">Empezar</button>
+      </div>
+      <div class="slots" id="slots"></div>
+      <div class="beats" id="beats"></div>
+    </div>
+
+    <div class="panel">
+      <h3>Cambios en un minuto</h3>
+      <p>Elegí dos acordes y cambiá entre ellos todo lo que puedas durante 60 segundos. Tocá el círculo cada vez que el acorde suene limpio. Repetilo a diario y anotá tu récord.</p>
+      <div class="controls">
+        <label>Acorde A<select id="trA"></select></label>
+        <label>Acorde B<select id="trB"></select></label>
+        <button class="btn primary" id="trStart">Empezar minuto</button>
+      </div>
+      <div class="trainer">
+        <div class="timer" id="trTimer">60 s</div>
+        <button class="bigtap" id="trTap" disabled><span><span id="trCount">0</span><small>cambios</small></span></button>
+        <div class="muted" id="trBest">Sin récord todavía</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- OÍDO -->
+  <section class="view" id="v-oido">
+    <div class="sec-head">
+      <h2>Entrenar el oído</h2>
+      <p>Para sacar punteos de oído necesitás reconocer qué escuchás. Practicá unos minutos por día: el oído mejora más con frecuencia que con sesiones largas.</p>
+    </div>
+    <div class="modes" id="earModes"></div>
+    <div class="panel" id="earPanel"></div>
+  </section>
+
+  <!-- PUNTEO -->
+  <section class="view" id="v-punteo">
+    <div class="sec-head">
+      <h2>Punteo de rock melódico</h2>
+      <p>Las técnicas del solo de hard rock clásico, el estilo que se escucha en guitarristas como Pato Sardelli: frases que "cantan", bends afinados, vibrato ancho y notas largas. Todos los licks son originales para practicar; los solos de las canciones conviene sacarlos de oído o de transcripciones oficiales.</p>
+    </div>
+    <div class="panel">
+      <h3>Cómo leer las tablaturas de punteo</h3>
+      <p class="legend"><b>7b9</b> bend del traste 7 hasta que suene como el 9. <b>7b9r7</b> bend y volver. <b>7~</b> vibrato. <b>h7</b> hammer-on (golpe sin púa). <b>p5</b> pull-off (tirar de la cuerda). <b>7/9</b> slide hacia arriba. Dos números en la misma columna se tocan juntos.</p>
+    </div>
+    <div class="progress"><div class="track"><div class="fill" id="pProgFill"></div></div><span id="pProgText"></span></div>
+    <div id="licks"></div>
+
+    <div class="sec-head">
+      <h2>Zapada</h2>
+      <p>Una base con batería, bajo y guitarra rítmica para improvisar. El diapasón te muestra las notas de la escala y, en azul, las del acorde que está sonando: son las mejores para terminar una frase.</p>
+    </div>
+    <div class="panel">
+      <div class="controls">
+        <label>Base<select id="jamSel"></select></label>
+        <label>Tempo<select id="jamBpm"><option>70</option><option selected>84</option><option>96</option><option>110</option><option>126</option></select></label>
+        <button class="btn primary" id="jamBtn">Empezar zapada</button>
+      </div>
+      <div class="jamnow"><div class="big" id="jamChord">Am</div><div class="next" id="jamNext"></div></div>
+      <div class="barcells" id="jamBars"></div>
+      <p class="muted" id="jamTxt" style="margin:0 0 10px"></p>
+      <div class="board-wrap" id="jamBoard" style="margin-top:0"></div>
+    </div>
+  </section>
+</main>
+<footer>El contenido es una guía de estudio general: contrastalo con un profesor o material especializado si tenés dudas.</footer>
+<script type="module" src="./src/main.js"></script>
+</body>
+</html>

@@ -39,3 +39,15 @@ Para presentar, ver [PRESENTACION.md](PRESENTACION.md).
 - **Los precios, la comisión (0,6%), la inflación y los movimientos son inventados** y aleatorios; no son cotizaciones reales.
 - El botón "Hacerlo en LBO" no lleva a ningún lado todavía.
 - El contenido de las lecciones es un borrador: conviene que alguien de LBO lo revise antes de usarlo.
+
+---
+
+## Traste (carpeta `traste/`)
+
+App aparte para aprender guitarra desde cero (Vite + JavaScript, instalable como PWA). Ver [traste/README.md](traste/README.md):
+
+```bash
+cd traste
+npm install
+npm run dev
+```
