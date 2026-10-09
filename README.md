@@ -2,7 +2,7 @@
 
 Prototipo de app para animarse a invertir: **aprender** con lecciones de 1 minuto, **entender** las palabras raras tocándolas, **practicar** con plata de mentira y **animarse** a dar el primer paso real.
 
-Abrí `index.html` en el navegador (no necesita instalar nada). Está pensado para verse en el celular.
+Abrí `index.html` en el navegador (no necesita instalar nada). En la compu se ve como la plataforma web de un broker (barra superior, cinta de cotizaciones, tabla de mercado con panel de operación al costado); en el celular pasa a una columna con barra inferior.
 
 ## Flujo
 

@@ -8,13 +8,17 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
 <style>
-  /* Layout: app de celular, una columna; barra de navegación inferior como en un broker. */
+  /* Layout: plataforma web de broker. Barra superior con navegación y saldo, cinta de cotizaciones,
+     contenido a lo ancho (tabla + panel lateral de operación). En celular pasa a una columna con barra inferior. */
   :root {
     --bg: #eef1f4;
     --card: #ffffff;
     --ink: #0f1a24;
     --muted: #5b6876;
     --line: #dde3e9;
+    --head: #0d2a3a;
+    --head-ink: #e8f0f5;
+    --head-muted: #94adbd;
     --accent: #0b6e4f;
     --accent-ink: #ffffff;
     --accent-soft: #e1f1ea;
@@ -24,6 +28,7 @@
     --down-soft: #fbe6e6;
     --warn: #9a5b00;
     --warn-soft: #fbefdc;
+    --row-hover: #f5f8fa;
     --shadow: 0 1px 2px rgba(15,26,36,.05), 0 6px 18px rgba(15,26,36,.05);
     --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
@@ -31,136 +36,223 @@
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
       --bg: #0c1117; --card: #151c24; --ink: #e6edf3; --muted: #8b98a6; --line: #26303b;
+      --head: #0a1f2b; --head-ink: #e6edf3; --head-muted: #7f98a8;
       --accent: #34c38f; --accent-ink: #06150f; --accent-soft: #12302a;
       --up: #34c38f; --up-soft: #12302a; --down: #ff7070; --down-soft: #3a1b1d;
-      --warn: #f2b25c; --warn-soft: #3a2a14; --shadow: 0 1px 2px rgba(0,0,0,.4);
+      --warn: #f2b25c; --warn-soft: #3a2a14; --row-hover: #1a222c; --shadow: 0 1px 2px rgba(0,0,0,.4);
       color-scheme: dark;
     }
   }
   :root[data-theme="dark"] {
     --bg: #0c1117; --card: #151c24; --ink: #e6edf3; --muted: #8b98a6; --line: #26303b;
+    --head: #0a1f2b; --head-ink: #e6edf3; --head-muted: #7f98a8;
     --accent: #34c38f; --accent-ink: #06150f; --accent-soft: #12302a;
     --up: #34c38f; --up-soft: #12302a; --down: #ff7070; --down-soft: #3a1b1d;
-    --warn: #f2b25c; --warn-soft: #3a2a14; --shadow: 0 1px 2px rgba(0,0,0,.4);
+    --warn: #f2b25c; --warn-soft: #3a2a14; --row-hover: #1a222c; --shadow: 0 1px 2px rgba(0,0,0,.4);
     color-scheme: dark;
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; }
-  body { background: var(--bg); color: var(--ink); font: 16px/1.5 var(--sans); }
-  .app { max-width: 460px; margin: 0 auto; padding: 12px 16px 104px; min-height: 100vh; }
-  .app.no-nav { padding-bottom: 40px; }
-  header.top { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 12px; }
-  .brand { font-weight: 700; letter-spacing: -.02em; font-size: 19px; }
-  .brand span { color: var(--accent); }
-  .sim-badge { font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--warn); background: var(--warn-soft); padding: 3px 8px; border-radius: 99px; }
-  .link { background: none; border: 0; color: var(--muted); font: inherit; font-size: 14px; cursor: pointer; padding: 4px; }
-  .link:hover { color: var(--ink); }
-  h1 { font-size: 24px; line-height: 1.2; margin: 6px 0 8px; letter-spacing: -.02em; text-wrap: balance; }
+  body { background: var(--bg); color: var(--ink); font: 15px/1.5 var(--sans); }
+  .wrap { max-width: 1320px; margin: 0 auto; padding-inline: 24px; }
+  main.wrap { padding-block: 20px 48px; }
+
+  /* Barra superior */
+  .topbar { background: var(--head); color: var(--head-ink); position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; }
+  .topbar .wrap { display: flex; align-items: center; gap: 28px; height: 60px; }
+  .brand { font-weight: 700; letter-spacing: -.02em; font-size: 20px; background: none; border: 0; color: inherit; font-family: inherit; cursor: pointer; padding: 0; }
+  .brand span { color: #4fd1a1; }
+  .topnav { display: flex; gap: 4px; height: 100%; }
+  .topnav button { background: none; border: 0; color: var(--head-muted); font: inherit; font-weight: 600; padding: 0 14px; cursor: pointer; border-bottom: 3px solid transparent; }
+  .topnav button:hover { color: var(--head-ink); }
+  .topnav button.on { color: var(--head-ink); border-bottom-color: #4fd1a1; }
+  .acct { margin-left: auto; display: flex; gap: 22px; align-items: center; font-size: 13px; }
+  .acct .k { color: var(--head-muted); display: block; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; }
+  .acct .v { font-family: var(--mono); font-weight: 600; font-size: 15px; font-variant-numeric: tabular-nums; }
+  .sim-badge { font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: #f2b25c; border: 1px solid rgba(242,178,92,.5); padding: 3px 8px; border-radius: 6px; white-space: nowrap; }
+  .topbar .link { color: var(--head-muted); }
+
+  /* Cinta de cotizaciones */
+  .tape { background: var(--card); border-bottom: 1px solid var(--line); overflow: hidden; white-space: nowrap; font-size: 13px; }
+  .tape-in { display: inline-flex; gap: 28px; padding: 8px 0; animation: tape 60s linear infinite; }
+  .tape-in span { display: inline-flex; gap: 6px; }
+  .tape b { font-family: var(--mono); }
+  @keyframes tape { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  @media (prefers-reduced-motion: reduce) { .tape-in { animation: none; } }
+
+  /* Tipografía y básicos */
+  h1 { font-size: 26px; line-height: 1.2; margin: 0 0 6px; letter-spacing: -.02em; text-wrap: balance; }
   h2 { font-size: 17px; margin: 0 0 8px; text-wrap: balance; }
   p { margin: 0 0 12px; }
   .muted { color: var(--muted); }
   .small { font-size: 14px; }
   .xs { font-size: 12px; }
   .num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
-  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px; box-shadow: var(--shadow); margin-bottom: 12px; }
-  .card.flat { box-shadow: none; }
-  .btn { display: block; width: 100%; border: 0; border-radius: 12px; padding: 13px 16px; font: inherit; font-weight: 600; cursor: pointer; background: var(--accent); color: var(--accent-ink); text-align: center; }
+  .label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; font-weight: 600; }
+  .big { font-size: 30px; font-weight: 600; letter-spacing: -.02em; line-height: 1.15; }
+  .up { color: var(--up); } .down { color: var(--down); }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 18px; box-shadow: var(--shadow); }
+  .card.flat { box-shadow: none; background: var(--bg); border-color: transparent; }
+  .btn { display: block; width: 100%; border: 0; border-radius: 10px; padding: 12px 16px; font: inherit; font-weight: 600; cursor: pointer; background: var(--accent); color: var(--accent-ink); text-align: center; }
+  .btn.inline { display: inline-block; width: auto; }
+  .btn.sm { padding: 6px 12px; font-size: 13px; border-radius: 8px; }
   .btn[disabled] { opacity: .4; cursor: not-allowed; }
   .btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
   .btn.buy { background: var(--up); color: var(--accent-ink); }
   .btn.sell { background: var(--down); color: #fff; }
+  .link { background: none; border: 0; color: var(--muted); font: inherit; font-size: 14px; cursor: pointer; padding: 4px 0; }
+  .link:hover { color: var(--ink); }
   button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   .row { display: flex; gap: 8px; }
   .row > * { flex: 1; min-width: 0; }
-  .between { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
-  .opt { display: block; width: 100%; text-align: left; border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 12px; padding: 12px 14px; margin-bottom: 8px; font: inherit; cursor: pointer; }
-  .opt.sel, .opt.right { border-color: var(--accent); background: var(--accent-soft); }
-  .opt.wrong { border-color: var(--down); }
-  .progress { height: 6px; background: var(--line); border-radius: 99px; overflow: hidden; margin: 4px 0 16px; }
-  .progress > div { height: 100%; background: var(--accent); transition: width .3s; }
+  .between { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+  .stack { display: flex; flex-direction: column; gap: 8px; }
   .pill { display: inline-block; font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 99px; background: var(--accent-soft); color: var(--accent); white-space: nowrap; }
   .pill.warn { background: var(--warn-soft); color: var(--warn); }
   .pill.up { background: var(--up-soft); color: var(--up); }
   .pill.down { background: var(--down-soft); color: var(--down); }
   .pill.grey { background: var(--bg); color: var(--muted); }
-  .up { color: var(--up); } .down { color: var(--down); }
+  .term { background: none; border: 0; padding: 0; font: inherit; color: inherit; cursor: pointer; text-decoration: underline dotted var(--accent) 2px; text-underline-offset: 3px; }
+  .note { font-size: 12px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 10px; margin-top: 16px; }
+  .page-h { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
+  .page-h p { margin: 0; }
 
-  /* Camino */
-  .level { display: flex; gap: 12px; align-items: center; cursor: pointer; }
+  /* Aprender */
+  .narrow { max-width: 720px; margin: 0 auto; }
+  .hero { display: grid; grid-template-columns: 1.1fr 1fr; gap: 32px; align-items: center; padding-block: 32px; }
+  .hero h1 { font-size: 44px; letter-spacing: -.03em; }
+  .hero .lead { font-size: 18px; color: var(--muted); max-width: 46ch; }
+  .pillars { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .pillars .card { box-shadow: none; }
+  .pillars b { display: block; font-size: 16px; margin-bottom: 2px; }
+  .progress { height: 6px; background: var(--line); border-radius: 99px; overflow: hidden; margin: 4px 0 16px; }
+  .progress > div { height: 100%; background: var(--accent); transition: width .3s; }
+  .opt { display: block; width: 100%; text-align: left; border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 10px; padding: 13px 16px; margin-bottom: 8px; font: inherit; cursor: pointer; }
+  .opt:hover { border-color: var(--accent); }
+  .opt.sel, .opt.right { border-color: var(--accent); background: var(--accent-soft); }
+  .opt.wrong { border-color: var(--down); }
+  .levels { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 16px; }
+  .level { display: flex; flex-direction: column; gap: 10px; cursor: pointer; text-align: left; font: inherit; color: inherit; }
+  .level:hover { border-color: var(--accent); }
   .level.locked { cursor: default; opacity: .55; }
-  .dot { flex: none; width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; background: var(--accent-soft); color: var(--accent); border: 2px solid var(--accent); }
+  .level.locked:hover { border-color: var(--line); }
+  .dot { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; background: var(--accent-soft); color: var(--accent); border: 2px solid var(--accent); }
   .level.done .dot { background: var(--accent); color: var(--accent-ink); }
   .level.locked .dot { border-color: var(--line); color: var(--muted); background: transparent; }
   .level .t { font-weight: 600; line-height: 1.3; }
-  .lesson p { font-size: 17px; }
-  .term { background: none; border: 0; padding: 0; font: inherit; color: inherit; cursor: pointer; text-decoration: underline dotted var(--accent) 2px; text-underline-offset: 3px; }
-
-  /* Hojas y diálogos */
-  .sheet-bg { position: fixed; inset: 0; background: rgba(5,10,15,.45); display: flex; align-items: flex-end; justify-content: center; z-index: 30; }
-  .sheet { background: var(--card); color: var(--ink); width: 100%; max-width: 460px; border-radius: 20px 20px 0 0; padding: 20px 16px calc(24px + env(safe-area-inset-bottom, 0px)); }
-  .sheet h3 { margin: 0 0 6px; font-size: 18px; }
-  .example { background: var(--bg); border-radius: 10px; padding: 10px 12px; font-size: 15px; margin-bottom: 14px; }
-  .feedback { border-radius: 12px; padding: 12px 14px; margin: 8px 0 12px; }
+  .banner { display: flex; gap: 24px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+  .banner > div { flex: 1 1 360px; min-width: 0; }
+  .lesson p { font-size: 18px; line-height: 1.6; }
+  .feedback { border-radius: 10px; padding: 12px 14px; margin: 8px 0 12px; }
   .feedback.ok { background: var(--accent-soft); }
   .feedback.no { background: var(--warn-soft); }
-  .tip { background: var(--accent-soft); border-radius: 12px; padding: 12px 14px; margin-bottom: 12px; font-size: 14px; display: flex; gap: 10px; align-items: flex-start; }
+  .tip { background: var(--accent-soft); border-radius: 10px; padding: 10px 14px; margin-bottom: 16px; font-size: 14px; display: flex; gap: 12px; align-items: flex-start; }
   .tip > div { flex: 1; min-width: 0; }
-  .tip .link { font-size: 13px; flex: none; }
+  .tip .link { font-size: 13px; padding: 0; flex: none; }
 
-  /* Broker */
-  .big { font-size: 30px; font-weight: 600; letter-spacing: -.02em; line-height: 1.15; }
-  .label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; font-weight: 600; }
-  .chips { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 10px; scrollbar-width: none; }
-  .chip { flex: none; border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 99px; padding: 6px 12px; font: inherit; font-size: 14px; cursor: pointer; }
+  /* Mercado: tabla + panel */
+  .tools { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 12px; }
+  .search { flex: 0 1 280px; min-width: 0; border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 10px; padding: 9px 12px; font: inherit; }
+  .chips { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
+  .chip { flex: none; border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 99px; padding: 6px 12px; font: inherit; font-size: 13px; cursor: pointer; }
   .chip.on { background: var(--ink); color: var(--card); border-color: var(--ink); }
-  .search { width: 100%; border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 12px; padding: 11px 14px; font: inherit; margin-bottom: 10px; }
-  .list { background: var(--card); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; margin-bottom: 12px; }
-  .list-h { padding: 10px 14px 6px; }
-  .tick { display: grid; grid-template-columns: 1fr 56px auto; gap: 10px; align-items: center; padding: 11px 14px; border-top: 1px solid var(--line); cursor: pointer; background: none; border-left: 0; border-right: 0; border-bottom: 0; width: 100%; text-align: left; font: inherit; color: inherit; }
-  .tick:first-child { border-top: 0; }
-  .tick:hover { background: var(--bg); }
+  .split { display: grid; grid-template-columns: minmax(0, 1fr) 400px; gap: 20px; align-items: start; }
+  .side { position: sticky; top: 76px; display: flex; flex-direction: column; gap: 14px; }
+  .tbl-wrap { background: var(--card); border: 1px solid var(--line); border-radius: 12px; overflow-x: auto; box-shadow: var(--shadow); }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 600; padding: 10px 14px; border-bottom: 1px solid var(--line); white-space: nowrap; background: var(--card); }
+  td { padding: 10px 12px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  tr:last-child td { border-bottom: 0; }
+  th.r, td.r { text-align: right; }
+  tbody tr.click { cursor: pointer; }
+  tbody tr.click:hover { background: var(--row-hover); }
+  tbody tr.sel { background: var(--accent-soft); }
+  tr.group td { background: var(--bg); font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 600; padding: 6px 14px; }
   .sym { font-weight: 700; font-family: var(--mono); letter-spacing: .01em; }
-  .tname { font-size: 13px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .tright { text-align: right; }
-  .tright .num { display: block; font-size: 15px; }
+  .tname { font-size: 12px; color: var(--muted); max-width: 230px; overflow: hidden; text-overflow: ellipsis; }
   .flash-up { animation: fu .8s; } .flash-down { animation: fd .8s; }
   @keyframes fu { from { background: var(--up-soft); } to { background: transparent; } }
   @keyframes fd { from { background: var(--down-soft); } to { background: transparent; } }
   @media (prefers-reduced-motion: reduce) { .flash-up, .flash-down { animation: none; } }
-  svg.chart { width: 100%; height: 160px; display: block; }
-  svg.spark { width: 56px; height: 24px; display: block; }
-  .kv { display: flex; justify-content: space-between; gap: 12px; padding: 7px 0; border-top: 1px solid var(--line); font-size: 15px; }
+  svg.chart { width: 100%; height: 170px; display: block; }
+  svg.chart.tall { height: 240px; }
+  svg.spark { width: 80px; height: 24px; display: block; }
+  .kv { display: flex; justify-content: space-between; gap: 12px; padding: 7px 0; border-top: 1px solid var(--line); font-size: 14px; }
   .kv:first-child { border-top: 0; }
-  .kv b { font-weight: 600; }
-  .seg { display: flex; background: var(--bg); border-radius: 10px; padding: 3px; gap: 3px; margin-bottom: 12px; }
-  .seg button { flex: 1; border: 0; background: transparent; color: var(--muted); border-radius: 8px; padding: 8px; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
+  .kv b { font-weight: 600; text-align: right; }
+  .seg { display: flex; background: var(--bg); border-radius: 9px; padding: 3px; gap: 3px; }
+  .seg button { flex: 1; border: 0; background: transparent; color: var(--muted); border-radius: 7px; padding: 7px; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+  .seg button[disabled] { opacity: .4; cursor: not-allowed; }
   .seg button.on { background: var(--card); color: var(--ink); box-shadow: var(--shadow); }
   .seg button.on.buy { color: var(--up); } .seg button.on.sell { color: var(--down); }
-  .field { margin-bottom: 12px; }
-  .field > .label { display: block; margin-bottom: 4px; }
-  .stepper { display: flex; align-items: stretch; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--card); }
-  .stepper button { width: 48px; border: 0; background: var(--bg); color: var(--ink); font: inherit; font-size: 20px; cursor: pointer; }
-  .stepper input { flex: 1; min-width: 0; border: 0; background: transparent; color: var(--ink); text-align: center; font: 600 18px var(--mono); padding: 10px; }
-  .alloc-bar { display: flex; height: 10px; border-radius: 99px; overflow: hidden; background: var(--line); margin: 10px 0 8px; gap: 2px; }
-  .legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13px; color: var(--muted); }
-  .legend i { display: inline-block; width: 9px; height: 9px; border-radius: 3px; margin-right: 5px; vertical-align: 0; }
-  .time { display: flex; gap: 6px; }
-  .time button { flex: 1; font-size: 14px; padding: 12px 6px; white-space: nowrap; }
-  .empty { text-align: center; padding: 28px 16px; color: var(--muted); }
-  .note { font-size: 12px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 10px; margin-top: 12px; }
-  .stack { display: flex; flex-direction: column; gap: 8px; }
-  .done-ic { width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; font-size: 28px; margin: 8px auto 12px; background: var(--up-soft); color: var(--up); }
+  .field { display: flex; flex-direction: column; gap: 4px; }
+  .fields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .stepper { display: flex; align-items: stretch; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--card); }
+  .stepper button { width: 40px; border: 0; background: var(--bg); color: var(--ink); font: inherit; font-size: 18px; cursor: pointer; }
+  .stepper input { flex: 1; min-width: 0; border: 0; background: transparent; color: var(--ink); text-align: center; font: 600 16px var(--mono); padding: 8px; }
+  .ticket { display: flex; flex-direction: column; gap: 12px; }
+  .ticket-h { display: flex; justify-content: space-between; align-items: center; }
+  .done-ic { width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; font-size: 24px; margin: 4px auto 0; background: var(--up-soft); color: var(--up); }
   .done-ic.pend { background: var(--warn-soft); color: var(--warn); }
+  .placeholder { text-align: center; color: var(--muted); padding: 40px 20px; }
+  .mobile-back { display: none; }
 
-  nav.bottom { position: fixed; left: 0; right: 0; bottom: 0; background: var(--card); border-top: 1px solid var(--line); z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px); }
-  nav.bottom .in { max-width: 460px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); }
-  nav.bottom button { border: 0; background: none; color: var(--muted); font: inherit; font-size: 12px; font-weight: 600; padding: 9px 4px 10px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px; }
-  nav.bottom button.on { color: var(--accent); }
-  nav.bottom svg { width: 22px; height: 22px; }
+  /* Cartera */
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 16px; }
+  .kpi .v { font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: 22px; font-weight: 600; margin-top: 2px; }
+  .grid-2 { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 16px; margin-bottom: 16px; align-items: start; }
+  .alloc-bar { display: flex; height: 12px; border-radius: 99px; overflow: hidden; background: var(--line); margin: 12px 0; gap: 2px; }
+  .alloc-list .kv i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 8px; }
+  .time { display: flex; gap: 6px; }
+  .time button { flex: 1; font-size: 14px; padding: 10px 6px; white-space: nowrap; }
+  .empty { text-align: center; padding: 28px 16px; color: var(--muted); }
+
+  /* Diálogos */
+  .sheet-bg { position: fixed; inset: 0; background: rgba(5,10,15,.5); display: flex; align-items: center; justify-content: center; z-index: 40; padding: 16px; }
+  .sheet { background: var(--card); color: var(--ink); width: 100%; max-width: 440px; border-radius: 14px; padding: 22px 20px; box-shadow: 0 20px 60px rgba(0,0,0,.3); }
+  .sheet h3 { margin: 0 0 6px; font-size: 18px; }
+  .example { background: var(--bg); border-radius: 10px; padding: 10px 12px; font-size: 14px; margin-bottom: 14px; }
+
+  /* Navegación inferior (solo celular) */
+  nav.bottom { display: none; }
+
+  @media (max-width: 1360px) { .hide-l { display: none; } }
+  @media (max-width: 1100px) {
+    .levels { grid-template-columns: repeat(3, 1fr); }
+    .split { grid-template-columns: minmax(0, 1fr) 360px; }
+    .acct .hide-t { display: none; }
+  }
+  @media (max-width: 900px) {
+    .wrap { padding-inline: 16px; }
+    main.wrap { padding-block: 16px 100px; }
+    .topnav, .acct { display: none; }
+    .topbar .wrap { height: 52px; justify-content: space-between; }
+    .hero { grid-template-columns: 1fr; padding-block: 8px; gap: 20px; }
+    .hero h1 { font-size: 32px; }
+    .levels { grid-template-columns: 1fr; }
+    .level { flex-direction: row; align-items: center; }
+    .split { grid-template-columns: 1fr; }
+    .split.has-sel .main-col { display: none; }
+    .split:not(.has-sel) .side { display: none; }
+    .side { position: static; }
+    .mobile-back { display: block; }
+    .hide-m { display: none; }
+    .kpis { grid-template-columns: 1fr 1fr; }
+    .grid-2 { grid-template-columns: 1fr; }
+    .fields { grid-template-columns: 1fr; }
+    .sheet-bg { align-items: flex-end; padding: 0; }
+    .sheet { border-radius: 18px 18px 0 0; max-width: none; padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px)); }
+    nav.bottom { display: block; position: fixed; left: 0; right: 0; bottom: 0; background: var(--card); border-top: 1px solid var(--line); z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px); }
+    nav.bottom .in { display: grid; grid-template-columns: repeat(4, 1fr); }
+    nav.bottom button { border: 0; background: none; color: var(--muted); font: inherit; font-size: 12px; font-weight: 600; padding: 9px 4px 10px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+    nav.bottom button.on { color: var(--accent); }
+    nav.bottom svg { width: 22px; height: 22px; }
+  }
 </style>
 </head>
 <body>
-<div class="app" id="app"></div>
+<div id="top"></div>
+<main class="wrap" id="app"></main>
 <div id="nav"></div>
 <div id="sheet"></div>
 
@@ -378,197 +470,15 @@ function profileTip() {
   ][p.fear];
 }
 
-/* =========================================================
-   Render
-   ========================================================= */
 
-const app = document.getElementById("app");
-const navEl = document.getElementById("nav");
-const sheet = document.getElementById("sheet");
-const TAB_OF = { path: "learn", lesson: "learn", quiz: "learn", leap: "learn", market: "market", detail: "market", order: "market", portfolio: "portfolio", activity: "activity" };
-
-function go(v) { view = v; render(); window.scrollTo(0, 0); }
-
-function render() {
-  const hasNav = !!S.profile;
-  app.classList.toggle("no-nav", !hasNav);
-  const inBroker = ["market", "detail", "order", "portfolio", "activity"].includes(view.name);
-  const back = view.name === "lesson" || view.name === "quiz" || view.name === "leap" ? `<button class="link" data-act="path">← Camino</button>`
-    : view.name === "detail" ? `<button class="link" data-act="market">← Mercado</button>`
-    : view.name === "order" && view.step !== "done" ? `<button class="link" data-act="detail" data-sym="${view.sym}">← Volver</button>`
-    : inBroker ? `<span class="sim-badge">Simulador · plata de mentira</span>`
-    : S.profile ? `<button class="link" data-act="reset">Reiniciar</button>` : "";
-  const top = `<header class="top"><div class="brand">Sin <span>Miedo</span></div>${back}</header>`;
-  const views = { welcome, path, lesson, quiz, leap, market, detail, order, portfolio, activity };
-  const needsBroker = inBroker && !brokerOpen();
-  app.innerHTML = top + (needsBroker ? lockedBroker() : views[view.name]());
-  navEl.innerHTML = hasNav ? nav() : "";
-  renderModal();
-}
-
-const ICONS = {
-  learn: '<path d="M4 6.5 12 3l8 3.5-8 3.5L4 6.5Z"/><path d="M7 8v5c0 1.7 2.2 3 5 3s5-1.3 5-3V8"/><path d="M20 6.5V12"/>',
-  market: '<path d="M4 19V5"/><path d="M4 19h16"/><path d="m7 14 4-4 3 3 5-6"/>',
-  portfolio: '<rect x="3.5" y="7" width="17" height="12" rx="2"/><path d="M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7"/><path d="M3.5 12h17"/>',
-  activity: '<path d="M8 6h12"/><path d="M8 12h12"/><path d="M8 18h12"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/>'
-};
-function nav() {
-  const tab = TAB_OF[view.name];
-  const item = (id, label) => `<button class="${tab === id ? "on" : ""}" data-act="tab" data-tab="${id}" aria-label="${label}">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICONS[id]}</svg>${label}</button>`;
-  return `<nav class="bottom"><div class="in">${item("learn", "Aprender")}${item("market", "Mercado")}${item("portfolio", "Cartera")}${item("activity", "Movimientos")}</div></nav>`;
-}
-
-function tip(id, html) {
-  if (S.tips[id]) return "";
-  return `<div class="tip"><div>${html}</div><button class="link" data-act="tipOk" data-id="${id}">Entendido</button></div>`;
-}
-
-/* ---------- Aprender ---------- */
-
-function welcome() {
-  const { step, answers } = view;
-  if (step < 0) return `
-    <h1>Invertir, sin miedo.</h1>
-    <p class="muted">Aprendé en lecciones de 1 minuto, entendé las palabras raras y practicá en un broker de mentira antes de poner plata real.</p>
-    <div class="card stack small">
-      <div><b>Aprendé</b> en 5 niveles cortos.</div>
-      <div><b>Entendé</b>: tocá las palabras subrayadas.</div>
-      <div><b>Practicá</b> con $100.000 de mentira en un simulador igual a un broker.</div>
-      <div><b>Animate</b> a dar el primer paso real.</div>
-    </div>
-    <button class="btn" data-act="start">Empezar</button>
-    <p class="note">Te hacemos 3 preguntas rápidas para adaptar el camino.</p>`;
-  const o = ONBOARDING[step];
-  return `
-    <div class="small muted">Pregunta ${step + 1} de 3</div>
-    <div class="progress"><div style="width:${(step + 1) / 3 * 100}%"></div></div>
-    <h1>${o.q}</h1>
-    ${o.opts.map((t, i) => `<button class="opt ${answers[o.key] === i ? "sel" : ""}" data-act="onb" data-i="${i}">${t}</button>`).join("")}`;
-}
-
-function path() {
-  const p = S.profile;
-  const skippable = p && p.exp === 2;
-  const levels = LEVELS.map((l, i) => {
-    const done = S.done.includes(i);
-    const open = i === 0 || S.done.includes(i - 1) || (skippable && i === 1) || done;
-    const tag = done ? `<span class="pill">Hecho</span>` :
-      (skippable && i === 0) ? `<span class="pill warn">Opcional para vos</span>` :
-      i === 2 ? `<span class="pill warn">Desbloquea el simulador</span>` : "";
-    return `<div class="card level ${done ? "done" : open ? "" : "locked"}" data-act="${open ? "lesson" : ""}" data-i="${i}">
-      <div class="dot">${done ? "✓" : i + 1}</div>
-      <div><div class="xs muted">Nivel ${i + 1} · 1 min</div><div class="t">${l.title}</div>${tag}</div>
-    </div>`;
-  }).join("");
-  return `
-    <h1>Tu camino</h1>
-    <div class="progress"><div style="width:${S.done.length / LEVELS.length * 100}%"></div></div>
-    ${profileTip() ? `<p class="small muted">${profileTip()}</p>` : ""}
-    ${levels}
-    <div class="card">
-      <h2>Simulador de broker</h2>
-      <p class="small muted">${brokerOpen()
-        ? "Mercado, órdenes de compra y venta, cartera y movimientos, igual que en un broker real. Con $100.000 de mentira."
-        : "Se desbloquea al terminar el nivel 3. Vas a operar como en un broker real, con $100.000 de mentira."}</p>
-      ${brokerOpen() ? `<button class="btn ghost" data-act="tab" data-tab="market">Ir al simulador</button>` : ""}
-    </div>
-    ${pathDone() ? `<button class="btn" data-act="leap">Dar el salto</button>` : ""}`;
-}
-
-function lesson() {
-  const l = LEVELS[view.i];
-  return `
-    <div class="small muted">Nivel ${view.i + 1} de ${LEVELS.length}</div>
-    <h1>${l.title}</h1>
-    <div class="card lesson">${l.lesson.map(p => `<p>${withTerms(p)}</p>`).join("")}</div>
-    ${l.placeholder ? `<p class="small"><span class="pill warn">Borrador</span> Las opciones concretas se definen con los productos reales de LBO.</p>` : ""}
-    <p class="small muted">Tocá las palabras subrayadas para ver qué significan.</p>
-    <button class="btn" data-act="quiz" data-i="${view.i}">Probá lo que aprendiste</button>`;
-}
-
-function quiz() {
-  const l = LEVELS[view.i], picked = view.picked;
-  const answered = picked !== undefined, ok = picked === l.answer;
-  return `
-    <div class="small muted">Nivel ${view.i + 1} · Pregunta de práctica</div>
-    <h1>${l.q}</h1>
-    ${l.options.map((t, i) => {
-      const c = !answered ? "" : i === l.answer ? "right" : i === picked ? "wrong" : "";
-      return `<button class="opt ${c}" data-act="pick" data-i="${i}" ${answered ? "disabled" : ""}>${t}</button>`;
-    }).join("")}
-    ${answered ? `
-      <div class="feedback ${ok ? "ok" : "no"}"><b>${ok ? "¡Bien!" : "Casi."}</b> ${l.why}</div>
-      ${ok && l.unlock ? `<div class="feedback ok">${l.unlock}</div>` : ""}
-      ${ok ? `<button class="btn" data-act="finish">Seguir</button>` : `<button class="btn" data-act="retry">Intentar de nuevo</button>`}` : ""}`;
-}
-
-function leap() {
-  return `
-    <h1>¡Ya podés dar el primer paso!</h1>
-    <p>Entendiste por qué la plata guardada pierde valor, qué es invertir, cómo funciona el riesgo y operaste en un broker sin arriesgar nada.</p>
-    <div class="card">
-      <div class="label">Tu primer paso sugerido</div>
-      <p class="big num">${suggestion()}</p>
-      <p class="small muted">Un monto chico, según lo que nos dijiste al principio. Lo mismo que hiciste en el simulador, ahora con plata real.</p>
-    </div>
-    <div class="stack">
-      <button class="btn" data-act="lbo">Hacerlo en LBO</button>
-      <button class="btn ghost" data-act="tab" data-tab="market">Seguir practicando</button>
-    </div>
-    <p class="note">Prototipo: el botón todavía no lleva a ningún lado. Antes de invertir plata real, revisá las condiciones de cada producto.</p>`;
-}
-
-/* ---------- Broker ---------- */
-
-function lockedBroker() {
-  return `
-    <h1>Simulador de broker</h1>
-    <div class="card">
-      <p>Acá vas a operar como en un broker real: ver precios, comprar, vender y seguir tu cartera. Con $100.000 de mentira.</p>
-      <p class="small muted">Se desbloquea al terminar el nivel 3 del camino, así llegás sabiendo qué es el riesgo.</p>
-      <div class="stack">
-        <button class="btn" data-act="path">Ir al camino</button>
-        <button class="btn ghost" data-act="demo">Abrirlo igual (modo presentación)</button>
-      </div>
-    </div>`;
-}
+/* ---------- Gráficos ---------- */
 
 function spark(sym) {
   const h = S.market[sym].hist.slice(-20).concat(px(sym));
   const min = Math.min(...h), max = Math.max(...h), span = max - min || 1;
-  const pts = h.map((v, i) => `${(i / (h.length - 1) * 56).toFixed(1)},${(22 - (v - min) / span * 20).toFixed(1)}`).join(" ");
+  const pts = h.map((v, i) => `${(i / (h.length - 1) * 80).toFixed(1)},${(22 - (v - min) / span * 20).toFixed(1)}`).join(" ");
   const up = h[h.length - 1] >= h[0];
-  return `<svg class="spark" viewBox="0 0 56 24" aria-hidden="true"><polyline points="${pts}" fill="none" stroke="var(--${up ? "up" : "down"})" stroke-width="1.5" vector-effect="non-scaling-stroke"/></svg>`;
-}
-
-function tickRow(sym) {
-  const i = INS[sym], v = dayVar(sym);
-  const key = (sym + " " + i.name).toLowerCase(), q = (view.q || "").trim().toLowerCase();
-  return `<button class="tick" data-act="detail" data-sym="${sym}" data-row="${sym}" data-search="${key}" ${q && !key.includes(q) ? "hidden" : ""}>
-    <div style="min-width:0"><div class="sym">${sym}</div><div class="tname">${i.name}</div></div>
-    ${spark(sym)}
-    <div class="tright"><span class="num" data-px="${sym}">${money(px(sym))}</span><span class="pill ${cls(v)} num" data-var="${sym}">${pct(v)}</span></div>
-  </button>`;
-}
-
-function market() {
-  const f = view.filter || "all";
-  const groups = Object.keys(TYPES).filter(t => f === "all" || f === t);
-  return `
-    <div class="between"><h1>Mercado</h1><span class="xs muted">Día ${S.broker.day}</span></div>
-    ${tip("market", `Así se ve el mercado en un broker. Cada fila es algo que podés comprar: el código, la ${T("cotización")} y la ${T("variación")} del día. Los precios se mueven solos mientras mirás.`)}
-    <input class="search" id="search" type="search" placeholder="Buscar por nombre o código" value="${esc(view.q || "")}" autocomplete="off">
-    <div class="chips">
-      <button class="chip ${f === "all" ? "on" : ""}" data-act="filter" data-f="all">Todos</button>
-      ${Object.entries(TYPES).map(([k, t]) => `<button class="chip ${f === k ? "on" : ""}" data-act="filter" data-f="${k}">${t.name}</button>`).join("")}
-    </div>
-    ${groups.map(t => `
-      <div class="list">
-        <div class="list-h between"><span class="label">${TYPES[t].name}</span><span class="pill ${["", "", "warn", "down"][TYPES[t].risk]}">${RISK[TYPES[t].risk]}</span></div>
-        ${INSTRUMENTS.filter(i => i.type === t).map(i => tickRow(i.sym)).join("")}
-      </div>`).join("")}
-    <p class="note">Precios simulados con fines educativos. No son cotizaciones reales ni una recomendación de inversión.</p>`;
+  return `<svg class="spark" viewBox="0 0 80 24" aria-hidden="true"><polyline points="${pts}" fill="none" stroke="var(--${up ? "up" : "down"})" stroke-width="1.5" vector-effect="non-scaling-stroke"/></svg>`;
 }
 
 function chart(values, opts = {}) {
@@ -582,7 +492,7 @@ function chart(values, opts = {}) {
   const grid = [0.25, 0.5, 0.75].map(f => `<line x1="0" x2="${W}" y1="${(P + f * (H - 2 * P - 14)).toFixed(1)}" y2="${(P + f * (H - 2 * P - 14)).toFixed(1)}" stroke="var(--line)" stroke-width="1" vector-effect="non-scaling-stroke"/>`).join("");
   const baseLine = opts.base != null ? `<line x1="0" x2="${W}" y1="${y(Math.min(Math.max(opts.base, min), max)).toFixed(1)}" y2="${y(Math.min(Math.max(opts.base, min), max)).toFixed(1)}" stroke="var(--muted)" stroke-dasharray="3 4" stroke-width="1" vector-effect="non-scaling-stroke"/>` : "";
   const last = pts[pts.length - 1].split(",");
-  return `<svg class="chart" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="${opts.label || "Gráfico de precio"}">
+  return `<svg class="chart${opts.tall ? " tall" : ""}" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="${opts.label || "Gráfico de precio"}">
     ${grid}${baseLine}
     <polygon points="0,${H - 14} ${pts.join(" ")} ${W},${H - 14}" fill="${col}" fill-opacity=".1"/>
     <polyline points="${pts.join(" ")}" fill="none" stroke="${col}" stroke-width="2" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
@@ -593,44 +503,7 @@ function chart(values, opts = {}) {
 
 const RANGES = { "1S": 5, "1M": 21, "3M": 63 };
 
-function detail() {
-  const sym = view.sym, i = INS[sym], t = TYPES[i.type], v = dayVar(sym);
-  const range = view.range || "1M";
-  const values = S.market[sym].hist.slice(-RANGES[range]).concat(px(sym));
-  const rv = values[values.length - 1] / values[0] - 1;
-  const pos = S.broker.pos[sym];
-  return `
-    <div class="xs muted">${t.name} · Pesos (ARS)</div>
-    <h1 style="margin-bottom:2px"><span class="sym">${sym}</span> <span class="muted" style="font-weight:500;font-size:17px">${i.name}</span></h1>
-    <div class="big num" data-px="${sym}">${money(px(sym))}</div>
-    <div class="small"><span class="pill ${cls(v)} num" data-var="${sym}">${pct(v)}</span> <span class="muted">hoy · </span><span class="${cls(rv)} num">${pct(rv)}</span> <span class="muted">en ${range}</span></div>
-    <div class="card" style="margin-top:12px">
-      <div class="seg">${Object.keys(RANGES).map(r => `<button class="${r === range ? "on" : ""}" data-act="range" data-r="${r}">${r}</button>`).join("")}</div>
-      ${chart(values, { label: `Precio de ${sym} en ${range}` })}
-    </div>
-    ${pos ? `
-    <div class="card">
-      <div class="label">Tu tenencia</div>
-      <div class="kv"><span>Cantidad</span><b class="num">${qtyFmt(sym, pos.qty)}</b></div>
-      <div class="kv"><span>${T("precio promedio", "Precio promedio")}</span><b class="num">${money(pos.cost / pos.qty)}</b></div>
-      <div class="kv"><span>Valor hoy</span><b class="num">${money(pos.qty * px(sym))}</b></div>
-      <div class="kv"><span>${T("ganancia o pérdida", "Ganancia / pérdida")}</span><b class="num ${cls(pos.qty * px(sym) - pos.cost)}">${money(pos.qty * px(sym) - pos.cost)}</b></div>
-    </div>` : ""}
-    <div class="card">
-      <div class="between"><span class="label">En palabras simples</span><span class="pill ${["", "", "warn", "down"][t.risk]}">${RISK[t.risk]}</span></div>
-      <p style="margin-top:8px">${t.simple}</p>
-      <div class="kv"><span>Tipo</span><b>${T(t.term, t.short)}</b></div>
-      <div class="kv"><span>${T("liquidez", "Liquidez")}</span><b>${i.type === "fci" ? "Alta (24hs)" : "Alta, en horario de mercado"}</b></div>
-      <div class="kv"><span>${T("volatilidad", "Volatilidad")}</span><b>${i.sigma < .005 ? "Muy baja" : i.sigma < .015 ? "Media" : "Alta"}</b></div>
-    </div>
-    <div class="row">
-      <button class="btn buy" data-act="order" data-sym="${sym}" data-side="buy">${isFci(sym) ? "Suscribir" : "Comprar"}</button>
-      ${pos ? `<button class="btn sell" data-act="order" data-sym="${sym}" data-side="sell">${isFci(sym) ? "Rescatar" : "Vender"}</button>` : ""}
-    </div>
-    <p class="note">Precios simulados con fines educativos. No son cotizaciones reales ni una recomendación de inversión.</p>`;
-}
-
-/* ---------- Órdenes ---------- */
+/* ---------- Órdenes (cálculo y ejecución) ---------- */
 
 function newOrder(sym, side) {
   const fci = isFci(sym), held = S.broker.pos[sym]?.qty || 0;
@@ -669,103 +542,6 @@ function summaryRows(o, c) {
     <div class="kv"><span><b>${o.side === "buy" ? "Total a pagar" : "Total a recibir"}</b></span><b class="num" data-c="total">${money(c.total)}</b></div>`;
 }
 
-function order() {
-  const o = view, sym = o.sym, fci = isFci(sym), c = calc(o);
-  const verb = o.side === "buy" ? (fci ? "Suscribir" : "Comprar") : (fci ? "Rescatar" : "Vender");
-  const held = S.broker.pos[sym]?.qty || 0;
-
-  if (o.step === "done") {
-    const r = o.result, pend = r.status === "Pendiente";
-    return `
-      <div class="done-ic ${pend ? "pend" : ""}">${pend ? "⏳" : "✓"}</div>
-      <h1 style="text-align:center">${pend ? "Orden enviada" : "Orden ejecutada"}</h1>
-      <p class="muted" style="text-align:center">${pend
-        ? `Tu ${T("orden límite")} queda esperando. Se ejecuta sola si el precio llega a ${money(r.limit)}.`
-        : `${verb === "Comprar" ? "Compraste" : verb === "Vender" ? "Vendiste" : verb === "Suscribir" ? "Suscribiste" : "Rescataste"} ${qtyFmt(sym, r.qty)} ${fci ? "cuotapartes de" : ""} ${sym} a ${money(r.price)}.`}</p>
-      <div class="card">
-        <div class="kv"><span>Orden N.º</span><b class="num">${String(r.id).padStart(6, "0")}</b></div>
-        <div class="kv"><span>Estado</span><b><span class="pill ${pend ? "warn" : "up"}">${r.status}</span></b></div>
-        <div class="kv"><span>${o.side === "buy" ? "Total pagado" : "Total recibido"}</span><b class="num">${pend ? "—" : money(r.total)}</b></div>
-        <div class="kv"><span>${T("saldo disponible", "Saldo disponible")}</span><b class="num">${money(S.broker.cash)}</b></div>
-      </div>
-      <div class="stack">
-        <button class="btn" data-act="tab" data-tab="portfolio">Ver mi cartera</button>
-        <button class="btn ghost" data-act="tab" data-tab="activity">Ver movimientos</button>
-      </div>`;
-  }
-
-  if (o.step === "review") return `
-    <h1>Revisá tu orden</h1>
-    ${tip("review", "En un broker real siempre hay un paso para revisar antes de confirmar. Mirá bien el total: incluye la comisión.")}
-    <div class="card">
-      <div class="kv"><span>Operación</span><b class="${o.side === "buy" ? "up" : "down"}">${verb}</b></div>
-      <div class="kv"><span>Activo</span><b><span class="sym">${sym}</span></b></div>
-      <div class="kv"><span>Tipo de orden</span><b>${o.type === "mkt" ? T("orden a mercado", "A mercado") : T("orden límite", "Límite")}</b></div>
-      <div class="kv"><span>Plazo</span><b>${T(o.plazo.toLowerCase(), o.plazo)}</b></div>
-      ${summaryRows(o, c)}
-    </div>
-    ${c.err ? `<div class="feedback no">${c.err}</div>` : ""}
-    <div class="stack">
-      <button class="btn ${o.side === "buy" ? "buy" : "sell"}" data-act="confirm" ${c.err ? "disabled" : ""}>Confirmar ${verb.toLowerCase()}</button>
-      <button class="btn ghost" data-act="editOrder">Modificar</button>
-    </div>`;
-
-  return `
-    <div class="between"><h1><span class="sym">${sym}</span></h1><span class="num" data-px="${sym}">${money(px(sym))}</span></div>
-    ${tip("order", `Esto es una orden: le decís al broker qué querés comprar o vender, cuánto y cómo. Tocá las palabras subrayadas si alguna no la conocés.`)}
-    <div class="seg">
-      <button class="buy ${o.side === "buy" ? "on" : ""}" data-act="side" data-side="buy">${fci ? "Suscribir" : "Comprar"}</button>
-      <button class="sell ${o.side === "sell" ? "on" : ""}" data-act="side" data-side="sell" ${held ? "" : "disabled"}>${fci ? "Rescatar" : "Vender"}</button>
-    </div>
-    ${fci ? "" : `
-    <div class="field">
-      <span class="label">Tipo de orden</span>
-      <div class="seg" style="margin:0">
-        <button class="${o.type === "mkt" ? "on" : ""}" data-act="otype" data-t="mkt">A mercado</button>
-        <button class="${o.type === "lim" ? "on" : ""}" data-act="otype" data-t="lim">Límite</button>
-      </div>
-      <div class="xs muted" style="margin-top:4px">¿Qué es? ${T("orden a mercado", "A mercado")} · ${T("orden límite", "Límite")}</div>
-    </div>
-    <div class="field">
-      <span class="label">Plazo de liquidación</span>
-      <div class="seg" style="margin:0">
-        <button class="${o.plazo === "CI" ? "on" : ""}" data-act="plazo" data-p="CI">CI</button>
-        <button class="${o.plazo === "24hs" ? "on" : ""}" data-act="plazo" data-p="24hs">24hs</button>
-      </div>
-      <div class="xs muted" style="margin-top:4px">¿Qué es? ${T("ci", "CI")} · ${T("24hs")}</div>
-    </div>`}
-    <div class="field">
-      <label class="label" for="q">${fci ? "Monto en pesos" : "Cantidad"}</label>
-      <div class="stepper">
-        <button data-act="step" data-d="-1" aria-label="Restar">−</button>
-        <input id="q" inputmode="decimal" value="${fci ? o.amount : o.qty}" data-field="${fci ? "amount" : "qty"}">
-        <button data-act="step" data-d="1" aria-label="Sumar">+</button>
-      </div>
-      ${o.side === "sell" ? `<div class="xs muted" style="margin-top:4px">Tenés ${qtyFmt(sym, held)}${fci ? " cuotapartes (" + money(held * px(sym)) + ")" : ""}.</div>` : ""}
-    </div>
-    ${o.type === "lim" ? `
-    <div class="field">
-      <label class="label" for="lim">Precio límite</label>
-      <div class="stepper"><input id="lim" inputmode="decimal" value="${o.limit}" data-field="limit"></div>
-      <div class="xs muted" style="margin-top:4px">${o.side === "buy" ? "Se compra solo si el precio baja hasta este valor." : "Se vende solo si el precio sube hasta este valor."}</div>
-    </div>` : ""}
-    <div class="card flat">${summaryRows(o, c)}
-      <div class="kv"><span>${T("saldo disponible", "Saldo disponible")}</span><b class="num">${money(S.broker.cash)}</b></div>
-    </div>
-    <div class="feedback no" id="oerr" ${c.err ? "" : "hidden"}>${c.err}</div>
-    <button class="btn ${o.side === "buy" ? "buy" : "sell"}" id="review" data-act="review" ${c.err ? "disabled" : ""}>Revisar orden</button>`;
-}
-
-function updateTicket() {
-  if (view.name !== "order" || view.step !== "form") return;
-  const c = calc(view), fci = isFci(view.sym);
-  const set = (k, v) => { const el = app.querySelector(`[data-c="${k}"]`); if (el) el.textContent = v; };
-  set("qty", qtyFmt(view.sym, c.qty)); set("price", money(c.price)); set("gross", money(c.gross));
-  set("fee", fci ? "Incluida en el fondo" : money(c.fee)); set("total", money(c.total));
-  const err = app.querySelector("#oerr"); err.textContent = c.err; err.hidden = !c.err;
-  app.querySelector("#review").disabled = !!c.err;
-}
-
 function execute(o, price) {
   const B = S.broker, fci = isFci(o.sym);
   const qty = fci ? o.amount / price : o.qty;
@@ -786,21 +562,6 @@ function execute(o, price) {
   return { ok: true, qty, price, fee, total: gross - fee };
 }
 
-function placeOrder() {
-  const o = view, c = calc(o), B = S.broker;
-  if (c.err) return;
-  const rec = { id: B.nextId++, sym: o.sym, side: o.side, type: o.type, plazo: o.plazo, qty: c.qty, amount: o.amount, limit: o.limit, day: B.day, status: "Pendiente" };
-  const marketable = o.type === "mkt" || (o.side === "buy" ? px(o.sym) <= o.limit : px(o.sym) >= o.limit);
-  if (marketable) {
-    const r = execute(o, px(o.sym));
-    Object.assign(rec, r.ok ? { status: "Ejecutada", price: r.price, qty: r.qty, fee: r.fee, total: r.total } : { status: "Rechazada", why: r.why });
-  }
-  B.orders.unshift(rec);
-  save();
-  view = { ...o, step: "done", result: rec };
-  render(); window.scrollTo(0, 0);
-}
-
 function checkLimits() {
   S.broker.orders.filter(o => o.status === "Pendiente").forEach(o => {
     const p = px(o.sym);
@@ -811,94 +572,12 @@ function checkLimits() {
   });
 }
 
-/* ---------- Cartera y movimientos ---------- */
-
-function portfolio() {
-  const B = S.broker, total = equity(), inv = posValue();
-  const pnl = total - START_CASH;
-  const syms = Object.keys(B.pos);
-  const byType = {};
-  syms.forEach(s => byType[INS[s].type] = (byType[INS[s].type] || 0) + B.pos[s].qty * px(s));
-  const dayPnl = syms.reduce((a, s) => a + B.pos[s].qty * (px(s) - prevClose(s)), 0);
-  return `
-    <h1>Mi cartera</h1>
-    ${tip("portfolio", `Esta es tu ${T("cartera")}: todo lo que tenés, cuánto vale hoy y cuánto ganás o perdés. Usá “Avanzar el tiempo” para ver qué pasa en días o meses.`)}
-    <div class="card">
-      <div class="label">Valor total</div>
-      <div class="big num" data-total>${money(total)}</div>
-      <div class="small"><span class="${cls(pnl)} num" data-pnl>${money(pnl)} (${pct(pnl / START_CASH)})</span> <span class="muted">desde el inicio</span></div>
-      ${B.equity.length > 1 ? chart(B.equity.concat(total), { base: START_CASH, label: "Evolución de tu cartera" }) : ""}
-      <div class="alloc-bar">
-        ${Object.entries(byType).map(([t, v]) => `<div style="width:${v / total * 100}%;background:${TYPES[t].color}" title="${TYPES[t].name}"></div>`).join("")}
-        <div style="width:${B.cash / total * 100}%;background:var(--muted);opacity:.35" title="Pesos"></div>
-      </div>
-      <div class="legend">
-        ${Object.entries(byType).map(([t, v]) => `<span><i style="background:${TYPES[t].color}"></i>${TYPES[t].short} ${nf2.format(v / total * 100)}%</span>`).join("")}
-        <span><i style="background:var(--muted);opacity:.35"></i>Pesos ${nf2.format(B.cash / total * 100)}%</span>
-      </div>
-    </div>
-    <div class="card">
-      <div class="kv"><span>${T("saldo disponible", "Saldo disponible")}</span><b class="num">${money(B.cash)}</b></div>
-      <div class="kv"><span>Invertido</span><b class="num">${money(inv)}</b></div>
-      <div class="kv"><span>Resultado del día</span><b class="num ${cls(dayPnl)}">${money(dayPnl)}</b></div>
-    </div>
-    ${coach(dayPnl, pnl)}
-    <div class="list">
-      <div class="list-h between"><span class="label">Tenencias</span><span class="xs muted">Valor · ${T("ganancia o pérdida", "Ganancia")}</span></div>
-      ${syms.length ? syms.map(s => {
-        const p = B.pos[s], val = p.qty * px(s), g = val - p.cost;
-        return `<button class="tick" data-act="detail" data-sym="${s}" style="grid-template-columns:1fr auto">
-          <div style="min-width:0"><div class="sym">${s}</div><div class="tname">${qtyFmt(s, p.qty)} × ${money(px(s))}</div></div>
-          <div class="tright"><span class="num">${money(val)}</span><span class="pill ${cls(g)} num">${pct(g / p.cost)}</span></div>
-        </button>`;
-      }).join("") : `<div class="empty small">Todavía no compraste nada.<br><button class="btn" style="margin-top:12px" data-act="tab" data-tab="market">Ir al mercado</button></div>`}
-    </div>
-    <div class="card">
-      <div class="between"><span class="label">Avanzar el tiempo</span><span class="xs muted">Día ${B.day}</span></div>
-      <p class="small muted" style="margin-top:6px">En la vida real esperás. Acá podés adelantar para ver cómo se mueve tu plata.</p>
-      <div class="time">
-        <button class="btn ghost" data-act="adv" data-n="1">1 día</button>
-        <button class="btn ghost" data-act="adv" data-n="5">1 semana</button>
-        <button class="btn" data-act="adv" data-n="21">1 mes</button>
-      </div>
-    </div>
-    <button class="link" data-act="resetBroker">Reiniciar el simulador con $100.000</button>
-    <p class="note">Simulación con valores inventados para aprender. No es una recomendación ni refleja productos ni precios reales.</p>`;
-}
-
 function coach(dayPnl, pnl) {
   if (!Object.keys(S.broker.pos).length) return "";
   if (dayPnl < -equity() * 0.01) return `<div class="feedback no">Hoy bajó bastante. Así se siente la ${T("volatilidad")}. En la vida real, la clave es no vender por miedo.</div>`;
   if (pnl < 0) return `<div class="feedback no">Vas un poco abajo. Es normal: adelantá unos días y mirá qué pasa.</div>`;
   if (S.broker.day >= 40) return `<div class="feedback ok">Llevás ${S.broker.day} días en el simulador. ¿Ves cómo las bajas se mezclan con las subas?</div>`;
   return "";
-}
-
-function activity() {
-  const os = S.broker.orders;
-  const st = { "Ejecutada": "up", "Pendiente": "warn", "Cancelada": "grey", "Rechazada": "down" };
-  return `
-    <h1>Movimientos</h1>
-    ${tip("activity", "Acá queda registrada cada orden: las ejecutadas, las que esperan un precio y las canceladas. En un broker real también te llega por mail.")}
-    <div class="list">
-      ${os.length ? os.map(o => {
-        const fci = isFci(o.sym);
-        const verb = o.side === "buy" ? (fci ? "Suscripción" : "Compra") : (fci ? "Rescate" : "Venta");
-        return `<div class="tick" style="grid-template-columns:1fr auto;cursor:default">
-          <div style="min-width:0">
-            <div><b>${verb}</b> <span class="sym">${o.sym}</span></div>
-            <div class="tname">Día ${o.day} · ${o.type === "mkt" ? "A mercado" : "Límite " + money(o.limit)} · ${o.plazo} · N.º ${String(o.id).padStart(6, "0")}</div>
-            ${o.status === "Pendiente" ? `<button class="link" style="padding:4px 0" data-act="cancel" data-id="${o.id}">Cancelar orden</button>` : ""}
-            ${o.why ? `<div class="xs down">${o.why}</div>` : ""}
-          </div>
-          <div class="tright">
-            <span class="num">${o.total != null ? money(o.side === "buy" ? -o.total : o.total) : "—"}</span>
-            <span class="pill ${st[o.status]}">${o.status}</span>
-          </div>
-        </div>`;
-      }).join("") : `<div class="empty small">Todavía no hiciste ninguna operación.</div>`}
-    </div>
-    <p class="note">Simulación con valores inventados para aprender.</p>`;
 }
 
 /* ---------- Simulación del tiempo ---------- */
@@ -918,38 +597,6 @@ function advance(n) {
   }
   save(); render();
 }
-
-function liveTick() {
-  if (!S.market || !S.broker || document.hidden || modal) return;
-  if (!["market", "detail", "order", "portfolio"].includes(view.name)) return;
-  INSTRUMENTS.forEach(i => {
-    if (i.type === "fci") return;
-    S.market[i.sym].px *= 1 + i.sigma * 0.08 * gauss();
-  });
-  checkLimits();
-  app.querySelectorAll("[data-px]").forEach(el => {
-    const s = el.dataset.px, old = parseFloat(el.dataset.last || px(s));
-    el.textContent = money(px(s));
-    const row = el.closest(".tick") || el;
-    row.classList.remove("flash-up", "flash-down"); void row.offsetWidth;
-    row.classList.add(px(s) >= old ? "flash-up" : "flash-down");
-    el.dataset.last = px(s);
-  });
-  app.querySelectorAll("[data-var]").forEach(el => {
-    const v = dayVar(el.dataset.var);
-    el.textContent = pct(v); el.className = `pill ${cls(v)} num`;
-  });
-  const t = app.querySelector("[data-total]");
-  if (t) {
-    const total = equity(), pnl = total - START_CASH;
-    t.textContent = money(total);
-    const pe = app.querySelector("[data-pnl]");
-    pe.textContent = `${money(pnl)} (${pct(pnl / START_CASH)})`; pe.className = `${cls(pnl)} num`;
-  }
-  updateTicket();
-  save();
-}
-setInterval(liveTick, 2500);
 
 /* ---------- Glosario y diálogos ---------- */
 
@@ -971,15 +618,529 @@ function renderModal() {
 }
 
 /* =========================================================
+   Render
+   ========================================================= */
+
+const topEl = document.getElementById("top");
+const app = document.getElementById("app");
+const navEl = document.getElementById("nav");
+const sheet = document.getElementById("sheet");
+const TAB_OF = { path: "learn", lesson: "learn", quiz: "learn", leap: "learn", market: "market", portfolio: "portfolio", activity: "activity" };
+const TABS = [["learn", "Aprender"], ["market", "Mercado"], ["portfolio", "Cartera"], ["activity", "Movimientos"]];
+const wide = () => window.innerWidth > 900;
+
+function go(v) { view = v; render(); window.scrollTo(0, 0); }
+
+function render() {
+  const inBroker = ["market", "portfolio", "activity"].includes(view.name);
+  topEl.innerHTML = topbar() + (S.profile && S.broker && brokerOpen() ? tape() : "");
+  app.innerHTML = inBroker && !brokerOpen() ? lockedBroker() : ({ welcome, path, lesson, quiz, leap, market, portfolio, activity })[view.name]();
+  navEl.innerHTML = S.profile ? bottomNav() : "";
+  renderModal();
+}
+
+function topbar() {
+  const tab = TAB_OF[view.name];
+  const acct = S.broker && brokerOpen() ? `
+    <div class="acct">
+      <div><span class="k">Saldo disponible</span><span class="v" data-cash-h>${money(S.broker.cash)}</span></div>
+      <div class="hide-t"><span class="k">Total cuenta</span><span class="v" data-total-h>${money(equity())}</span></div>
+      <span class="sim-badge">Simulador · plata de mentira</span>
+    </div>` : S.profile ? `<div class="acct"><button class="link" data-act="reset">Reiniciar</button></div>` : "";
+  return `<header class="topbar"><div class="wrap">
+    <button class="brand" data-act="${S.profile ? "path" : ""}">Sin <span>Miedo</span></button>
+    ${S.profile ? `<nav class="topnav">${TABS.map(([id, l]) => `<button class="${tab === id ? "on" : ""}" data-act="tab" data-tab="${id}">${l}</button>`).join("")}</nav>` : ""}
+    ${acct}
+  </div></header>`;
+}
+
+function tape() {
+  const items = INSTRUMENTS.map(i => {
+    const v = dayVar(i.sym);
+    return `<span><b>${i.sym}</b><span class="num" data-px="${i.sym}">${money(px(i.sym))}</span><span class="${cls(v)} num" data-var-t="${i.sym}">${pct(v)}</span></span>`;
+  }).join("");
+  return `<div class="tape" aria-hidden="true"><div class="tape-in">${items}${items}</div></div>`;
+}
+
+const ICONS = {
+  learn: '<path d="M4 6.5 12 3l8 3.5-8 3.5L4 6.5Z"/><path d="M7 8v5c0 1.7 2.2 3 5 3s5-1.3 5-3V8"/><path d="M20 6.5V12"/>',
+  market: '<path d="M4 19V5"/><path d="M4 19h16"/><path d="m7 14 4-4 3 3 5-6"/>',
+  portfolio: '<rect x="3.5" y="7" width="17" height="12" rx="2"/><path d="M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7"/><path d="M3.5 12h17"/>',
+  activity: '<path d="M8 6h12"/><path d="M8 12h12"/><path d="M8 18h12"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/>'
+};
+function bottomNav() {
+  const tab = TAB_OF[view.name];
+  return `<nav class="bottom"><div class="in">${TABS.map(([id, l]) => `<button class="${tab === id ? "on" : ""}" data-act="tab" data-tab="${id}">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[id]}</svg>${l}</button>`).join("")}</div></nav>`;
+}
+
+function tip(id, html) {
+  if (S.tips[id]) return "";
+  return `<div class="tip"><div>${html}</div><button class="link" data-act="tipOk" data-id="${id}">Entendido</button></div>`;
+}
+
+const riskPill = r => `<span class="pill ${["", "", "warn", "down"][r]}">${RISK[r]}</span>`;
+
+/* ---------- Aprender ---------- */
+
+function welcome() {
+  const { step, answers } = view;
+  if (step < 0) return `
+    <section class="hero">
+      <div>
+        <h1>Invertir, sin miedo.</h1>
+        <p class="lead">Aprendé en lecciones de 1 minuto, entendé las palabras raras y practicá en un broker de mentira antes de poner plata real.</p>
+        <button class="btn inline" data-act="start" style="padding-inline:28px">Empezar</button>
+        <p class="small muted" style="margin-top:12px">Te hacemos 3 preguntas rápidas para adaptar el camino.</p>
+      </div>
+      <div class="pillars">
+        <div class="card"><b>Aprendé</b><span class="small muted">5 niveles de 1 minuto, con una pregunta de práctica cada uno.</span></div>
+        <div class="card"><b>Entendé</b><span class="small muted">Tocá cualquier palabra subrayada y te la explicamos con un ejemplo.</span></div>
+        <div class="card"><b>Practicá</b><span class="small muted">$100.000 de mentira en un simulador igual a un broker.</span></div>
+        <div class="card"><b>Animate</b><span class="small muted">Al final, el primer paso real con un monto chico.</span></div>
+      </div>
+    </section>`;
+  const o = ONBOARDING[step];
+  return `<div class="narrow" style="max-width:560px;padding-top:24px">
+    <div class="small muted">Pregunta ${step + 1} de 3</div>
+    <div class="progress"><div style="width:${(step + 1) / 3 * 100}%"></div></div>
+    <h1 style="margin-bottom:16px">${o.q}</h1>
+    ${o.opts.map((t, i) => `<button class="opt ${answers[o.key] === i ? "sel" : ""}" data-act="onb" data-i="${i}">${t}</button>`).join("")}
+  </div>`;
+}
+
+function path() {
+  const p = S.profile, skippable = p && p.exp === 2;
+  const levels = LEVELS.map((l, i) => {
+    const done = S.done.includes(i);
+    const open = i === 0 || S.done.includes(i - 1) || (skippable && i === 1) || done;
+    const tag = done ? `<span class="pill">Hecho</span>` :
+      (skippable && i === 0) ? `<span class="pill warn">Opcional para vos</span>` :
+      i === 2 ? `<span class="pill warn">Desbloquea el simulador</span>` : "";
+    return `<button class="card level ${done ? "done" : open ? "" : "locked"}" data-act="${open ? "lesson" : ""}" data-i="${i}">
+      <div class="dot">${done ? "✓" : i + 1}</div>
+      <div><div class="xs muted">Nivel ${i + 1} · 1 min</div><div class="t">${l.title}</div>${tag ? `<div style="margin-top:6px">${tag}</div>` : ""}</div>
+    </button>`;
+  }).join("");
+  return `
+    <div class="page-h">
+      <div><h1>Tu camino</h1>${profileTip() ? `<p class="muted" style="max-width:70ch">${profileTip()}</p>` : ""}</div>
+      <div class="small muted">${S.done.length} de ${LEVELS.length} niveles</div>
+    </div>
+    <div class="progress"><div style="width:${S.done.length / LEVELS.length * 100}%"></div></div>
+    <div class="levels">${levels}</div>
+    <div class="card banner">
+      <div>
+        <h2>Simulador de broker</h2>
+        <p class="small muted" style="margin:0">${brokerOpen()
+          ? "Mercado, órdenes de compra y venta, cartera y movimientos, igual que en un broker real. Con $100.000 de mentira."
+          : "Se desbloquea al terminar el nivel 3. Vas a operar como en un broker real, con $100.000 de mentira."}</p>
+      </div>
+      ${brokerOpen() ? `<button class="btn inline" data-act="tab" data-tab="market">Ir al simulador</button>`
+                     : `<button class="btn ghost inline" data-act="demo">Abrirlo igual (modo presentación)</button>`}
+    </div>
+    ${pathDone() ? `<p></p><button class="btn inline" data-act="leap">Dar el salto</button>` : ""}`;
+}
+
+function lesson() {
+  const l = LEVELS[view.i];
+  return `<div class="narrow">
+    <button class="link" data-act="path">← Tu camino</button>
+    <div class="small muted" style="margin-top:8px">Nivel ${view.i + 1} de ${LEVELS.length}</div>
+    <h1>${l.title}</h1>
+    <div class="card lesson" style="margin:16px 0">${l.lesson.map(p => `<p>${withTerms(p)}</p>`).join("")}</div>
+    ${l.placeholder ? `<p class="small"><span class="pill warn">Borrador</span> Las opciones concretas se definen con los productos reales de LBO.</p>` : ""}
+    <p class="small muted">Tocá las palabras subrayadas para ver qué significan.</p>
+    <button class="btn inline" data-act="quiz" data-i="${view.i}">Probá lo que aprendiste</button>
+  </div>`;
+}
+
+function quiz() {
+  const l = LEVELS[view.i], picked = view.picked;
+  const answered = picked !== undefined, ok = picked === l.answer;
+  return `<div class="narrow">
+    <button class="link" data-act="lesson" data-i="${view.i}">← Volver a la lección</button>
+    <div class="small muted" style="margin-top:8px">Nivel ${view.i + 1} · Pregunta de práctica</div>
+    <h1 style="margin-bottom:16px">${l.q}</h1>
+    ${l.options.map((t, i) => {
+      const c = !answered ? "" : i === l.answer ? "right" : i === picked ? "wrong" : "";
+      return `<button class="opt ${c}" data-act="pick" data-i="${i}" ${answered ? "disabled" : ""}>${t}</button>`;
+    }).join("")}
+    ${answered ? `
+      <div class="feedback ${ok ? "ok" : "no"}"><b>${ok ? "¡Bien!" : "Casi."}</b> ${l.why}</div>
+      ${ok && l.unlock ? `<div class="feedback ok">${l.unlock}</div>` : ""}
+      ${ok ? `<button class="btn inline" data-act="finish">Seguir</button>` : `<button class="btn inline" data-act="retry">Intentar de nuevo</button>`}` : ""}
+  </div>`;
+}
+
+function leap() {
+  return `<div class="narrow">
+    <h1>¡Ya podés dar el primer paso!</h1>
+    <p class="muted">Entendiste por qué la plata guardada pierde valor, qué es invertir, cómo funciona el riesgo y operaste en un broker sin arriesgar nada.</p>
+    <div class="card" style="margin:16px 0">
+      <div class="label">Tu primer paso sugerido</div>
+      <p class="big num" style="margin:6px 0">${suggestion()}</p>
+      <p class="small muted" style="margin:0">Un monto chico, según lo que nos dijiste al principio. Lo mismo que hiciste en el simulador, ahora con plata real.</p>
+    </div>
+    <div class="row" style="max-width:480px">
+      <button class="btn" data-act="lbo">Hacerlo en LBO</button>
+      <button class="btn ghost" data-act="tab" data-tab="market">Seguir practicando</button>
+    </div>
+    <p class="note">Prototipo: el botón todavía no lleva a ningún lado. Antes de invertir plata real, revisá las condiciones de cada producto.</p>
+  </div>`;
+}
+
+/* ---------- Broker ---------- */
+
+function lockedBroker() {
+  return `<div class="narrow card" style="margin-top:24px">
+    <h1>Simulador de broker</h1>
+    <p>Acá vas a operar como en un broker real: ver precios, comprar, vender y seguir tu cartera. Con $100.000 de mentira.</p>
+    <p class="small muted">Se desbloquea al terminar el nivel 3 del camino, así llegás sabiendo qué es el riesgo.</p>
+    <div class="row">
+      <button class="btn" data-act="path">Ir al camino</button>
+      <button class="btn ghost" data-act="demo">Abrirlo igual (modo presentación)</button>
+    </div>
+  </div>`;
+}
+
+function market() {
+  if (!view.sel && wide()) { view.sel = "SPY"; view.ticket = newOrder("SPY", "buy"); }
+  const f = view.filter || "all", q = (view.q || "").trim().toLowerCase();
+  const groups = Object.keys(TYPES).filter(t => f === "all" || f === t);
+  const rows = groups.map(t => `
+    <tr class="group"><td colspan="7">${TYPES[t].name}</td></tr>
+    ${INSTRUMENTS.filter(i => i.type === t).map(i => {
+      const v = dayVar(i.sym), key = (i.sym + " " + i.name).toLowerCase();
+      return `<tr class="click ${view.sel === i.sym ? "sel" : ""}" data-act="select" data-sym="${i.sym}" data-search="${key}" ${q && !key.includes(q) ? "hidden" : ""}>
+        <td><div class="sym">${i.sym}</div><div class="tname">${i.name}</div></td>
+        <td class="r num" data-px="${i.sym}">${money(px(i.sym))}</td>
+        <td class="r"><span class="pill ${cls(v)} num" data-var="${i.sym}">${pct(v)}</span></td>
+        <td class="r num hide-m hide-l">${money(S.market[i.sym].hist.slice(-1)[0])}</td>
+        <td class="hide-m">${spark(i.sym)}</td>
+        <td class="hide-m">${riskPill(TYPES[t].risk)}</td>
+        <td class="r hide-m"><button class="btn sm" data-act="select" data-sym="${i.sym}">Operar</button></td>
+      </tr>`;
+    }).join("")}`).join("");
+  return `
+    <div class="page-h">
+      <div><h1>Mercado</h1><p class="small muted">Día ${S.broker.day} de simulación · Precios en pesos</p></div>
+      <div class="tools">
+        <input class="search" id="search" type="search" placeholder="Buscar por nombre o código" value="${esc(view.q || "")}" autocomplete="off">
+        <div class="chips">
+          <button class="chip ${f === "all" ? "on" : ""}" data-act="filter" data-f="all">Todos</button>
+          ${Object.entries(TYPES).map(([k, t]) => `<button class="chip ${f === k ? "on" : ""}" data-act="filter" data-f="${k}">${t.name}</button>`).join("")}
+        </div>
+      </div>
+    </div>
+    ${tip("market", `Así se ve el mercado en un broker. Cada fila es algo que podés comprar: el código, la ${T("cotización")} y la ${T("variación")} del día. Los precios se mueven solos mientras mirás. Elegí uno para ver su gráfico y operar.`)}
+    <div class="split ${view.sel ? "has-sel" : ""}">
+      <div class="main-col">
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>Activo</th><th class="r">${T("cotización", "Último")}</th><th class="r">${T("variación", "Var. día")}</th><th class="r hide-m hide-l">Cierre anterior</th><th class="hide-m">20 días</th><th class="hide-m">${T("riesgo", "Riesgo")}</th><th class="hide-m"></th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table></div>
+        <p class="note">Precios simulados con fines educativos. No son cotizaciones reales ni una recomendación de inversión.</p>
+      </div>
+      <aside class="side">${view.sel ? sidePanel() : ""}</aside>
+    </div>`;
+}
+
+function sidePanel() {
+  const sym = view.sel, i = INS[sym], t = TYPES[i.type], v = dayVar(sym);
+  const range = view.range || "1M";
+  const values = S.market[sym].hist.slice(-RANGES[range]).concat(px(sym));
+  const rv = values[values.length - 1] / values[0] - 1;
+  const pos = S.broker.pos[sym];
+  return `
+    <button class="link mobile-back" data-act="unsel">← Volver al mercado</button>
+    <div class="card">
+      <div class="between">
+        <div><span class="sym" style="font-size:20px">${sym}</span> <span class="xs muted">${t.short}</span><div class="small muted">${i.name}</div></div>
+        ${riskPill(t.risk)}
+      </div>
+      <div style="margin-top:10px"><span class="big num" data-px="${sym}">${money(px(sym))}</span></div>
+      <div class="small"><span class="pill ${cls(v)} num" data-var="${sym}">${pct(v)}</span> <span class="muted">hoy ·</span> <span class="${cls(rv)} num">${pct(rv)}</span> <span class="muted">en ${range}</span></div>
+      <div class="seg" style="margin:12px 0 8px">${Object.keys(RANGES).map(r => `<button class="${r === range ? "on" : ""}" data-act="range" data-r="${r}">${r}</button>`).join("")}</div>
+      ${chart(values, { label: `Precio de ${sym} en ${range}` })}
+    </div>
+    <div class="card">${ticketHtml()}</div>
+    ${pos ? `
+    <div class="card">
+      <div class="label" style="margin-bottom:4px">Tu tenencia</div>
+      <div class="kv"><span>Cantidad</span><b class="num">${qtyFmt(sym, pos.qty)}</b></div>
+      <div class="kv"><span>${T("precio promedio", "Precio promedio")}</span><b class="num">${money(pos.cost / pos.qty)}</b></div>
+      <div class="kv"><span>Valor hoy</span><b class="num">${money(pos.qty * px(sym))}</b></div>
+      <div class="kv"><span>${T("ganancia o pérdida", "Ganancia / pérdida")}</span><b class="num ${cls(pos.qty * px(sym) - pos.cost)}">${money(pos.qty * px(sym) - pos.cost)}</b></div>
+    </div>` : ""}
+    <div class="card">
+      <div class="label" style="margin-bottom:6px">En palabras simples</div>
+      <p class="small">${t.simple}</p>
+      <div class="kv"><span>Tipo</span><b>${T(t.term, t.short)}</b></div>
+      <div class="kv"><span>${T("liquidez", "Liquidez")}</span><b>${i.type === "fci" ? "Alta (24hs)" : "Alta, en horario de mercado"}</b></div>
+      <div class="kv"><span>${T("volatilidad", "Volatilidad")}</span><b>${i.sigma < .005 ? "Muy baja" : i.sigma < .015 ? "Media" : "Alta"}</b></div>
+    </div>`;
+}
+
+/* ---------- Boleta de órdenes ---------- */
+
+function ticketHtml() {
+  const o = view.ticket, sym = o.sym, fci = isFci(sym), c = calc(o);
+  const verb = o.side === "buy" ? (fci ? "Suscribir" : "Comprar") : (fci ? "Rescatar" : "Vender");
+  const held = S.broker.pos[sym]?.qty || 0;
+
+  if (o.step === "done") {
+    const r = o.result, pend = r.status === "Pendiente", ok = r.status === "Ejecutada";
+    return `<div class="ticket">
+      <div class="done-ic ${pend ? "pend" : ""}">${pend ? "⏳" : ok ? "✓" : "!"}</div>
+      <h2 style="text-align:center;margin:0">${pend ? "Orden enviada" : ok ? "Orden ejecutada" : "Orden rechazada"}</h2>
+      <p class="small muted" style="text-align:center;margin:0">${pend
+        ? `Tu ${T("orden límite")} queda esperando. Se ejecuta sola si el precio llega a ${money(r.limit)}.`
+        : ok ? `${{ Comprar: "Compraste", Vender: "Vendiste", Suscribir: "Suscribiste", Rescatar: "Rescataste" }[verb]} ${qtyFmt(sym, r.qty)} ${fci ? "cuotapartes de " : ""}${sym} a ${money(r.price)}.` : r.why}</p>
+      <div>
+        <div class="kv"><span>Orden N.º</span><b class="num">${String(r.id).padStart(6, "0")}</b></div>
+        <div class="kv"><span>Estado</span><b><span class="pill ${pend ? "warn" : ok ? "up" : "down"}">${r.status}</span></b></div>
+        <div class="kv"><span>${o.side === "buy" ? "Total pagado" : "Total recibido"}</span><b class="num">${ok ? money(r.total) : "—"}</b></div>
+        <div class="kv"><span>${T("saldo disponible", "Saldo disponible")}</span><b class="num">${money(S.broker.cash)}</b></div>
+      </div>
+      <div class="row">
+        <button class="btn" data-act="newTicket">Nueva orden</button>
+        <button class="btn ghost" data-act="tab" data-tab="portfolio">Ver cartera</button>
+      </div>
+    </div>`;
+  }
+
+  if (o.step === "review") return `<div class="ticket">
+    <div class="ticket-h"><h2 style="margin:0">Revisá tu orden</h2></div>
+    ${tip("review", "En un broker real siempre hay un paso para revisar antes de confirmar. Mirá bien el total: incluye la comisión.")}
+    <div>
+      <div class="kv"><span>Operación</span><b class="${o.side === "buy" ? "up" : "down"}">${verb}</b></div>
+      <div class="kv"><span>Activo</span><b class="sym">${sym}</b></div>
+      ${fci ? "" : `<div class="kv"><span>Tipo de orden</span><b>${o.type === "mkt" ? T("orden a mercado", "A mercado") : T("orden límite", "Límite")}</b></div>`}
+      <div class="kv"><span>Plazo</span><b>${T(o.plazo.toLowerCase(), o.plazo)}</b></div>
+      ${summaryRows(o, c)}
+    </div>
+    ${c.err ? `<div class="feedback no">${c.err}</div>` : ""}
+    <div class="row">
+      <button class="btn ghost" data-act="editOrder">Modificar</button>
+      <button class="btn ${o.side === "buy" ? "buy" : "sell"}" data-act="confirm" ${c.err ? "disabled" : ""}>Confirmar</button>
+    </div>
+  </div>`;
+
+  return `<div class="ticket">
+    <div class="ticket-h"><span class="label">Boleta de operación</span><span class="xs muted">${T("saldo disponible", "Disponible")}: <b class="num">${money(S.broker.cash)}</b></span></div>
+    ${tip("order", `Esto es una orden: le decís al broker qué querés comprar o vender, cuánto y cómo. Tocá las palabras subrayadas si alguna no la conocés.`)}
+    <div class="seg">
+      <button class="buy ${o.side === "buy" ? "on" : ""}" data-act="side" data-side="buy">${fci ? "Suscribir" : "Comprar"}</button>
+      <button class="sell ${o.side === "sell" ? "on" : ""}" data-act="side" data-side="sell" ${held ? "" : "disabled"}>${fci ? "Rescatar" : "Vender"}</button>
+    </div>
+    ${fci ? "" : `
+    <div class="fields">
+      <div class="field">
+        <span class="label">${T("orden a mercado", "Tipo de orden")}</span>
+        <div class="seg">
+          <button class="${o.type === "mkt" ? "on" : ""}" data-act="otype" data-t="mkt">Mercado</button>
+          <button class="${o.type === "lim" ? "on" : ""}" data-act="otype" data-t="lim">Límite</button>
+        </div>
+      </div>
+      <div class="field">
+        <span class="label">Plazo · ${T("ci", "CI")}/${T("24hs")}</span>
+        <div class="seg">
+          <button class="${o.plazo === "CI" ? "on" : ""}" data-act="plazo" data-p="CI">CI</button>
+          <button class="${o.plazo === "24hs" ? "on" : ""}" data-act="plazo" data-p="24hs">24hs</button>
+        </div>
+      </div>
+    </div>`}
+    <div class="fields">
+      <div class="field">
+        <label class="label" for="q">${fci ? "Monto en pesos" : "Cantidad"}</label>
+        <div class="stepper">
+          <button data-act="step" data-d="-1" aria-label="Restar">−</button>
+          <input id="q" inputmode="decimal" value="${fci ? o.amount : o.qty}" data-field="${fci ? "amount" : "qty"}">
+          <button data-act="step" data-d="1" aria-label="Sumar">+</button>
+        </div>
+      </div>
+      ${o.type === "lim" ? `
+      <div class="field">
+        <label class="label" for="lim">${T("orden límite", "Precio límite")}</label>
+        <div class="stepper"><input id="lim" inputmode="decimal" value="${o.limit}" data-field="limit"></div>
+      </div>` : ""}
+    </div>
+    ${o.side === "sell" ? `<div class="xs muted">Tenés ${qtyFmt(sym, held)}${fci ? " cuotapartes (" + money(held * px(sym)) + ")" : ""}.</div>` : ""}
+    ${o.type === "lim" ? `<div class="xs muted">${o.side === "buy" ? "Se compra solo si el precio baja hasta este valor." : "Se vende solo si el precio sube hasta este valor."}</div>` : ""}
+    <div class="card flat" style="padding:10px 14px">${summaryRows(o, c)}</div>
+    <div class="feedback no" id="oerr" style="margin:0" ${c.err ? "" : "hidden"}>${c.err}</div>
+    <button class="btn ${o.side === "buy" ? "buy" : "sell"}" id="review" data-act="review" ${c.err ? "disabled" : ""}>Revisar orden</button>
+  </div>`;
+}
+
+function updateTicket() {
+  const o = view.ticket;
+  if (view.name !== "market" || !o || o.step !== "form") return;
+  const c = calc(o), fci = isFci(o.sym);
+  const set = (k, v) => { const el = app.querySelector(`[data-c="${k}"]`); if (el) el.textContent = v; };
+  set("qty", qtyFmt(o.sym, c.qty)); set("price", money(c.price)); set("gross", money(c.gross));
+  set("fee", fci ? "Incluida en el fondo" : money(c.fee)); set("total", money(c.total));
+  const err = app.querySelector("#oerr"); if (err) { err.textContent = c.err; err.hidden = !c.err; }
+  const btn = app.querySelector("#review"); if (btn) btn.disabled = !!c.err;
+}
+
+function placeOrder() {
+  const o = view.ticket, c = calc(o), B = S.broker;
+  if (c.err) return;
+  const rec = { id: B.nextId++, sym: o.sym, side: o.side, type: o.type, plazo: o.plazo, qty: c.qty, amount: o.amount, limit: o.limit, day: B.day, status: "Pendiente" };
+  const marketable = o.type === "mkt" || (o.side === "buy" ? px(o.sym) <= o.limit : px(o.sym) >= o.limit);
+  if (marketable) {
+    const r = execute(o, px(o.sym));
+    Object.assign(rec, r.ok ? { status: "Ejecutada", price: r.price, qty: r.qty, fee: r.fee, total: r.total } : { status: "Rechazada", why: r.why });
+  }
+  B.orders.unshift(rec);
+  save();
+  view.ticket = { ...o, step: "done", result: rec };
+  render();
+}
+
+/* ---------- Cartera y movimientos ---------- */
+
+function portfolio() {
+  const B = S.broker, total = equity(), inv = posValue();
+  const pnl = total - START_CASH;
+  const syms = Object.keys(B.pos);
+  const byType = {};
+  syms.forEach(s => byType[INS[s].type] = (byType[INS[s].type] || 0) + B.pos[s].qty * px(s));
+  const dayPnl = syms.reduce((a, s) => a + B.pos[s].qty * (px(s) - prevClose(s)), 0);
+  const alloc = Object.entries(byType).map(([t, v]) => ({ name: TYPES[t].name, color: TYPES[t].color, v })).concat({ name: "Pesos disponibles", color: "var(--line)", v: B.cash });
+  return `
+    <div class="page-h">
+      <div><h1>Mi cartera</h1><p class="small muted">Día ${B.day} de simulación</p></div>
+      <div class="time" style="min-width:min(100%,360px)">
+        <button class="btn ghost" data-act="adv" data-n="1">+1 día</button>
+        <button class="btn ghost" data-act="adv" data-n="5">+1 semana</button>
+        <button class="btn" data-act="adv" data-n="21">+1 mes</button>
+      </div>
+    </div>
+    ${tip("portfolio", `Esta es tu ${T("cartera")}: todo lo que tenés, cuánto vale hoy y cuánto ganás o perdés. En la vida real esperás; acá podés adelantar el tiempo con los botones de arriba.`)}
+    <div class="kpis">
+      <div class="card kpi"><div class="label">Valor total</div><div class="v" data-total>${money(total)}</div></div>
+      <div class="card kpi"><div class="label">${T("ganancia o pérdida", "Resultado total")}</div><div class="v ${cls(pnl)}" data-pnl>${money(pnl)}</div><div class="xs ${cls(pnl)} num">${pct(pnl / START_CASH)} desde el inicio</div></div>
+      <div class="card kpi"><div class="label">Resultado del día</div><div class="v ${cls(dayPnl)}">${money(dayPnl)}</div></div>
+      <div class="card kpi"><div class="label">${T("saldo disponible", "Saldo disponible")}</div><div class="v">${money(B.cash)}</div><div class="xs muted num">Invertido: ${money(inv)}</div></div>
+    </div>
+    ${coach(dayPnl, pnl)}
+    <div class="grid-2">
+      <div class="card">
+        <div class="between"><span class="label">Evolución de tu cartera</span><span class="xs muted">La línea punteada es lo que pusiste: $100.000</span></div>
+        ${B.equity.length > 1 ? chart(B.equity.concat(total), { base: START_CASH, label: "Evolución de tu cartera", tall: true })
+          : `<div class="empty small">Comprá algo y adelantá el tiempo para ver cómo se mueve tu plata.</div>`}
+      </div>
+      <div class="card">
+        <span class="label">Distribución</span>
+        <div class="alloc-bar">${alloc.map(a => `<div style="width:${a.v / total * 100}%;background:${a.color}" title="${a.name}"></div>`).join("")}</div>
+        <div class="alloc-list">${alloc.map(a => `<div class="kv"><span><i style="background:${a.color}"></i>${a.name}</span><b class="num">${nf2.format(a.v / total * 100)}%</b></div>`).join("")}</div>
+        <p class="xs muted" style="margin:10px 0 0">Repartir entre distintos tipos es ${T("diversificar")}.</p>
+      </div>
+    </div>
+    <div class="between" style="margin-bottom:8px"><h2 style="margin:0">Tenencias</h2></div>
+    <div class="tbl-wrap">
+      ${syms.length ? `<table>
+        <thead><tr><th>Activo</th><th class="r">Cantidad</th><th class="r hide-m">${T("precio promedio", "Precio prom.")}</th><th class="r">Último</th><th class="r hide-m">Var. día</th><th class="r">Valor</th><th class="r">${T("ganancia o pérdida", "Resultado")}</th><th class="hide-m"></th></tr></thead>
+        <tbody>${syms.map(s => {
+          const p = B.pos[s], val = p.qty * px(s), g = val - p.cost, v = dayVar(s);
+          return `<tr class="click" data-act="select" data-sym="${s}">
+            <td><div class="sym">${s}</div><div class="tname">${INS[s].name}</div></td>
+            <td class="r num">${qtyFmt(s, p.qty)}</td>
+            <td class="r num hide-m">${money(p.cost / p.qty)}</td>
+            <td class="r num">${money(px(s))}</td>
+            <td class="r hide-m"><span class="pill ${cls(v)} num">${pct(v)}</span></td>
+            <td class="r num">${money(val)}</td>
+            <td class="r"><div class="num ${cls(g)}">${money(g)}</div><div class="xs num ${cls(g)}">${pct(g / p.cost)}</div></td>
+            <td class="r hide-m"><button class="btn sm ghost" data-act="sellFrom" data-sym="${s}">${isFci(s) ? "Rescatar" : "Vender"}</button></td>
+          </tr>`;
+        }).join("")}</tbody>
+      </table>` : `<div class="empty small">Todavía no compraste nada.<p></p><button class="btn inline" data-act="tab" data-tab="market">Ir al mercado</button></div>`}
+    </div>
+    <p></p>
+    <button class="link" data-act="resetBroker">Reiniciar el simulador con $100.000</button>
+    <p class="note">Simulación con valores inventados para aprender. No es una recomendación ni refleja productos ni precios reales.</p>`;
+}
+
+function activity() {
+  const os = S.broker.orders;
+  const st = { "Ejecutada": "up", "Pendiente": "warn", "Cancelada": "grey", "Rechazada": "down" };
+  return `
+    <div class="page-h"><div><h1>Movimientos</h1><p class="small muted">Todas tus órdenes en el simulador</p></div></div>
+    ${tip("activity", "Acá queda registrada cada orden: las ejecutadas, las que esperan un precio y las canceladas. En un broker real también te llega por mail.")}
+    <div class="tbl-wrap">
+      ${os.length ? `<table>
+        <thead><tr><th class="hide-m">N.º</th><th class="hide-m">Día</th><th>Operación</th><th class="hide-m">Tipo</th><th class="hide-m">Plazo</th><th class="r hide-m">Cantidad</th><th class="r hide-m">Precio</th><th class="r">Importe</th><th>Estado</th></tr></thead>
+        <tbody>${os.map(o => {
+          const fci = isFci(o.sym);
+          const verb = o.side === "buy" ? (fci ? "Suscripción" : "Compra") : (fci ? "Rescate" : "Venta");
+          return `<tr>
+            <td class="num xs hide-m">${String(o.id).padStart(6, "0")}</td>
+            <td class="hide-m">${o.day}</td>
+            <td><b class="${o.side === "buy" ? "up" : "down"}">${verb}</b> <span class="sym">${o.sym}</span></td>
+            <td class="hide-m">${fci ? "—" : o.type === "mkt" ? "A mercado" : "Límite " + money(o.limit)}</td>
+            <td class="hide-m">${o.plazo}</td>
+            <td class="r num hide-m">${qtyFmt(o.sym, o.qty)}</td>
+            <td class="r num hide-m">${o.price != null ? money(o.price) : "—"}</td>
+            <td class="r num">${o.total != null ? money(o.side === "buy" ? -o.total : o.total) : "—"}</td>
+            <td><span class="pill ${st[o.status]}">${o.status}</span>
+              ${o.status === "Pendiente" ? ` <button class="link xs" data-act="cancel" data-id="${o.id}">Cancelar</button>` : ""}
+              ${o.why ? `<div class="xs down">${o.why}</div>` : ""}</td>
+          </tr>`;
+        }).join("")}</tbody>
+      </table>` : `<div class="empty small">Todavía no hiciste ninguna operación.<p></p><button class="btn inline" data-act="tab" data-tab="market">Ir al mercado</button></div>`}
+    </div>
+    <p class="note">Simulación con valores inventados para aprender.</p>`;
+}
+
+/* ---------- Precios en vivo ---------- */
+
+function liveTick() {
+  if (!S.market || !S.broker || !brokerOpen() || document.hidden || modal) return;
+  INSTRUMENTS.forEach(i => {
+    if (i.type === "fci") return;
+    S.market[i.sym].px *= 1 + i.sigma * 0.08 * gauss();
+  });
+  const before = S.broker.orders.filter(o => o.status === "Pendiente").length;
+  checkLimits();
+  const after = S.broker.orders.filter(o => o.status === "Pendiente").length;
+  document.querySelectorAll("[data-px]").forEach(el => {
+    const s = el.dataset.px, old = parseFloat(el.dataset.last || px(s));
+    el.textContent = money(px(s));
+    const row = el.closest("tr");
+    if (row) { row.classList.remove("flash-up", "flash-down"); void row.offsetWidth; row.classList.add(px(s) >= old ? "flash-up" : "flash-down"); }
+    el.dataset.last = px(s);
+  });
+  document.querySelectorAll("[data-var]").forEach(el => { const v = dayVar(el.dataset.var); el.textContent = pct(v); el.className = `pill ${cls(v)} num`; });
+  document.querySelectorAll("[data-var-t]").forEach(el => { const v = dayVar(el.dataset.varT); el.textContent = pct(v); el.className = `${cls(v)} num`; });
+  const total = equity(), pnl = total - START_CASH;
+  document.querySelectorAll("[data-total], [data-total-h]").forEach(el => el.textContent = money(total));
+  document.querySelectorAll("[data-cash-h]").forEach(el => el.textContent = money(S.broker.cash));
+  document.querySelectorAll("[data-pnl]").forEach(el => { el.textContent = money(pnl); el.className = `v ${cls(pnl)}`; });
+  updateTicket();
+  save();
+  if (after !== before && view.name === "activity") render();
+}
+setInterval(liveTick, 2500);
+
+/* =========================================================
    Eventos
    ========================================================= */
+
+function selectSym(sym, side = "buy") {
+  go({ name: "market", filter: view.name === "market" ? view.filter : undefined, q: view.name === "market" ? view.q : undefined,
+       range: view.range, sel: sym, ticket: newOrder(sym, side) });
+}
 
 document.addEventListener("click", e => {
   const term = e.target.closest(".term");
   if (term) { e.stopPropagation(); return openTerm(term.dataset.term); }
   const el = e.target.closest("[data-act]");
-  if (!el || el.disabled) return;
+  if (!el || el.disabled || !el.dataset.act) return;
   const act = el.dataset.act, i = +el.dataset.i;
+  const tk = view.ticket;
   switch (act) {
     case "close": if (e.target === el) { modal = null; renderModal(); } break;
     case "modalOk": { const f = modal.onOk; modal = null; renderModal(); f(); break; }
@@ -1015,23 +1176,24 @@ document.addEventListener("click", e => {
       break;
     }
     case "tipOk": S.tips[el.dataset.id] = true; save(); render(); break;
-    case "market": go({ name: "market", filter: view.filter }); break;
-    case "filter": go({ name: "market", filter: el.dataset.f, q: view.q }); break;
-    case "detail": go({ name: "detail", sym: el.dataset.sym }); break;
+    case "filter": view.filter = el.dataset.f; render(); break;
+    case "select": e.stopPropagation(); if (view.name !== "market" || view.sel !== el.dataset.sym) selectSym(el.dataset.sym); break;
+    case "sellFrom": e.stopPropagation(); selectSym(el.dataset.sym, "sell"); break;
+    case "unsel": view.sel = null; render(); window.scrollTo(0, 0); break;
     case "range": view.range = el.dataset.r; render(); break;
-    case "order": go(newOrder(el.dataset.sym, el.dataset.side)); break;
-    case "side": view = newOrder(view.sym, el.dataset.side); render(); break;
-    case "otype": view.type = el.dataset.t; if (view.type === "lim") view.limit = +px(view.sym).toFixed(2); render(); break;
-    case "plazo": view.plazo = el.dataset.p; render(); break;
+    case "side": view.ticket = newOrder(tk.sym, el.dataset.side); render(); break;
+    case "newTicket": view.ticket = newOrder(tk.sym, "buy"); render(); break;
+    case "otype": tk.type = el.dataset.t; if (tk.type === "lim") tk.limit = +px(tk.sym).toFixed(2); render(); break;
+    case "plazo": tk.plazo = el.dataset.p; render(); break;
     case "step": {
-      const fci = isFci(view.sym), d = +el.dataset.d;
-      if (fci) view.amount = Math.max(0, Math.round(view.amount + d * 1000));
-      else view.qty = Math.max(0, Math.round(view.qty) + d);
-      app.querySelector("#q").value = fci ? view.amount : view.qty;
+      const fci = isFci(tk.sym), d = +el.dataset.d;
+      if (fci) tk.amount = Math.max(0, Math.round(tk.amount + d * 1000));
+      else tk.qty = Math.max(0, Math.round(tk.qty) + d);
+      app.querySelector("#q").value = fci ? tk.amount : tk.qty;
       updateTicket(); break;
     }
-    case "review": if (!calc(view).err) go({ ...view, step: "review" }); break;
-    case "editOrder": go({ ...view, step: "form" }); break;
+    case "review": if (!calc(tk).err) { tk.step = "review"; render(); } break;
+    case "editOrder": tk.step = "form"; render(); break;
     case "confirm": placeOrder(); break;
     case "cancel": {
       const o = S.broker.orders.find(x => x.id === +el.dataset.id);
@@ -1051,14 +1213,14 @@ document.addEventListener("input", e => {
   if (e.target.id === "search") {
     view.q = e.target.value;
     const q = view.q.trim().toLowerCase();
-    app.querySelectorAll("[data-row]").forEach(r => r.hidden = q && !r.dataset.search.includes(q));
+    app.querySelectorAll("tr[data-search]").forEach(r => r.hidden = !!q && !r.dataset.search.includes(q));
     return;
   }
   const f = e.target.dataset.field;
-  if (f && view.name === "order") {
+  if (f && view.ticket) {
     const raw = e.target.value.trim();
     const v = parseFloat(raw.includes(",") ? raw.replace(/\./g, "").replace(",", ".") : raw);
-    view[f] = isNaN(v) ? 0 : v;
+    view.ticket[f] = isNaN(v) ? 0 : v;
     updateTicket();
   }
 });
