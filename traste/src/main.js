@@ -1,4 +1,8 @@
 // Traste: lógica principal de la app
+import "@fontsource/atkinson-hyperlegible/latin-400.css";
+import "@fontsource/atkinson-hyperlegible/latin-700.css";
+import "@fontsource/atkinson-hyperlegible/latin-400-italic.css";
+import "@fontsource-variable/bricolage-grotesque/wght.css";
 import "./styles.css";
 
 /* ---------- Datos básicos ---------- */
@@ -111,7 +115,7 @@ function chordSVG(c){
 }
 
 /* ---------- Diapasón ---------- */
-const FW=56,OX=46,TOP=22,SP=26,FRETS=12;
+const FW=56,OX=58,TOP=22,SP=26,FRETS=12;
 function boardSVG(mark){
   const W=OX+FW*FRETS+14,H=TOP+SP*5+34;
   let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Diapasón de guitarra">`;
@@ -214,7 +218,7 @@ function renderRuta(){let k=0,html='';
       html+=`<div class="actions">${l.prog?`<button class="btn primary" data-prog="${l.prog.join(',')}">Escuchar ${l.prog.map(i=>byId[i].n).join(' ')}</button>`:''}<button class="btn ${isDone?'ok':''}" data-done="${k}">${isDone?'Completada':'Marcar como completada'}</button></div></div></div>`});
     html+='</div>'});
   levelsEl.innerHTML=html;updProg()}
-function updProg(){document.getElementById('progFill').style.width=(done.length/20*100)+'%';document.getElementById('progText').textContent=`${done.length} de 20`}
+function updProg(){document.getElementById('progFill').style.width=(done.length/20*100)+'%';document.getElementById('progText').textContent=`${done.length} de 20`;updSide()}
 levelsEl.addEventListener('click',e=>{
   const h=e.target.closest('.lh');if(h){const ls=h.parentElement;ls.classList.toggle('open');h.setAttribute('aria-expanded',ls.classList.contains('open'));return}
   const m=e.target.closest('[data-chord]');if(m){strum(byId[m.dataset.chord].frets);return}
@@ -277,9 +281,9 @@ function renderField(){const k=+keySel.value;fieldDet.innerHTML='';
   fieldEl.innerHTML=MAJ.map((iv,d)=>{const p=pc(k+iv);return`<button class="fc${d===0?' key':''}" data-p="${p}" data-q="${QUAL[d]}"><span class="rn">${ROM[d]}</span><b>${NOTES[p]}${QUAL[d]}</b></button>`}).join('')}
 fieldEl.addEventListener('click',e=>{const b=e.target.closest('.fc');if(!b)return;const p=+b.dataset.p,q=b.dataset.q;const c=findChord(p,q);
   const notes=triad(p,q).map(m=>NOTES[pc(m)]).join(' ');
-  if(c){strum(c.frets);fieldDet.innerHTML=`${chordSVG(c)}<div><b style="font-family:'Bricolage Grotesque',sans-serif;font-size:22px">${c.n}</b><br><span class="muted">${c.es}. Notas: ${notes}</span></div>`}
+  if(c){strum(c.frets);fieldDet.innerHTML=`${chordSVG(c)}<div><b style="font-family:'Bricolage Grotesque Variable',sans-serif;font-size:22px">${c.n}</b><br><span class="muted">${c.es}. Notas: ${notes}</span></div>`}
   else{if(ac()){const t=ctx.currentTime;triad(48+p,q).forEach((m,i)=>playNote(m,t+i*.03,null,.4))}
-    fieldDet.innerHTML=`<div><b style="font-family:'Bricolage Grotesque',sans-serif;font-size:22px">${NOTES[p]}${q}</b><br><span class="muted">Notas: ${notes}. Este acorde no está en el diccionario: se toca con una forma de cejilla o buscalo con el explorador.</span></div>`}});
+    fieldDet.innerHTML=`<div><b style="font-family:'Bricolage Grotesque Variable',sans-serif;font-size:22px">${NOTES[p]}${q}</b><br><span class="muted">Notas: ${notes}. Este acorde no está en el diccionario: se toca con una forma de cejilla o buscalo con el explorador.</span></div>`}});
 keySel.addEventListener('change',renderField);renderField();
 
 /* ---------- Práctica ---------- */
@@ -402,7 +406,7 @@ function renderLicks(){licksEl.innerHTML=LICKS.map((L,i)=>{const isDone=pdone.in
   <div class="controls" style="margin-top:12px"><label>Velocidad<select data-speed="${i}"><option value=".5">50 %</option><option value=".75">75 %</option><option value="1" selected>100 %</option></select></label><label class="toggle" style="margin:0 0 8px"><input type="checkbox" data-loop="${i}"> Repetir</label></div>`:''}
   ${L.tip?`<div class="tip">${L.tip}</div>`:''}
   <div class="actions">${L.ev?`<button class="btn primary" data-play="${i}">Escuchar y ver</button>`:''}<button class="btn ${isDone?'ok':''}" data-pdone="${i+1}">${isDone?'Completada':'Marcar como completada'}</button></div></div></div>`}).join('');updPProg()}
-function updPProg(){document.getElementById('pProgFill').style.width=(pdone.length/LICKS.length*100)+'%';document.getElementById('pProgText').textContent=`${pdone.length} de ${LICKS.length}`}
+function updPProg(){document.getElementById('pProgFill').style.width=(pdone.length/LICKS.length*100)+'%';document.getElementById('pProgText').textContent=`${pdone.length} de ${LICKS.length}`;updSide()}
 function stopLick(){if(!lickPlay)return;lickPlay.timers.forEach(clearTimeout);const b=licksEl.querySelector(`[data-play="${lickPlay.i}"]`);if(b)b.textContent='Escuchar y ver';
   const tb=document.getElementById('tab'+lickPlay.i);if(tb)tb.querySelectorAll('.cur').forEach(x=>x.classList.remove('cur'));
   Object.values(leadActive).forEach(a=>{try{a.g.gain.setTargetAtTime(0,ctx.currentTime,.03)}catch(e){}});lickPlay=null}
@@ -512,6 +516,29 @@ function go(id){if(typeof stopLick==='function')stopLick();tabs.forEach(t=>t.set
 tabs.forEach(t=>t.addEventListener('click',()=>go(t.dataset.tab)));
 const lastTab=store.get('tab','ruta');if(lastTab!=='ruta')go(lastTab);
 
+/* ---------- Escritorio: progreso lateral, tema y atajos de teclado ---------- */
+// Se declara con function para que updProg/updPProg la puedan llamar antes de llegar acá.
+function updSide(){
+  const r=document.getElementById('sideRuta');if(!r)return;
+  let pd=[],nl=0;try{pd=pdone;nl=LICKS.length}catch(e){} // en la primera carga Punteo todavía no existe
+  r.style.width=(done.length/20*100)+'%';document.getElementById('sideRutaTxt').textContent=`${done.length}/20`;
+  document.getElementById('sidePunteo').style.width=(nl?pd.length/nl*100:0)+'%';document.getElementById('sidePunteoTxt').textContent=`${pd.length}/${nl}`}
+updSide();
+
+const THEMES=[['auto','Tema: automático'],['light','Tema: claro'],['dark','Tema: oscuro']];
+const themeBtn=document.getElementById('themeBtn');
+function applyTheme(t){if(t==='auto')delete document.documentElement.dataset.theme;else document.documentElement.dataset.theme=t;
+  themeBtn.textContent=THEMES.find(x=>x[0]===t)[1];store.set('theme',t)}
+applyTheme(store.get('theme','auto'));
+themeBtn.addEventListener('click',()=>{const i=THEMES.findIndex(x=>x[0]===(store.get('theme','auto')));applyTheme(THEMES[(i+1)%THEMES.length][0])});
+
+function stopAll(){stopLick();if(metro.on)metroBtn.click();if(jam.on)jamBtn.click();if(loopCb.checked){loopCb.checked=false;setLoop()}}
+const TAB_KEYS=['ruta','acordes','teoria','oido','punteo','practica'];
+document.addEventListener('keydown',e=>{
+  if(e.ctrlKey||e.metaKey||e.altKey)return;
+  if(e.target.closest('input,select,textarea,[contenteditable]'))return;
+  if(e.key==='Escape'){stopAll();return}
+  const n=+e.key;if(n>=1&&n<=TAB_KEYS.length){go(TAB_KEYS[n-1]);e.preventDefault()}});
 
 /* ---------- PWA: funciona offline y se puede instalar ---------- */
 if ("serviceWorker" in navigator && import.meta.env.PROD) {
