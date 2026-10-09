@@ -48,3 +48,15 @@ La carpeta `desktop/` convierte el prototipo en una app de escritorio con [Elect
 - En Windows: descomprimir el .zip y abrir `Sin Miedo.exe`. F11 pone pantalla completa.
 - Como no está firmada, Windows puede mostrar "Windows protegió su PC": "Más información" → "Ejecutar de todas formas".
 - Para probarla con Node instalado: `cd desktop && npm install && npm start` (copiar antes `index.html` dentro de `desktop/`).
+
+---
+
+## Traste (carpeta `traste/`)
+
+App aparte para aprender guitarra desde cero (Vite + JavaScript, instalable como PWA). Ver [traste/README.md](traste/README.md):
+
+```bash
+cd traste
+npm install
+npm run dev
+```
