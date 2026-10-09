@@ -1,0 +1,23 @@
+# Arma la app de escritorio de Sin Miedo para Windows (carpeta con "Sin Miedo.exe").
+# Corre cuando cambia index.html o desktop/, o a mano desde la pestaña Actions ("Run workflow").
+# El resultado queda para descargar en la sección "Artifacts" de la ejecución.
+name: Sin Miedo para Windows
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "index.html"
+      - "desktop/**"
+      - ".github/workflows/sin-miedo-windows.yml"
+
+jobs:
+  app:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: ./desktop/build-windows.sh "$RUNNER_TEMP/dist"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Sin-Miedo-Windows
+          path: ${{ runner.temp }}/dist/Sin Miedo/
