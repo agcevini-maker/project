@@ -1,10 +1,14 @@
 # Genera el instalador de Traste para Windows (Traste-Setup-x.y.z.exe).
-# Se corre a mano desde la pestaña Actions de GitHub ("Run workflow").
+# Corre solo cuando cambia algo en traste/, o a mano desde la pestaña Actions ("Run workflow").
 # El .exe queda para descargar en la sección "Artifacts" de la ejecución.
 name: Traste para Windows
 
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - "traste/**"
+      - ".github/workflows/traste-windows.yml"
 
 jobs:
   instalador:

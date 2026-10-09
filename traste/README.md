@@ -46,7 +46,7 @@ npm run dist:win   # crea release/Traste-Setup-1.0.0.exe
 ```
 
 - `dist:win` funciona directo en Windows. En Linux o Mac necesita [Wine](https://www.winehq.org) instalado.
-- También se puede generar desde GitHub, sin instalar nada: pestaña **Actions** → **Traste para Windows** → **Run workflow**. El `.exe` queda en "Artifacts" al terminar.
+- También se puede generar desde GitHub, sin instalar nada: se genera solo cada vez que se sube un cambio en `traste/` (también a mano: pestaña **Actions** → **Traste para Windows** → **Run workflow**). El `.exe` queda en "Artifacts" de esa ejecución.
 - El instalador no está firmado digitalmente, así que Windows puede mostrar el aviso "Windows protegió tu PC". Se sigue con **Más información** → **Ejecutar de todas formas**. Para que no aparezca hace falta un certificado de firma de código.
 
 ## Convertirla en app nativa para celular (opcional)
