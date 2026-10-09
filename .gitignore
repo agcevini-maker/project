@@ -1,1 +1,4 @@
 *.png
+!desktop/icon.png
+desktop/dist/
+node_modules/

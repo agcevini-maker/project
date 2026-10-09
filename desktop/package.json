@@ -1,0 +1,13 @@
+{
+  "name": "sin-miedo",
+  "productName": "Sin Miedo",
+  "version": "1.0.0",
+  "description": "Prototipo educativo para aprender a invertir y practicar en un broker simulado.",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "devDependencies": {
+    "electron": "33.4.11"
+  }
+}

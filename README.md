@@ -39,3 +39,12 @@ Para presentar, ver [PRESENTACION.md](PRESENTACION.md).
 - **Los precios, la comisión (0,6%), la inflación y los movimientos son inventados** y aleatorios; no son cotizaciones reales.
 - El botón "Hacerlo en LBO" no lleva a ningún lado todavía.
 - El contenido de las lecciones es un borrador: conviene que alguien de LBO lo revise antes de usarlo.
+
+## App de escritorio (Windows)
+
+La carpeta `desktop/` convierte el prototipo en una app de escritorio con [Electron](https://www.electronjs.org/). Usa el mismo `index.html`.
+
+- Para armarla (en Linux o Mac, con `curl`, `unzip` y `zip`): `./desktop/build-windows.sh`. Deja `desktop/dist/Sin-Miedo-Windows.zip`.
+- En Windows: descomprimir el .zip y abrir `Sin Miedo.exe`. F11 pone pantalla completa.
+- Como no está firmada, Windows puede mostrar "Windows protegió su PC": "Más información" → "Ejecutar de todas formas".
+- Para probarla con Node instalado: `cd desktop && npm install && npm start` (copiar antes `index.html` dentro de `desktop/`).
