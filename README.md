@@ -73,3 +73,9 @@ cd traste
 npm install
 npm run dev
 ```
+
+## Prototipo de diseño para escritorio (`prototipo/`)
+
+`prototipo/index.html` es un prototipo navegable para presentar en LBO, pensado para pantalla de escritorio (1440x900). Es independiente de la app principal: todos sus datos son simulados y están marcados como tales.
+
+Pantallas: landing, diagnóstico, inicio, ¿Y si…?, Aprender (camino de 6 niveles), lección, ¿Es estafa? (detector con semáforo), simulador, liga con amigos, Preguntá sin vergüenza, Empezar con poco y El salto. El botón "Mapa del prototipo" (o la tecla M) permite saltar a cualquier pantalla durante la presentación.

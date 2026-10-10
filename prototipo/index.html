@@ -1,0 +1,1350 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sin Miedo · prototipo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+<style>
+  /* Prototipo de escritorio (1440x900). Estructura en verde petróleo (barra lateral, hero),
+     contenido sobre superficie clara para lectura cómoda, acento verde menta. */
+  :root {
+    --petrol-900: #0B2A33;
+    --petrol-800: #003845;
+    --petrol-700: #0E4A57;
+    --petrol-600: #1B5F6B;
+    --petrol-200: #9FC3C6;
+    --mint: #2BB673;
+    --mint-600: #1F9D63;
+    --mint-100: #DDF4E8;
+    --mint-50: #EEF9F3;
+    --bg: #F2F6F5;
+    --card: #FFFFFF;
+    --ink: #0F2229;
+    --ink-2: #4A5E64;
+    --ink-3: #7A8C91;
+    --line: #DCE5E4;
+    --red: #D64545;   --red-100: #FBE4E4;
+    --amber: #E3A21A; --amber-100: #FCF1D8;
+    --green: #2BB673; --green-100: #DDF4E8;
+    /* categóricos del simulador (validados para daltonismo) */
+    --c-mm: #1F9D63; --c-bono: #2F6FB5; --c-cedear: #C76A12; --c-accion: #B0417A;
+    --radius: 16px;
+    --shadow: 0 1px 2px rgba(11,42,51,.05), 0 8px 24px rgba(11,42,51,.06);
+    --shadow-lg: 0 18px 50px rgba(11,42,51,.16);
+    --font: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    color-scheme: light;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body { font: 15px/1.55 var(--font); color: var(--ink); background: var(--bg); -webkit-font-smoothing: antialiased; }
+  button, input, textarea { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  :focus-visible { outline: 3px solid rgba(43,182,115,.45); outline-offset: 2px; border-radius: 8px; }
+  h1, h2, h3, h4 { margin: 0; letter-spacing: -.02em; text-wrap: balance; }
+  h1 { font-size: 34px; line-height: 1.15; font-weight: 800; }
+  h2 { font-size: 22px; line-height: 1.25; font-weight: 800; }
+  h3 { font-size: 17px; line-height: 1.3; font-weight: 700; }
+  p { margin: 0; }
+  .muted { color: var(--ink-2); }
+  .faint { color: var(--ink-3); }
+  .small { font-size: 13.5px; }
+  .xs { font-size: 12px; }
+  .num { font-variant-numeric: tabular-nums; }
+  .eyebrow { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
+
+  /* Botones y piezas */
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 0; border-radius: 12px; padding: 12px 20px; font-weight: 700; background: var(--mint); color: #062018; transition: transform .15s, box-shadow .15s, background .15s; text-decoration: none; }
+  .btn:hover { background: #33c47f; box-shadow: 0 6px 18px rgba(43,182,115,.3); transform: translateY(-1px); }
+  .btn:disabled { opacity: .45; cursor: not-allowed; transform: none; box-shadow: none; }
+  .btn.lg { padding: 15px 26px; font-size: 16px; border-radius: 14px; }
+  .btn.ghost { background: transparent; color: var(--ink); border: 1.5px solid var(--line); }
+  .btn.ghost:hover { border-color: var(--mint); box-shadow: none; background: var(--mint-50); }
+  .btn.dark { background: var(--petrol-800); color: #fff; }
+  .btn.dark:hover { background: var(--petrol-700); box-shadow: 0 6px 18px rgba(0,56,69,.3); }
+  .btn.wa { background: #1FA855; color: #fff; }
+  .btn.block { width: 100%; }
+  .link { background: none; border: 0; padding: 0; color: var(--mint-600); font-weight: 700; }
+  .link:hover { text-decoration: underline; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px; box-shadow: var(--shadow); }
+  .card.hover { transition: transform .18s, box-shadow .18s, border-color .18s; }
+  .card.hover:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); border-color: #c5d6d4; }
+  .pill { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 99px; background: var(--mint-100); color: #13774a; white-space: nowrap; }
+  .pill.amber { background: var(--amber-100); color: #8a5a00; }
+  .pill.red { background: var(--red-100); color: #a52a2a; }
+  .pill.grey { background: #EAF0EF; color: var(--ink-2); }
+  .pill.petrol { background: var(--petrol-800); color: #fff; }
+  .sim-tag { display: inline-flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 700; padding: 6px 12px; border-radius: 99px; background: var(--amber-100); color: #7a5000; border: 1px solid #f1d58e; }
+  .sim-tag i { width: 8px; height: 8px; border-radius: 50%; background: var(--amber); display: inline-block; }
+  .bar { height: 10px; border-radius: 99px; background: #E3ECEA; overflow: hidden; }
+  .bar > span { display: block; height: 100%; border-radius: 99px; background: var(--mint); animation: grow .9s cubic-bezier(.2,.8,.2,1); transform-origin: left; }
+  @keyframes grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+  .grid { display: grid; gap: 18px; }
+  .row { display: flex; gap: 12px; align-items: center; }
+  .between { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .stack { display: flex; flex-direction: column; gap: 12px; }
+  .ic { width: 20px; height: 20px; flex: none; }
+  .icon-box { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; background: var(--mint-50); color: var(--mint-600); flex: none; }
+  .icon-box .ic { width: 22px; height: 22px; }
+  .note { font-size: 12px; color: var(--ink-3); }
+
+  /* Términos con explicación */
+  .term { border-bottom: 2px dotted var(--mint); cursor: help; font-weight: 600; }
+  #tip { position: fixed; z-index: 90; max-width: 300px; background: var(--petrol-900); color: #fff; border-radius: 12px; padding: 12px 14px; font-size: 13.5px; line-height: 1.45; box-shadow: var(--shadow-lg); pointer-events: none; opacity: 0; transform: translateY(4px); transition: opacity .12s, transform .12s; }
+  #tip.on { opacity: 1; transform: none; }
+  #tip b { color: #7EE2AE; display: block; margin-bottom: 2px; }
+  #tip .ex { color: #C5DCDD; margin-top: 6px; display: block; }
+
+  /* ---------- Landing ---------- */
+  .landing { background: var(--bg); min-height: 100%; }
+  .l-hero { background: radial-gradient(1200px 500px at 80% -10%, #0f4b58 0%, transparent 60%), linear-gradient(180deg, var(--petrol-900), var(--petrol-800)); color: #fff; }
+  .l-wrap { max-width: 1240px; margin: 0 auto; padding-inline: 40px; }
+  .l-nav { display: flex; align-items: center; justify-content: space-between; height: 76px; }
+  .l-nav .row { gap: 24px; }
+  .l-nav .logo, .diag-top .logo { padding: 0; }
+  .l-nav a, .l-nav .navlink { color: #CFE3E4; text-decoration: none; font-weight: 600; background: none; border: 0; }
+  .l-nav .navlink:hover { color: #fff; }
+  .l-hero-in { display: grid; grid-template-columns: 1.05fr 1fr; gap: 48px; align-items: center; padding-block: 48px 84px; }
+  .l-hero h1 { font-size: 56px; line-height: 1.04; letter-spacing: -.035em; }
+  .l-hero h1 em { font-style: normal; color: var(--mint); }
+  .l-hero .lead { font-size: 19px; color: #CFE3E4; margin: 20px 0 30px; max-width: 34ch; }
+  .trust { display: flex; gap: 22px; margin-top: 30px; flex-wrap: wrap; color: #A9C7C9; font-size: 13.5px; font-weight: 600; }
+  .trust span { display: inline-flex; gap: 8px; align-items: center; }
+  .trust .ic { color: var(--mint); width: 18px; height: 18px; }
+  .preview { position: relative; height: 430px; }
+  .preview .card { position: absolute; color: var(--ink); }
+  .l-section { padding-block: 72px; }
+  .l-section h2 { font-size: 34px; }
+  .frenos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 32px; }
+  .freno { display: flex; flex-direction: column; gap: 14px; padding: 26px; }
+  .freno .quote { font-size: 15px; color: var(--ink-2); border-left: 3px solid var(--line); padding-left: 12px; font-style: italic; }
+  .freno .solve { background: var(--mint-50); border-radius: 12px; padding: 14px; font-size: 14px; }
+  .freno .solve b { color: #13774a; display: block; margin-bottom: 4px; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; }
+  .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-top: 32px; }
+  .step-n { width: 34px; height: 34px; border-radius: 50%; background: var(--petrol-800); color: #fff; display: grid; place-items: center; font-weight: 800; margin-bottom: 14px; }
+  .l-cta { background: var(--petrol-800); color: #fff; border-radius: 24px; padding: 44px; display: flex; justify-content: space-between; align-items: center; gap: 24px; }
+  .l-foot { padding-block: 28px 40px; color: var(--ink-3); font-size: 12.5px; display: flex; justify-content: space-between; gap: 20px; }
+
+  /* ---------- Diagnóstico ---------- */
+  .diag { min-height: 100%; display: grid; grid-template-rows: auto 1fr; background: linear-gradient(180deg, var(--petrol-900) 0, var(--petrol-900) 220px, var(--bg) 220px); }
+  .diag-top { color: #fff; }
+  .diag-card { max-width: 760px; margin: 10px auto 40px; width: 100%; }
+  .opts { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 22px; }
+  .opt { text-align: left; background: var(--card); border: 2px solid var(--line); border-radius: 14px; padding: 18px; display: flex; gap: 14px; align-items: flex-start; transition: border-color .15s, background .15s, transform .15s; }
+  .opt:hover { border-color: #a8d9bf; transform: translateY(-2px); }
+  .opt.sel { border-color: var(--mint); background: var(--mint-50); }
+  .opt .t { font-weight: 700; }
+  .seg-progress { display: flex; gap: 6px; }
+  .seg-progress span { flex: 1; height: 6px; border-radius: 99px; background: rgba(255,255,255,.2); }
+  .seg-progress span.on { background: var(--mint); }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field label { font-size: 13px; font-weight: 700; color: var(--ink-2); }
+  .input { border: 1.5px solid var(--line); background: #fff; border-radius: 12px; padding: 12px 14px; width: 100%; }
+  .input:focus { outline: none; border-color: var(--mint); box-shadow: 0 0 0 4px rgba(43,182,115,.15); }
+  .money-in { position: relative; }
+  .money-in span { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--ink-3); font-weight: 700; }
+  .money-in .input { padding-left: 30px; font-weight: 700; font-size: 18px; }
+
+  /* ---------- App shell ---------- */
+  .shell { display: grid; grid-template-columns: 252px minmax(0, 1fr) 316px; height: 100vh; }
+  .side { background: var(--petrol-900); color: #DCEBEC; display: flex; flex-direction: column; padding: 22px 16px; gap: 6px; overflow-y: auto; }
+  .logo { display: flex; align-items: center; gap: 10px; padding: 4px 8px 22px; color: #fff; }
+  .logo b { font-size: 19px; font-weight: 800; letter-spacing: -.02em; display: block; line-height: 1.1; }
+  .logo small { color: var(--petrol-200); font-weight: 600; font-size: 12px; }
+  .nav-i { display: flex; align-items: center; gap: 12px; padding: 11px 12px; border-radius: 12px; background: none; border: 0; color: #BFD6D8; font-weight: 600; text-align: left; width: 100%; transition: background .15s, color .15s; }
+  .nav-i:hover { background: rgba(255,255,255,.06); color: #fff; }
+  .nav-i.on { background: var(--petrol-700); color: #fff; box-shadow: inset 3px 0 0 var(--mint); }
+  .nav-i.on .ic { color: var(--mint); }
+  .nav-i .badge { margin-left: auto; font-size: 11px; background: var(--mint); color: #062018; border-radius: 99px; padding: 1px 7px; font-weight: 800; }
+  .side-foot { margin-top: auto; display: flex; flex-direction: column; gap: 10px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,.08); }
+  .me { display: flex; gap: 10px; align-items: center; padding: 6px 8px; }
+  .avatar { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; font-size: 13px; color: #fff; background: var(--petrol-600); flex: none; }
+  .main { overflow-y: auto; }
+  .main-in { padding: 30px 36px 48px; max-width: 980px; margin: 0 auto; }
+  .page-h { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; margin-bottom: 24px; }
+  .page-h p { margin-top: 6px; }
+  .rail { background: #fff; border-left: 1px solid var(--line); overflow-y: auto; padding: 26px 22px; display: flex; flex-direction: column; gap: 22px; }
+  .rail h4 { font-size: 13px; text-transform: uppercase; letter-spacing: .07em; color: var(--ink-3); margin-bottom: 12px; }
+  .ring { position: relative; width: 84px; height: 84px; flex: none; }
+  .ring b { position: absolute; inset: 0; display: grid; place-items: center; font-size: 19px; font-weight: 800; }
+  .streak-days { display: flex; gap: 6px; margin-top: 12px; }
+  .streak-days div { flex: 1; text-align: center; font-size: 11px; color: var(--ink-3); font-weight: 700; }
+  .streak-days i { display: block; height: 28px; border-radius: 8px; background: #EEF3F2; margin-bottom: 4px; }
+  .streak-days .on i { background: linear-gradient(180deg, #FFB547, #F27B1A); }
+  .todo { display: flex; gap: 10px; align-items: flex-start; padding: 10px; border-radius: 12px; border: 1px solid var(--line); background: #fff; width: 100%; text-align: left; transition: border-color .15s, background .15s; }
+  .todo:hover { border-color: var(--mint); background: var(--mint-50); }
+  .todo .chk { width: 20px; height: 20px; border-radius: 6px; border: 2px solid #c7d5d3; flex: none; display: grid; place-items: center; margin-top: 1px; }
+  .todo.done { opacity: .6; }
+  .todo.done .chk { background: var(--mint); border-color: var(--mint); color: #fff; }
+  .todo.done .t { text-decoration: line-through; }
+
+  /* Dashboard */
+  .dash { grid-template-columns: repeat(6, 1fr); }
+  .span-2 { grid-column: span 2; } .span-3 { grid-column: span 3; } .span-4 { grid-column: span 4; } .span-6 { grid-column: span 6; }
+  .goal-hero { background: linear-gradient(135deg, var(--petrol-800), var(--petrol-700)); color: #fff; border: 0; }
+  .goal-hero .bar { background: rgba(255,255,255,.15); }
+  .goal-hero .muted { color: #B9D3D5; }
+  .big-num { font-size: 32px; font-weight: 800; letter-spacing: -.02em; }
+
+  /* Aprender: camino */
+  .path { position: relative; display: flex; flex-direction: column; gap: 22px; padding: 10px 0 20px; }
+  .lvl { display: flex; align-items: center; gap: 20px; }
+  .lvl:nth-child(4n+2) { padding-left: 120px; } .lvl:nth-child(4n+3) { padding-left: 200px; } .lvl:nth-child(4n+4) { padding-left: 120px; }
+  .node { width: 76px; height: 76px; border-radius: 50%; border: 0; display: grid; place-items: center; flex: none; position: relative; box-shadow: 0 6px 0 rgba(0,0,0,.12); transition: transform .15s; }
+  .node:hover { transform: translateY(-2px); }
+  .node .ic { width: 30px; height: 30px; }
+  .node.done { background: var(--mint); color: #fff; box-shadow: 0 6px 0 #1b8a55; }
+  .node.cur { background: #fff; color: var(--petrol-800); border: 4px solid var(--mint); box-shadow: 0 6px 0 #1b8a55, 0 0 0 0 rgba(43,182,115,.5); animation: pulse 2s infinite; }
+  .node.lock { background: #E3EAE9; color: #93A5A8; box-shadow: 0 6px 0 #cdd8d6; cursor: not-allowed; }
+  @keyframes pulse { 0% { box-shadow: 0 6px 0 #1b8a55, 0 0 0 0 rgba(43,182,115,.5); } 70% { box-shadow: 0 6px 0 #1b8a55, 0 0 0 16px rgba(43,182,115,0); } 100% { box-shadow: 0 6px 0 #1b8a55, 0 0 0 0 rgba(43,182,115,0); } }
+  @media (prefers-reduced-motion: reduce) { .node.cur { animation: none; } .bar > span { animation: none; } }
+  .lvl-info { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 12px 16px; min-width: 300px; box-shadow: var(--shadow); }
+  .lvl.lockrow .lvl-info { background: #F6F9F8; box-shadow: none; }
+
+  /* Lección */
+  .lesson-top { display: flex; align-items: center; gap: 16px; margin-bottom: 22px; }
+  .lp { display: flex; gap: 6px; flex: 1; }
+  .lp span { flex: 1; height: 8px; border-radius: 99px; background: #E3ECEA; transition: background .3s; }
+  .lp span.on { background: var(--mint); }
+  .lcard { padding: 40px 44px; min-height: 340px; display: flex; flex-direction: column; gap: 18px; }
+  .lcard h2 { font-size: 28px; }
+  .lcard p { font-size: 18px; line-height: 1.65; color: #23383E; }
+  .lcard .kicker { display: flex; gap: 14px; align-items: center; }
+  .callout { background: var(--mint-50); border-radius: 14px; padding: 16px 18px; font-size: 16px; }
+  .callout.red { background: var(--red-100); }
+  .q-opt { width: 100%; text-align: left; background: #fff; border: 2px solid var(--line); border-radius: 14px; padding: 16px 18px; font-weight: 600; display: flex; gap: 12px; align-items: center; transition: border-color .15s, background .15s; }
+  .q-opt:hover:not(:disabled) { border-color: #a8d9bf; }
+  .q-opt .k { width: 30px; height: 30px; border-radius: 8px; background: #EEF3F2; display: grid; place-items: center; font-weight: 800; flex: none; }
+  .q-opt.right { border-color: var(--mint); background: var(--mint-50); }
+  .q-opt.right .k { background: var(--mint); color: #fff; }
+  .q-opt.wrong { border-color: var(--red); background: var(--red-100); }
+  .q-opt.wrong .k { background: var(--red); color: #fff; }
+  .q-opt:disabled { cursor: default; }
+  .fb { border-radius: 14px; padding: 16px 18px; display: flex; gap: 12px; animation: pop .25s ease-out; }
+  .fb.ok { background: var(--mint-100); } .fb.no { background: var(--red-100); }
+  @keyframes pop { from { transform: scale(.97); opacity: 0; } to { transform: none; opacity: 1; } }
+
+  /* Detector */
+  .light { width: 132px; padding: 16px; background: #13252B; border-radius: 30px; display: flex; flex-direction: column; gap: 12px; align-items: center; flex: none; }
+  .light i { width: 70px; height: 70px; border-radius: 50%; background: #2a3b41; transition: background .3s, box-shadow .3s; }
+  .light i.r.on { background: #F05252; box-shadow: 0 0 30px rgba(240,82,82,.7); }
+  .light i.y.on { background: #F7C33B; box-shadow: 0 0 30px rgba(247,195,59,.7); }
+  .light i.g.on { background: #35CE85; box-shadow: 0 0 30px rgba(53,206,133,.7); }
+  .chk-row { display: grid; grid-template-columns: 1fr auto; gap: 14px; align-items: center; padding: 14px 0; border-top: 1px solid var(--line); }
+  .chk-row:first-child { border-top: 0; }
+  .tri { display: flex; background: #EEF3F2; border-radius: 10px; padding: 3px; gap: 3px; }
+  .tri button { border: 0; background: none; padding: 6px 12px; border-radius: 8px; font-size: 13px; font-weight: 700; color: var(--ink-2); }
+  .tri button.on.si { background: var(--red); color: #fff; }
+  .tri button.on.no { background: var(--mint); color: #062018; }
+  .tri button.on.ns { background: var(--amber); color: #3b2a00; }
+  .tri.inv button.on.si { background: var(--mint); color: #062018; }
+  .tri.inv button.on.no { background: var(--red); color: #fff; }
+  .chip { border: 1.5px solid var(--line); background: #fff; border-radius: 99px; padding: 8px 14px; font-size: 13.5px; font-weight: 600; text-align: left; transition: border-color .15s, background .15s; }
+  .chip:hover { border-color: var(--mint); background: var(--mint-50); }
+  .placeholder { background: repeating-linear-gradient(45deg, #F6F9F8, #F6F9F8 8px, #EFF4F3 8px, #EFF4F3 16px); border: 1.5px dashed #c5d6d4; border-radius: 12px; padding: 4px 10px; font-weight: 700; color: var(--ink-2); font-size: 13px; }
+
+  /* Simulador */
+  .opt4 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .inv { position: relative; overflow: hidden; }
+  .inv::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 5px; background: var(--c); }
+  .inv .icon-box { background: color-mix(in srgb, var(--c) 12%, white); color: var(--c); }
+  .risk { display: inline-flex; gap: 3px; align-items: center; }
+  .risk i { width: 14px; height: 6px; border-radius: 3px; background: #DCE5E4; }
+  .risk i.on { background: var(--c, var(--ink)); }
+  input[type=range] { width: 100%; accent-color: var(--c, var(--mint)); }
+  .alloc { display: flex; height: 14px; border-radius: 99px; overflow: hidden; gap: 2px; background: #E3ECEA; }
+  .alloc div { transition: width .3s; }
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 13px; color: var(--ink-2); }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .legend i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+  .legend i.line { height: 3px; border-radius: 2px; width: 18px; }
+  .legend i.dash { height: 0; border-top: 3px dashed; background: none !important; width: 18px; border-radius: 0; }
+
+  /* Gráficos */
+  .chart { position: relative; }
+  .chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .chart .hover-tip { position: absolute; pointer-events: none; background: var(--petrol-900); color: #fff; border-radius: 10px; padding: 8px 12px; font-size: 12.5px; white-space: nowrap; transform: translate(-50%, -110%); opacity: 0; transition: opacity .1s; z-index: 5; }
+  .chart .hover-tip.on { opacity: 1; }
+  .chart .hover-tip i { display: inline-block; width: 10px; height: 3px; border-radius: 2px; margin-right: 6px; vertical-align: middle; }
+
+  /* Liga */
+  .tabs { display: inline-flex; background: #E6EEEC; border-radius: 12px; padding: 4px; gap: 4px; }
+  .tabs button { border: 0; background: none; padding: 8px 16px; border-radius: 9px; font-weight: 700; color: var(--ink-2); }
+  .tabs button.on { background: #fff; color: var(--ink); box-shadow: var(--shadow); }
+  table { width: 100%; border-collapse: collapse; }
+  th.c, td.c { text-align: center; }
+  th { text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-3); font-weight: 700; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+  td { padding: 12px; border-bottom: 1px solid var(--line); }
+  tr:last-child td { border-bottom: 0; }
+  tr.me-row td { background: var(--mint-50); }
+  .rank { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; background: #EEF3F2; }
+  .rank.r1 { background: #FFE9A8; } .rank.r2 { background: #E4E9EC; } .rank.r3 { background: #F6D7BD; }
+  .mini { display: inline-flex; gap: 6px; flex-wrap: wrap; }
+  .mini span { font-size: 12px; background: #F1F5F4; border-radius: 8px; padding: 3px 8px; color: var(--ink-2); font-weight: 600; }
+
+  /* Chat */
+  .chat-box { display: flex; flex-direction: column; height: calc(100vh - 190px); min-height: 520px; padding: 0; overflow: hidden; }
+  .chat-log { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 14px; }
+  .msg { max-width: 76%; padding: 14px 16px; border-radius: 16px; font-size: 15px; line-height: 1.55; animation: pop .2s ease-out; }
+  .msg.bot { background: #F1F6F5; border-top-left-radius: 4px; align-self: flex-start; }
+  .msg.me { background: var(--petrol-800); color: #fff; border-top-right-radius: 4px; align-self: flex-end; }
+  .msg ul { margin: 8px 0 0; padding-left: 18px; }
+  .typing { display: inline-flex; gap: 4px; }
+  .typing i { width: 7px; height: 7px; border-radius: 50%; background: #9DB3B6; animation: blink 1s infinite; }
+  .typing i:nth-child(2) { animation-delay: .15s; } .typing i:nth-child(3) { animation-delay: .3s; }
+  @keyframes blink { 0%, 100% { opacity: .3; } 50% { opacity: 1; } }
+  .chat-in { border-top: 1px solid var(--line); padding: 16px 20px; display: flex; flex-direction: column; gap: 12px; }
+
+  /* El salto */
+  .leap-hero { background: radial-gradient(800px 300px at 50% 0, #135a68, transparent 70%), linear-gradient(180deg, var(--petrol-800), var(--petrol-900)); color: #fff; border-radius: 24px; padding: 48px; text-align: center; }
+  .medal { width: 96px; height: 96px; margin: 0 auto 18px; border-radius: 50%; background: linear-gradient(145deg, #7EE2AE, var(--mint)); display: grid; place-items: center; color: #062018; box-shadow: 0 0 0 10px rgba(43,182,115,.15); }
+  .medal .ic { width: 48px; height: 48px; }
+  .stats4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 30px; }
+  .stats4 div { background: rgba(255,255,255,.07); border-radius: 14px; padding: 16px; }
+  .stats4 b { font-size: 26px; display: block; }
+  .toggle { display: inline-flex; align-items: center; gap: 10px; font-weight: 600; cursor: pointer; }
+  .toggle input { display: none; }
+  .toggle .sw { width: 44px; height: 26px; border-radius: 99px; background: #CFDAD8; position: relative; transition: background .2s; }
+  .toggle .sw::after { content: ""; position: absolute; left: 3px; top: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; transition: transform .2s; box-shadow: 0 1px 3px rgba(0,0,0,.2); }
+  .toggle input:checked + .sw { background: var(--mint); }
+  .toggle input:checked + .sw::after { transform: translateX(18px); }
+
+  /* Modales, toast, confetti */
+  #modal .bg { position: fixed; inset: 0; background: rgba(11,42,51,.55); z-index: 80; display: grid; place-items: center; padding: 20px; animation: fade .15s; }
+  #modal .box { background: #fff; border-radius: 20px; padding: 28px; width: 100%; max-width: 520px; box-shadow: var(--shadow-lg); animation: pop .2s ease-out; }
+  @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+  #toast { position: fixed; bottom: 26px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--petrol-900); color: #fff; padding: 12px 18px; border-radius: 12px; font-weight: 600; z-index: 95; opacity: 0; transition: opacity .2s, transform .2s; pointer-events: none; }
+  #toast.on { opacity: 1; transform: translateX(-50%); }
+  #confetti { position: fixed; inset: 0; pointer-events: none; z-index: 99; }
+  .map-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 16px 0; }
+  .map-grid button { text-align: left; border: 1px solid var(--line); background: #fff; border-radius: 10px; padding: 10px 12px; font-weight: 600; font-size: 14px; }
+  .map-grid button:hover { border-color: var(--mint); background: var(--mint-50); }
+  .map-grid b { color: var(--ink-3); margin-right: 6px; }
+
+  @media (max-width: 1240px) { .shell { grid-template-columns: 232px minmax(0, 1fr); } .rail { display: none; } }
+  @media (max-width: 1000px) { .l-hero-in, .frenos, .steps { grid-template-columns: 1fr; } .preview { display: none; } .opt4, .opts { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<div id="modal"></div>
+<div id="tip" role="tooltip"></div>
+<div id="toast" role="status" aria-live="polite"></div>
+<canvas id="confetti"></canvas>
+
+<script>
+/* =================================================================
+   Contenido
+   ================================================================= */
+
+const TERMS = {
+  fci: ["FCI (fondo común de inversión)", "Mucha gente junta su plata y un equipo profesional la invierte.", "Es como hacer una vaquita con otros para invertir juntos."],
+  mm: ["Fondo de liquidez (Money Market)", "Un FCI muy tranquilo: tu plata rinde un poco y la podés sacar rápido.", "Como una alcancía que crece de a poquito y abrís cuando querés."],
+  cnv: ["CNV (Comisión Nacional de Valores)", "El organismo del Estado que controla a quienes ofrecen inversiones en Argentina.", "Como el árbitro del partido: si alguien no está registrado, no debería jugar."],
+  alyc: ["ALyC", "Agente de Liquidación y Compensación: empresa autorizada por la CNV para comprar y vender inversiones por vos.", "Como un despachante autorizado: hace el trámite en el mercado en tu nombre."],
+  ponzi: ["Esquema Ponzi", "Estafa que paga a los primeros con la plata de los que entran después. Cuando dejan de entrar, se cae.", "Como una cadena de mensajes: funciona hasta que se corta y la mayoría pierde."],
+  inflacion: ["Inflación", "Cuando los precios suben y tu plata alcanza para menos.", "Con $1.000 antes comprabas 4 alfajores; ahora, 3."],
+  rendimiento: ["Rendimiento", "Lo que gana tu plata por estar invertida.", "Pusiste $10.000 y al mes tenés $10.200: rindió $200."],
+  riesgo: ["Riesgo", "La posibilidad de que el resultado no sea el que esperabas, incluso de perder algo.", "Salir sin paraguas un día nublado."],
+  volatilidad: ["Volatilidad", "Cuánto sube y baja el valor de algo en poco tiempo.", "Una montaña rusa es muy volátil; una escalera mecánica, poco."],
+  diversificar: ["Diversificar", "Repartir tu plata en distintas cosas para no depender de una sola.", "No poner todos los huevos en la misma canasta."],
+  cedear: ["CEDEAR", "Un certificado que comprás en pesos y representa acciones de empresas de afuera.", "Tener un pedacito de Apple sin abrir una cuenta en otro país."],
+  bono: ["Bono", "Le prestás plata a un gobierno o empresa y te la devuelve con intereses.", "Como prestarle a un amigo que te firma cuándo y cuánto te devuelve."],
+  accion: ["Acción", "Un pedacito de una empresa. Si a la empresa le va bien, tu pedacito vale más.", "Ser dueño de una porción de la pizzería del barrio."],
+  liquidez: ["Liquidez", "Qué tan rápido podés convertir una inversión en efectivo.", "La plata en la billetera tiene mucha liquidez; una casa, poca."],
+  cuotaparte: ["Cuotaparte", "Cada porción de un fondo común. Su valor sube o baja según cómo le vaya al fondo.", "Si el fondo es una torta, cada cuotaparte es una porción."],
+  compuesto: ["Interés compuesto", "Cuando lo que ganás también empieza a ganar.", "Una bola de nieve que, al rodar, junta más nieve."]
+};
+const t = (key, label) => `<span class="term" tabindex="0" data-term="${key}">${label}</span>`;
+
+const LEVELS = [
+  { title: "Por qué la plata guardada pierde valor", min: 3, cards: [
+      { h: "El número no cambia. Lo que compra, sí.", p: `Si guardás $20.000 en un cajón, dentro de un año seguís teniendo $20.000. Pero por la ${t("inflacion", "inflación")} los precios suben y esa plata alcanza para menos.` },
+      { h: "No hacer nada también es una decisión", p: `Guardar en el cajón parece “seguro”, pero tiene un costo escondido: todos los meses perdés un poquito de lo que podés comprar.` },
+      { h: "La idea no es arriesgar todo", p: `Invertir es buscar que tu plata, como mínimo, no pierda contra los precios. Y se puede hacer con opciones tranquilas.` } ],
+    q: "Tenés $20.000 guardados y en un año los precios suben un 30%. ¿Qué pasa?",
+    opts: ["Tengo más plata", "Tengo la misma plata, pero me alcanza para menos", "No pasa nada"], a: 1,
+    why: "El número es el mismo, pero con precios más altos comprás menos." },
+  { title: "Qué es invertir y qué no", min: 3, cards: [
+      { h: "Invertir es poner tu plata a trabajar", p: `Comprás algo que, con el tiempo, te puede dar un ${t("rendimiento", "rendimiento")}. Puede ser un ${t("fci", "FCI")}, un ${t("bono", "bono")} o una ${t("accion", "acción")}.` },
+      { h: "Apostar no es invertir", p: `En una apuesta, lo más probable es perder todo. Al invertir, sabés en qué ponés la plata y qué ${t("riesgo", "riesgo")} tiene.` },
+      { h: "Nadie sabe el futuro", p: `Ninguna inversión real te puede garantizar cuánto vas a ganar. Si alguien te lo garantiza, desconfiá.` } ],
+    q: "¿Cuál de estas cosas NO es invertir?",
+    opts: ["Comprar cuotapartes de un fondo", "Comprar un número de rifa esperando ganar", "Comprar un bono"], a: 1,
+    why: "La rifa depende de la suerte y lo más probable es perder todo. Eso es apostar." },
+  { title: "Inversión o estafa: cómo darte cuenta", min: 4, cards: [
+      { h: "Las estafas tienen un patrón", p: `Casi siempre prometen mucho, rápido y sin riesgo. Un ${t("ponzi", "esquema Ponzi")} paga a los primeros con la plata de los que entran después, hasta que se cae.`,
+        callout: "Si suena demasiado bueno para ser verdad, probablemente no lo sea." },
+      { h: "Cinco señales de alerta", p: `<span style="display:block">1. Te garantizan ganancias, o son muy altas.<br>2. Te apuran: “solo por hoy”.<br>3. Ganás más si traés a otros.<br>4. No están registrados en la ${t("cnv", "CNV")}.<br>5. Te escribieron por redes o WhatsApp sin que lo pidas.</span>`, red: true },
+      { h: "Cómo chequear antes de poner un peso", p: `Buscá a la empresa en el registro de la ${t("cnv", "CNV")}. Si opera en el mercado, tiene que ser un ${t("alyc", "ALyC")} o agente registrado. Ante la duda, no pongas plata y preguntá.`,
+        callout: "Ninguna empresa seria te pide tus claves ni que transfieras a una cuenta personal." } ],
+    q: "Te escriben por Instagram: “Invertí $50.000 y en un mes tenés $100.000, garantizado”. ¿Qué hacés?",
+    opts: ["Pongo poquito, para probar", "Le pido que me mande más información", "No invierto: promete ganancias garantizadas y altísimas, y me contactó sin que lo pida", "Le pregunto a un amigo si a él le pagaron"], a: 2,
+    why: "Tiene tres señales de alerta juntas: ganancia garantizada, rendimiento altísimo (100% en un mes) y contacto por redes sin que lo pidas. Aunque a alguien le hayan pagado, así funcionan los Ponzi al principio." },
+  { title: "Riesgo: cuánto puedo perder", min: 4, cards: [
+      { h: "Más ganancia posible, más riesgo", p: `Las opciones que pueden ganar más suelen tener más ${t("volatilidad", "volatilidad")}: suben y bajan más.` },
+      { h: "Una baja no es una pérdida… todavía", p: `Si tu inversión baja y no vendés, es una pérdida “en los papeles”. Se vuelve real si vendés asustado en el peor momento.` },
+      { h: "Tres reglas", p: `Invertí plata que no vas a necesitar pronto, empezá con poco y ${t("diversificar", "diversificá")}.` } ],
+    q: "Tu inversión bajó un 5% esta semana. ¿Qué conviene hacer primero?",
+    opts: ["Vender todo ya", "Recordar para cuándo necesito la plata y no decidir por miedo", "Poner todos mis ahorros para recuperar"], a: 1,
+    why: "Las bajas son parte del camino. Lo importante es haber invertido plata que no necesitás pronto." },
+  { title: "Empezar con poco: por qué sí vale la pena", min: 3, cards: [
+      { h: "No hace falta mucha plata", p: `Hay opciones, como un ${t("mm", "fondo de liquidez")}, que se pueden empezar con montos chicos. Lo importante es arrancar.` },
+      { h: "El hábito vale más que el monto", p: `Poner un poco todos los meses suma más de lo que parece, sobre todo por el ${t("compuesto", "interés compuesto")}.` },
+      { h: "Aprender con poco es más barato", p: `Si te equivocás con poco, aprendés sin que te duela. Por eso conviene empezar chico.` } ],
+    q: "¿Cuál es la mejor forma de empezar?",
+    opts: ["Esperar a tener mucha plata", "Con un monto chico y constante, que no te quite el sueño", "Con todo lo que tengo, de una vez"], a: 1,
+    why: "Empezar chico y con constancia te deja aprender tranquilo y crear el hábito." },
+  { title: "Tu primera inversión", min: 3, cards: [
+      { h: "1. Para qué y para cuándo", p: `Definí tu meta y cuándo vas a necesitar la plata. Eso te dice cuánta ${t("liquidez", "liquidez")} necesitás.` },
+      { h: "2. Elegí según tu meta", p: `Si es para pronto, algo tranquilo como un ${t("mm", "fondo de liquidez")}. Si es para más adelante, podés sumar otras opciones de a poco.` },
+      { h: "3. Con quién", p: `Siempre con una empresa registrada en la ${t("cnv", "CNV")}. Abrís tu cuenta, cargás un monto chico y listo.` } ],
+    q: "Antes de invertir con una empresa, ¿qué chequeás?",
+    opts: ["Que tenga muchos seguidores en redes", "Que esté registrada en la CNV", "Que prometa la ganancia más alta"], a: 1,
+    why: "El registro en la CNV es lo primero. Seguidores y promesas no dicen nada sobre si es confiable." }
+];
+
+const GOALS = {
+  viaje: { name: "Viaje de egresados", target: 900000, icon: "plane" },
+  recital: { name: "Entrada para un recital", target: 120000, icon: "music" },
+  zapas: { name: "Zapatillas", target: 220000, icon: "shoe" },
+  otra: { name: "Mi meta", target: 300000, icon: "target" }
+};
+
+const FRENOS = {
+  miedo: { name: "Me da miedo, no entiendo nada", short: "Me da miedo", icon: "shield-q",
+    quote: "Una vez quise averiguar, vi la palabra “CEDEAR” y cerré todo.",
+    solve: "Lecciones de 3 minutos y cero palabras raras sin explicar: pasás el mouse y te las traducimos con un ejemplo." },
+  estafa: { name: "¿Esto es inversión o estafa?", short: "¿Es estafa?", icon: "alert",
+    quote: "Mi primo perdió plata en una cripto que le pasaron por Instagram. Desde ahí no confío.",
+    solve: "Un detector de estafas con semáforo y un nivel entero para aprender a reconocerlas." },
+  poca: { name: "Con lo poco que tengo no vale la pena", short: "Tengo poca plata", icon: "coins",
+    quote: "Tengo 20 lucas, ¿qué voy a invertir con eso?",
+    solve: "Una calculadora que muestra cómo se puede empezar con poco y cuánto suma con constancia." }
+};
+
+const OPTIONS = [
+  { id: "mm", name: "Fondo de liquidez", sub: "Money Market", term: "mm", risk: 1, riskLabel: "Riesgo bajo", color: "var(--c-mm)", hex: "#1F9D63", icon: "drop",
+    desc: "Tu plata disponible cuando la necesites. Rinde de a poco y casi no baja.", mu: 0.021, sd: 0.002 },
+  { id: "bono", name: "Bonos", sub: "Renta fija", term: "bono", risk: 2, riskLabel: "Riesgo medio", color: "var(--c-bono)", hex: "#2F6FB5", icon: "doc",
+    desc: "Le prestás plata a un gobierno o empresa y te devuelve con intereses.", mu: 0.024, sd: 0.03 },
+  { id: "cedear", name: "CEDEARs", sub: "Empresas de afuera", term: "cedear", risk: 3, riskLabel: "Riesgo medio-alto", color: "var(--c-cedear)", hex: "#C76A12", icon: "globe",
+    desc: "Invertís en empresas como Apple o Coca-Cola desde Argentina, en pesos.", mu: 0.026, sd: 0.06 },
+  { id: "accion", name: "Acciones argentinas", sub: "Renta variable", term: "accion", risk: 4, riskLabel: "Riesgo alto", color: "var(--c-accion)", hex: "#B0417A", icon: "building",
+    desc: "Sos dueño de un pedacito de una empresa. Puede subir o bajar mucho.", mu: 0.028, sd: 0.10 }
+];
+
+const FRIENDS = [
+  { name: "Cami R.", pts: 1240, div: 4, days: 12, lessons: 5, scams: 3 },
+  { name: "Tomi G.", pts: 1105, div: 3, days: 9, lessons: 4, scams: 2 },
+  { name: "Juli P.", pts: 980, div: 3, days: 7, lessons: 4, scams: 1 },
+  { name: "Valen S.", pts: 760, div: 2, days: 5, lessons: 3, scams: 1 },
+  { name: "Nico F.", pts: 610, div: 1, days: 4, lessons: 2, scams: 0 },
+  { name: "Mati L.", pts: 455, div: 1, days: 2, lessons: 2, scams: 0 }
+];
+const COURSE = ["Abril M.", "Bauti C.", "Cami R.", "Delfi O.", "Fede A.", "Guada T.", "Juli P.", "Lauti B.", "Mati L.", "Nico F.", "Pili D.", "Santi V.", "Tomi G.", "Valen S."];
+
+const TIPS = [
+  "Si alguien te garantiza una ganancia, es una señal de alerta. Ninguna inversión real puede hacerlo.",
+  "Repartir tu plata en distintas opciones (diversificar) suma puntos en la liga y baja tu riesgo.",
+  "Antes de invertir, preguntate: ¿para cuándo voy a necesitar esta plata?"
+];
+
+/* =================================================================
+   Íconos (trazos simples)
+   ================================================================= */
+const IC = {
+  home: '<path d="M3 11 12 4l9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/>',
+  learn: '<path d="M3 7.5 12 4l9 3.5-9 3.5L3 7.5Z"/><path d="M7 9.5V14c0 1.7 2.2 3 5 3s5-1.3 5-3V9.5"/>',
+  sim: '<path d="M4 19V5"/><path d="M4 19h16"/><path d="m7 15 4-4 3 3 5-6"/>',
+  league: '<path d="M8 4h8v5a4 4 0 0 1-8 0V4Z"/><path d="M16 5h3v2a3 3 0 0 1-3 3"/><path d="M8 5H5v2a3 3 0 0 0 3 3"/><path d="M12 13v4"/><path d="M8.5 20h7"/>',
+  shield: '<path d="M12 3 4.5 6v6c0 4.4 3.2 7.8 7.5 9 4.3-1.2 7.5-4.6 7.5-9V6L12 3Z"/><path d="m9 12 2 2 4-4"/>',
+  "shield-q": '<path d="M12 3 4.5 6v6c0 4.4 3.2 7.8 7.5 9 4.3-1.2 7.5-4.6 7.5-9V6L12 3Z"/><path d="M10 10a2 2 0 1 1 3 1.7c-.6.4-1 .8-1 1.5"/><circle cx="12" cy="16" r=".6"/>',
+  chat: '<path d="M4 5h16v11H9l-5 4V5Z"/><path d="M8 10h8"/><path d="M8 13h5"/>',
+  target: '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/>',
+  map: '<path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2Z"/><path d="M9 4v14"/><path d="M15 6v14"/>',
+  lock: '<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
+  check: '<path d="m5 12 4.5 4.5L19 7"/>',
+  play: '<path d="M8 5v14l11-7L8 5Z"/>',
+  flame: '<path d="M12 3c1 3 4 4.5 4 8.5a4 4 0 0 1-8 0c0-2 1-3 1-4.5 1.5 1 2 2 2 3 1-1.5 1-4 1-7Z"/><path d="M12 21a6 6 0 0 0 6-6c0-2-1-3.5-2-4.5"/>',
+  alert: '<path d="M12 3 2.5 20h19L12 3Z"/><path d="M12 10v4"/><circle cx="12" cy="17" r=".6"/>',
+  coins: '<ellipse cx="9" cy="7" rx="5" ry="2.5"/><path d="M4 7v4c0 1.4 2.2 2.5 5 2.5s5-1.1 5-2.5V7"/><path d="M10 15.5c.6 1 2.6 1.8 5 1.8 2.8 0 5-1.1 5-2.5v-4c0-1.4-2.2-2.5-5-2.5"/>',
+  plane: '<path d="M3 13.5 21 6l-4 14-5-5-3 3v-5l9-7"/>',
+  music: '<path d="M9 18V6l11-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="16" r="2.5"/>',
+  shoe: '<path d="M3 16v-5l4-1 3 3 5 1 6 2v3H3v-3Z"/><path d="M7 10 8 6h3l1 4"/>',
+  drop: '<path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11Z"/>',
+  doc: '<path d="M6 3h9l4 4v14H6V3Z"/><path d="M14 3v5h5"/><path d="M9 13h7"/><path d="M9 17h5"/>',
+  globe: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.5 2.8 3.5 5.8 3.5 9s-1 6.2-3.5 9c-2.5-2.8-3.5-5.8-3.5-9S9.5 5.8 12 3Z"/>',
+  building: '<path d="M4 21V7l8-4 8 4v14"/><path d="M9 21v-5h6v5"/><path d="M8 10h.01M12 10h.01M16 10h.01M8 13h.01M12 13h.01M16 13h.01"/>',
+  bulb: '<path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3Z"/>',
+  arrow: '<path d="M5 12h14"/><path d="m13 6 6 6-6 6"/>',
+  back: '<path d="M19 12H5"/><path d="m11 18-6-6 6-6"/>',
+  users: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7"/><path d="M18 14.5a6.5 6.5 0 0 1 3.5 5.5"/>',
+  send: '<path d="M21 3 3 10.5l7 3 3 7L21 3Z"/><path d="m10 13.5 4.5-4.5"/>',
+  star: '<path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9L12 3Z"/>',
+  calc: '<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8"/><path d="M8 12h.01M12 12h.01M16 12h.01M8 16h.01M12 16h.01M16 16h.01"/>',
+  wa: '<path d="M4 20l1.3-4A8 8 0 1 1 8 18.7L4 20Z"/><path d="M9 9.5c0 2.5 2.5 5 5 5l1-1.5-2-1-1 .8c-.8-.4-1.5-1.1-1.8-1.8l.8-1-1-2L9 9.5Z"/>',
+  sparkle: '<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6"/>',
+  rocket: '<path d="M5 15c-1 1-1.5 3.5-1.5 5.5 2 0 4.5-.5 5.5-1.5"/><path d="M9 15 6 12c1-4 4-8 12-9-1 8-5 11-9 12Z"/><circle cx="14" cy="9" r="1.5"/>'
+};
+const icon = (n, cls = "ic") => `<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[n] || ""}</svg>`;
+
+/* =================================================================
+   Estado
+   ================================================================= */
+const KEY = "sinmiedo-prototipo.v1";
+const fresh = () => ({
+  name: "", exp: null, freno: null, goal: null, started: false,
+  done: [0, 1], streak: 5, scams: 0, minor: false, saved: 0.18,
+  sim: { alloc: { mm: 40000, bono: 25000, cedear: 20000, accion: 15000 }, month: 0 },
+  chat: null, league: "amigos", lessonsSeen: {}
+});
+let S = (() => { try { return Object.assign(fresh(), JSON.parse(localStorage.getItem(KEY)) || {}); } catch (e) { return fresh(); } })();
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
+let V = { page: S.started ? "home" : "landing" };
+
+const money = n => "$" + Math.round(n).toLocaleString("es-AR");
+const pct = n => (n >= 0 ? "+" : "−") + Math.abs(n * 100).toLocaleString("es-AR", { maximumFractionDigits: 1 }) + "%";
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const goal = () => GOALS[S.goal || "viaje"];
+const current = () => Math.min(S.done.length, LEVELS.length - 1);
+const allDone = () => S.done.length >= LEVELS.length;
+const myName = () => S.name.trim() || "Agus";
+
+// Aleatorio con semilla: el mismo resultado cada vez que se abre el prototipo.
+function rng(seed) { let s = seed >>> 0; return () => { s = (s + 0x6D2B79F5) >>> 0; let x = Math.imul(s ^ s >>> 15, 1 | s); x ^= x + Math.imul(x ^ x >>> 7, 61 | x); return ((x ^ x >>> 14) >>> 0) / 4294967296; }; }
+function gauss(r) { let u = 0, v = 0; while (!u) u = r(); while (!v) v = r(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); }
+
+/* =================================================================
+   Render
+   ================================================================= */
+const root = document.getElementById("root");
+function go(page, extra = {}) { V = { page, ...extra }; render(); const m = document.querySelector(".main"); if (m) m.scrollTop = 0; window.scrollTo(0, 0); }
+
+function render() {
+  if (V.page === "landing") root.innerHTML = landing();
+  else if (V.page === "diag") root.innerHTML = diag();
+  else root.innerHTML = shell();
+  hideTip();
+  mountCharts();
+}
+
+const NAV = [
+  ["home", "Inicio", "home"], ["learn", "Aprender", "learn"], ["sim", "Simulador", "sim"], ["league", "Liga", "league"],
+  ["scam", "¿Es estafa?", "shield"], ["ask", "Preguntá", "chat"], ["goal", "Mi meta", "target"]
+];
+const NAV_OF = { lesson: "learn", leap: "learn", whatif: "goal", small: "goal" };
+
+function logo(light = true) {
+  return `<div class="logo">
+    <svg width="38" height="38" viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="11" fill="${light ? "#2BB673" : "#003845"}"/><path d="M10 25.5c2.5 3 6 4 9.5 3.2 5.2-1.2 7.6-6.5 5.2-9.6-1.6-2-5-2.2-7.6-1.2" fill="none" stroke="${light ? "#062018" : "#fff"}" stroke-width="3.2" stroke-linecap="round"/><path d="M14 17l4.5-6.5L23 17" fill="none" stroke="${light ? "#062018" : "#2BB673"}" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <div><b>Sin Miedo</b><small>by LBO</small></div></div>`;
+}
+
+function shell() {
+  const active = NAV_OF[V.page] || V.page;
+  const pages = { home, learn, lesson, sim, league, scam, ask, goal: goalPage, whatif: goalPage, small: goalPage, leap };
+  return `<div class="shell">
+    <aside class="side">
+      ${logo()}
+      ${NAV.map(([id, l, ic]) => `<button class="nav-i ${active === id ? "on" : ""}" data-go="${id}">${icon(ic)}${l}${id === "learn" && !allDone() ? `<span class="badge">${current() + 1}/6</span>` : ""}</button>`).join("")}
+      <div class="side-foot">
+        <button class="nav-i" data-act="map">${icon("map")}Mapa del prototipo</button>
+        <div class="me"><div class="avatar" style="background:var(--mint);color:#062018">${esc(myName()[0].toUpperCase())}</div><div><b style="color:#fff">${esc(myName())}</b><div class="xs" style="color:var(--petrol-200)">Nivel ${current() + 1} · ${S.streak} días de racha</div></div></div>
+      </div>
+    </aside>
+    <main class="main"><div class="main-in">${pages[V.page]()}</div></main>
+    ${rail()}
+  </div>`;
+}
+
+function ringSvg(frac, size = 84) {
+  const r = size / 2 - 7, c = 2 * Math.PI * r;
+  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" aria-hidden="true"><circle cx="${size / 2}" cy="${size / 2}" r="${r}" fill="none" stroke="#E3ECEA" stroke-width="8"/><circle cx="${size / 2}" cy="${size / 2}" r="${r}" fill="none" stroke="#2BB673" stroke-width="8" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${c * (1 - frac)}" transform="rotate(-90 ${size / 2} ${size / 2})" style="transition:stroke-dashoffset .8s"/></svg>`;
+}
+
+function rail() {
+  const g = goal(), dn = S.done.length;
+  const todos = [
+    { t: `Terminar el nivel ${current() + 1}`, done: allDone(), go: allDone() ? "learn" : "lesson" },
+    { t: "Revisar una oferta en el detector", done: S.scams > 0, go: "scam" },
+    { t: "Armar tu cartera de práctica", done: !!S.simTouched, go: "sim" },
+    { t: "Invitar a 2 amigos a la liga", done: !!S.invited, go: "league" },
+    { t: "Dar el salto", done: false, go: allDone() ? "leap" : "learn" }
+  ];
+  return `<aside class="rail">
+    <section>
+      <h4>Tu progreso</h4>
+      <div class="row" style="gap:16px"><div class="ring">${ringSvg(dn / LEVELS.length)}<b>${dn}/6</b></div>
+      <div><b>${allDone() ? "¡Camino completo!" : `Nivel ${current() + 1} en curso`}</b><p class="small muted">${allDone() ? "Ya podés dar el salto." : esc(LEVELS[current()].title)}</p></div></div>
+    </section>
+    <section>
+      <h4>Racha</h4>
+      <div class="row"><span style="color:#F27B1A">${icon("flame", "ic")}</span><b style="font-size:20px">${S.streak} días seguidos</b></div>
+      <div class="streak-days">${["L", "M", "M", "J", "V", "S", "D"].map((d, k) => `<div class="${k < S.streak ? "on" : ""}"><i></i>${d}</div>`).join("")}</div>
+    </section>
+    <section>
+      <h4>Próximos pasos</h4>
+      <div class="stack" style="gap:8px">${todos.map(x => `<button class="todo ${x.done ? "done" : ""}" data-go="${x.go}"><span class="chk">${x.done ? icon("check", "ic") : ""}</span><span class="t small">${x.t}</span></button>`).join("")}</div>
+    </section>
+    <section>
+      <h4>Tu meta</h4>
+      <div class="between small"><b>${esc(g.name)}</b><span class="muted num">${Math.round(S.saved * 100)}%</span></div>
+      <div class="bar" style="margin-top:8px"><span style="width:${S.saved * 100}%"></span></div>
+      <p class="xs faint" style="margin-top:6px">${money(g.target * S.saved)} de ${money(g.target)} · ahorro de práctica</p>
+    </section>
+  </aside>`;
+}
+
+/* ---------- 1. Landing ---------- */
+function landing() {
+  return `<div class="landing">
+    <section class="l-hero">
+      <div class="l-wrap">
+        <nav class="l-nav">${logo()}<div class="row"><button class="navlink" data-scroll="frenos">Cómo funciona</button><button class="navlink" data-scroll="confianza">Seguridad</button><button class="btn" data-go="diag">Empezar</button></div></nav>
+        <div class="l-hero-in">
+          <div>
+            <span class="pill petrol" style="background:rgba(43,182,115,.15);color:#7EE2AE">Para tu primera inversión</span>
+            <h1 style="margin-top:18px">El miedo no se va leyendo. <em>Se va practicando.</em></h1>
+            <p class="lead">Con amigos y para algo que te importa. Aprendé en minutos, detectá estafas, practicá con plata virtual y, cuando estés listo, empezá con poco en LBO.</p>
+            <div class="row"><button class="btn lg" data-go="diag">Empezar gratis ${icon("arrow")}</button><button class="btn lg ghost" style="color:#fff;border-color:rgba(255,255,255,.25)" data-scroll="frenos">Ver cómo funciona</button></div>
+            <div class="trust"><span>${icon("shield")}Nunca te prometemos ganancias</span><span>${icon("sim")}Practicás con plata virtual</span><span>${icon("check")}Sin palabras raras</span></div>
+          </div>
+          <div class="preview" aria-hidden="true">
+            <div class="card" style="left:0;top:0;width:340px">
+              <div class="between"><span class="eyebrow">Tu meta</span><span class="pill">18%</span></div>
+              <div class="row" style="margin:12px 0"><div class="icon-box">${icon("plane")}</div><div><b>Viaje de egresados</b><p class="xs faint">$162.000 de $900.000</p></div></div>
+              <div class="bar"><span style="width:18%"></span></div>
+            </div>
+            <div class="card" style="right:0;top:150px;width:300px">
+              <span class="eyebrow">¿Es estafa?</span>
+              <div class="row" style="margin-top:10px"><div style="width:16px;height:16px;border-radius:50%;background:#F05252;box-shadow:0 0 14px rgba(240,82,82,.7)"></div><b>Alto riesgo de estafa</b></div>
+              <p class="xs muted" style="margin-top:8px">“30% mensual garantizado por Instagram”: 3 señales de alerta.</p>
+            </div>
+            <div class="card" style="left:30px;top:300px;width:340px">
+              <div class="between"><span class="eyebrow">Liga de amigos</span><span class="xs faint">plata virtual</span></div>
+              ${["Cami R.", "Vos", "Tomi G."].map((n, k) => `<div class="between small" style="margin-top:10px"><span class="row" style="gap:10px"><span class="rank r${k + 1}" style="width:24px;height:24px;font-size:12px">${k + 1}</span>${n}</span><b class="num">${[1240, 1180, 1105][k]} pts</b></div>`).join("")}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="l-section" id="frenos">
+      <div class="l-wrap">
+        <span class="eyebrow">Los 3 frenos</span>
+        <h2 style="margin-top:8px">Sabemos por qué todavía no invertiste</h2>
+        <p class="muted" style="margin-top:8px;max-width:60ch">Hablamos con chicos y chicas de 16 a 22 años. Estas son las tres cosas que más los frenan, y cómo las resolvemos.</p>
+        <div class="frenos">${Object.values(FRENOS).map(f => `
+          <article class="card hover freno">
+            <div class="icon-box">${icon(f.icon)}</div>
+            <h3>“${f.short}”</h3>
+            <p class="quote">${f.quote}<br><span class="xs faint" style="font-style:normal">Frase de ejemplo: se reemplaza por las de las entrevistas</span></p>
+            <div class="solve"><b>Cómo lo resolvemos</b>${f.solve}</div>
+          </article>`).join("")}</div>
+      </div>
+    </section>
+
+    <section class="l-section" style="background:#fff;border-block:1px solid var(--line)">
+      <div class="l-wrap">
+        <span class="eyebrow">Cómo funciona</span>
+        <h2 style="margin-top:8px">De cero a tu primera inversión, a tu ritmo</h2>
+        <div class="steps">${[
+          ["Aprendé", "6 niveles cortos, estilo juego. Cada palabra rara viene explicada."],
+          ["Detectá estafas", "Pegá cualquier oferta que te llegue y mirá el semáforo."],
+          ["Practicá con amigos", "Una liga con plata virtual donde gana quien mejor administra."],
+          ["Dá el salto", "Tu primera inversión real en LBO, arrancando con poco."]
+        ].map(([h, p], k) => `<div><div class="step-n">${k + 1}</div><h3>${h}</h3><p class="muted small" style="margin-top:6px">${p}</p></div>`).join("")}</div>
+      </div>
+    </section>
+
+    <section class="l-section" id="confianza">
+      <div class="l-wrap">
+        <div class="l-cta">
+          <div><h2 style="font-size:30px">Sin promesas. Sin apuro. Sin miedo.</h2><p style="color:#B9D3D5;margin-top:8px;max-width:56ch">Una plataforma educativa de LBO. Nunca te vamos a garantizar ganancias: te vamos a enseñar a decidir.</p></div>
+          <button class="btn lg" data-go="diag">Empezar ${icon("arrow")}</button>
+        </div>
+        <div class="l-foot"><span>Sin Miedo · by LBO · Prototipo de diseño</span><span>Las inversiones tienen riesgo. Rendimientos pasados no garantizan resultados futuros.</span></div>
+      </div>
+    </section>
+  </div>`;
+}
+
+/* ---------- 2. Diagnóstico ---------- */
+const DIAG = [
+  { key: "exp", q: "¿Alguna vez invertiste?", sub: "No hay respuestas incorrectas.", opts: [["nunca", "Nunca", "Arranco de cero", "sparkle"], ["poco", "Alguna vez, poquito", "Probé algo, pero no entendí mucho", "coins"], ["si", "Sí, a veces", "Quiero hacerlo mejor", "sim"]] },
+  { key: "freno", q: "¿Qué te frena más?", sub: "Elegí la que más te represente.", opts: [["miedo", "Me da miedo, no entiendo nada", "Las palabras técnicas me espantan", "shield-q"], ["estafa", "¿Es inversión o estafa?", "No sé en quién confiar", "alert"], ["poca", "Tengo poca plata", "Creo que no vale la pena", "coins"]] },
+  { key: "goal", q: "¿Para qué te gustaría juntar plata?", sub: "Invertir tiene más sentido con una meta.", opts: [["viaje", "Viaje de egresados", "", "plane"], ["recital", "Un recital", "", "music"], ["zapas", "Zapatillas", "", "shoe"], ["otra", "Otra cosa", "", "target"]] }
+];
+function diag() {
+  const step = V.step || 0, d = DIAG[step], val = S[d.key];
+  return `<div class="diag">
+    <div class="diag-top"><div class="l-wrap" style="max-width:840px"><nav class="l-nav">${logo()}<button class="navlink" style="color:#CFE3E4" data-go="landing">Salir</button></nav>
+      <div class="seg-progress">${DIAG.map((_, k) => `<span class="${k <= step ? "on" : ""}"></span>`).join("")}</div>
+      <p style="color:#A9C7C9;margin:14px 0 4px" class="small">Pregunta ${step + 1} de ${DIAG.length}</p>
+    </div></div>
+    <div class="l-wrap" style="max-width:840px;width:100%">
+      <div class="card diag-card" style="padding:36px">
+        ${step === 0 ? `<div class="field" style="max-width:340px;margin-bottom:26px"><label for="nm">¿Cómo te llamamos? (opcional)</label><input class="input" id="nm" data-bind="name" value="${esc(S.name)}" placeholder="Tu nombre o apodo" maxlength="20" autocomplete="off"></div>` : ""}
+        <h1>${d.q}</h1><p class="muted" style="margin-top:6px">${d.sub}</p>
+        <div class="opts">${d.opts.map(([v, title, sub, ic]) => `<button class="opt ${val === v ? "sel" : ""}" data-diag="${v}"><div class="icon-box">${icon(ic)}</div><div><div class="t">${title}</div>${sub ? `<div class="small muted">${sub}</div>` : ""}</div></button>`).join("")}</div>
+        <div class="between" style="margin-top:28px">
+          ${step > 0 ? `<button class="btn ghost" data-act="diagBack">${icon("back")}Atrás</button>` : "<span></span>"}
+          <button class="btn" data-act="diagNext" ${val ? "" : "disabled"}>${step === DIAG.length - 1 ? "Armar mi camino" : "Siguiente"} ${icon("arrow")}</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ---------- 3. Inicio ---------- */
+function home() {
+  const g = goal(), lv = LEVELS[current()];
+  const me = leagueRows("amigos").findIndex(r => r.me) + 1;
+  const focus = {
+    miedo: ["Empezá por acá", "Las palabras raras, traducidas", "Pasá el mouse por cualquier palabra subrayada o preguntale al asistente sin vergüenza.", "ask", "Preguntá sin vergüenza"],
+    estafa: ["Empezá por acá", "¿Te llegó una oferta rara?", "Pegala en el detector y mirá el semáforo. Además, el nivel 3 te enseña a reconocerlas.", "scam", "Abrir el detector"],
+    poca: ["Empezá por acá", "Con poco sí se puede", "Mirá cuánto podés juntar cambiando un par de salidas por mes.", "small", "Abrir la calculadora"]
+  }[S.freno || "miedo"];
+  return `
+    <div class="page-h"><div><span class="eyebrow">Inicio</span><h1 style="margin-top:6px">Hola, ${esc(myName())}</h1>
+      <p class="muted">${{ nunca: "Arrancás de cero, y está perfecto: vamos paso a paso.", poco: "Ya probaste algo. Ahora vamos a entenderlo bien.", si: "Ya invertiste: acá vas a hacerlo con más confianza." }[S.exp || "nunca"]}</p></div>
+      <span class="sim-tag"><i></i>Modo práctica · plata virtual</span></div>
+    <div class="grid dash">
+      <div class="card goal-hero span-4">
+        <div class="between"><span class="eyebrow" style="color:#9FC3C6">Tu meta</span><button class="link" style="color:#7EE2AE" data-go="goal">Ver mi meta</button></div>
+        <div class="row" style="margin:16px 0 18px;gap:16px"><div class="icon-box" style="background:rgba(43,182,115,.18);color:#7EE2AE;width:56px;height:56px">${icon(g.icon)}</div>
+          <div><h2 style="color:#fff">${esc(g.name)}</h2><p class="muted">${money(g.target * S.saved)} de ${money(g.target)} · ahorro de práctica</p></div>
+          <div style="margin-left:auto;text-align:right"><div class="big-num">${Math.round(S.saved * 100)}%</div></div></div>
+        <div class="bar"><span style="width:${S.saved * 100}%"></span></div>
+      </div>
+      <div class="card span-2" style="display:flex;flex-direction:column;justify-content:space-between">
+        <div class="between"><span class="eyebrow">Racha</span><span style="color:#F27B1A">${icon("flame")}</span></div>
+        <div><div class="big-num">${S.streak} días</div><p class="small muted">Entrá mañana para llegar a ${S.streak + 1}.</p></div>
+      </div>
+      <div class="card hover span-3">
+        <span class="eyebrow">${allDone() ? "Camino completo" : "Próxima lección"}</span>
+        <div class="row" style="margin:14px 0"><div class="icon-box">${icon(allDone() ? "star" : "play")}</div><div><b>${allDone() ? "¡Terminaste los 6 niveles!" : `Nivel ${current() + 1}: ${esc(lv.title)}`}</b><p class="small muted">${allDone() ? "Te espera el último paso." : `${lv.min} minutos · 3 tarjetas y 1 pregunta`}</p></div></div>
+        <button class="btn" data-go="${allDone() ? "leap" : "lesson"}">${allDone() ? "Dar el salto" : "Seguir aprendiendo"} ${icon("arrow")}</button>
+      </div>
+      <div class="card hover span-3">
+        <div class="between"><span class="eyebrow">Liga de amigos</span><span class="xs faint">plata virtual</span></div>
+        <div class="row" style="margin:14px 0"><div class="rank ${me <= 3 ? "r" + me : ""}" style="width:44px;height:44px;font-size:18px">${me}°</div><div><b>Estás ${me}° de ${FRIENDS.length + 1}</b><p class="small muted">Te faltan ${Math.max(0, leagueRows("amigos")[Math.max(0, me - 2)].pts - leagueRows("amigos")[me - 1].pts)} puntos para subir un puesto.</p></div></div>
+        <button class="btn ghost" data-go="league">Ver la liga</button>
+      </div>
+      <div class="card hover span-3" style="border-color:#BFE6D1">
+        <span class="eyebrow">${focus[0]} · porque elegiste “${FRENOS[S.freno || "miedo"].short}”</span>
+        <h3 style="margin:10px 0 6px">${focus[1]}</h3><p class="small muted">${focus[2]}</p>
+        <button class="btn" style="margin-top:14px" data-go="${focus[3]}">${focus[4]}</button>
+      </div>
+      <div class="card hover span-3">
+        <span class="eyebrow">¿Y si…?</span>
+        <h3 style="margin:10px 0 6px">¿Qué hubiera pasado con la plata de tu cumpleaños?</h3><p class="small muted">Compará “guardado en el cajón” contra “invertido” en 12 meses.</p>
+        <button class="btn ghost" style="margin-top:14px" data-go="whatif">Probar</button>
+      </div>
+      <div class="card span-6" style="background:var(--mint-50);border-color:#CDEBDB">
+        <div class="row" style="gap:14px"><div class="icon-box" style="background:#fff">${icon("bulb")}</div><div><span class="eyebrow">Tip del día</span><p style="margin-top:2px">${TIPS[(new Date().getDate()) % TIPS.length]}</p></div></div>
+      </div>
+    </div>`;
+}
+
+/* ---------- 5. Aprender ---------- */
+function learn() {
+  return `
+    <div class="page-h"><div><span class="eyebrow">Aprender</span><h1 style="margin-top:6px">Tu camino</h1><p class="muted">6 niveles cortos. Cada uno tiene 3 tarjetas y 1 pregunta.</p></div>
+      <div style="min-width:220px"><div class="between small"><b>${S.done.length} de 6 niveles</b><span class="muted">${Math.round(S.done.length / 6 * 100)}%</span></div><div class="bar" style="margin-top:8px"><span style="width:${S.done.length / 6 * 100}%"></span></div></div></div>
+    <div class="card" style="padding:34px 40px">
+      <div class="path">${LEVELS.map((l, i) => {
+        const st = S.done.includes(i) ? "done" : i === current() && !allDone() ? "cur" : "lock";
+        return `<div class="lvl ${st === "lock" ? "lockrow" : ""}">
+          <button class="node ${st}" data-lvl="${i}" aria-label="Nivel ${i + 1}">${icon(st === "done" ? "check" : st === "cur" ? "play" : "lock")}</button>
+          <div class="lvl-info"><div class="between"><span class="xs faint" style="font-weight:700">NIVEL ${i + 1} · ${l.min} MIN</span>${st === "done" ? `<span class="pill">Completo</span>` : st === "cur" ? `<span class="pill amber">En curso</span>` : `<span class="pill grey">Bloqueado</span>`}</div>
+          <b style="display:block;margin-top:4px">${l.title}</b>
+          ${st === "cur" ? `<button class="btn" style="margin-top:10px;padding:9px 16px" data-lvl="${i}">Empezar nivel</button>` : st === "done" ? `<button class="link small" style="margin-top:6px" data-lvl="${i}">Repasar</button>` : ""}</div>
+        </div>`;
+      }).join("")}
+      <div class="lvl" style="padding-left:0"><button class="node ${allDone() ? "done" : "lock"}" data-go="${allDone() ? "leap" : "learn"}" aria-label="El salto" style="${allDone() ? "background:#F7C33B;box-shadow:0 6px 0 #c99a20;color:#3b2a00" : ""}">${icon("rocket")}</button>
+        <div class="lvl-info"><span class="xs faint" style="font-weight:700">META FINAL</span><b style="display:block;margin-top:4px">El salto: tu primera inversión real</b></div></div>
+      </div>
+    </div>`;
+}
+
+/* ---------- 6. Lección ---------- */
+function lesson() {
+  const i = V.lvl ?? current(), l = LEVELS[i], step = V.step || 0, total = l.cards.length + 1;
+  const isQ = step >= l.cards.length;
+  const head = `<div class="lesson-top"><button class="btn ghost" data-go="learn">${icon("back")}Camino</button>
+    <div class="lp">${Array.from({ length: total }, (_, k) => `<span class="${k <= step ? "on" : ""}"></span>`).join("")}</div>
+    <span class="pill">Nivel ${i + 1} de 6</span></div>`;
+  if (!isQ) {
+    const c = l.cards[step];
+    return `${head}<div class="card lcard">
+      <div class="kicker"><div class="icon-box">${icon(i === 2 ? "shield" : "learn")}</div><span class="eyebrow">${esc(l.title)} · Tarjeta ${step + 1} de ${l.cards.length}</span></div>
+      <h2>${c.h}</h2><p>${c.p}</p>
+      ${c.callout ? `<div class="callout ${c.red ? "red" : ""}">${c.callout}</div>` : ""}
+      <p class="small faint" style="margin-top:auto">Pasá el mouse por las palabras subrayadas para ver qué significan.</p>
+    </div>
+    <div class="between" style="margin-top:18px">
+      ${step > 0 ? `<button class="btn ghost" data-act="lstep" data-d="-1">${icon("back")}Anterior</button>` : "<span></span>"}
+      <button class="btn lg" data-act="lstep" data-d="1">${step === l.cards.length - 1 ? "Ir a la pregunta" : "Siguiente"} ${icon("arrow")}</button>
+    </div>`;
+  }
+  const picked = V.picked, ans = picked != null, ok = picked === l.a;
+  return `${head}<div class="card lcard">
+    <div class="kicker"><div class="icon-box">${icon("star")}</div><span class="eyebrow">Pregunta de práctica</span></div>
+    <h2>${l.q}</h2>
+    <div class="stack">${l.opts.map((o, k) => `<button class="q-opt ${ans ? (k === l.a ? "right" : k === picked ? "wrong" : "") : ""}" data-pick="${k}" ${ans ? "disabled" : ""}><span class="k">${"ABCD"[k]}</span>${o}</button>`).join("")}</div>
+    ${ans ? `<div class="fb ${ok ? "ok" : "no"}"><span>${icon(ok ? "check" : "alert")}</span><div><b>${ok ? "¡Exacto!" : "Casi. Mirá por qué:"}</b><p class="small" style="margin-top:4px">${l.why}</p></div></div>` : ""}
+  </div>
+  <div class="between" style="margin-top:18px">
+    <button class="btn ghost" data-act="lstep" data-d="-1">${icon("back")}Volver a las tarjetas</button>
+    ${ans ? (ok ? `<button class="btn lg" data-act="finishLvl">${S.done.includes(i) ? "Listo" : "Completar nivel"} ${icon("check")}</button>` : `<button class="btn lg" data-act="retryQ">Intentar de nuevo</button>`) : `<span class="small faint">Elegí una opción</span>`}
+  </div>`;
+}
+
+/* ---------- 7. ¿Es estafa? ---------- */
+const SIGNALS = [
+  { id: "garantia", q: "¿Promete ganancias garantizadas o muy altas?", why: "Ninguna inversión real puede garantizar ganancias. Rendimientos de 10% o más por mes son una señal fuerte de estafa.", re: /garantiz|asegurad|sin riesgo|segur[oa]|duplic|tripl|x2|x3|\b([1-9]\d|\d{3,})\s?%\s?(mensual|por mes|semanal|por semana|diario|por d[ií]a)/i },
+  { id: "apuro", q: "¿Te apura para decidir?", why: "Las estafas no te dejan pensar: “solo por hoy”, “quedan pocos lugares”.", re: /hoy|ya mismo|urgente|[uú]ltim|solo por|quedan pocos|r[aá]pido|ahora/i },
+  { id: "referidos", q: "¿Te pide traer a otros para ganar más?", why: "Si ganás por sumar gente, es probable que sea un esquema Ponzi o piramidal.", re: /tra[eé]|invit|referid|sum[aá]s? (gente|personas|amigos)|por cada (persona|amigo)|red de|niveles/i },
+  { id: "cnv", q: "¿Está registrada ante la CNV?", why: "Buscala en el registro de la CNV. Si no aparece, no debería ofrecerte inversiones.", inverse: true },
+  { id: "redes", q: "¿Te contactó por redes o WhatsApp sin que lo pidas?", why: "Las ofertas que llegan solas por Instagram, TikTok, Telegram o WhatsApp son el canal favorito de las estafas.", re: /instagram|insta\b|whats|wpp|telegram|tiktok|facebook|\bdm\b|mensaje privado|me escribi/i }
+];
+const SCAM_EXAMPLES = [
+  "Me ofrecen 30% mensual garantizado por Instagram",
+  "Un grupo de Telegram me invita a ganar por cada amigo que sume, pero tengo que entrar hoy",
+  "Quiero abrir una cuenta en una ALyC registrada en la CNV para comprar un fondo de liquidez"
+];
+function analyze(text) {
+  const ans = {};
+  SIGNALS.forEach(s => { ans[s.id] = s.inverse ? (/registrad[ao].{0,20}cnv|cnv.{0,20}registrad|\balyc\b/i.test(text) ? "si" : "ns") : (s.re.test(text) ? "si" : "no"); });
+  return ans;
+}
+function verdict(ans) {
+  const red = ["garantia", "referidos"].some(k => ans[k] === "si") || ans.cnv === "no";
+  const flags = ["garantia", "apuro", "referidos", "redes"].filter(k => ans[k] === "si").length;
+  if (red || flags >= 2) return { c: "r", t: "Alto riesgo de estafa", d: "Tiene señales típicas de estafa. No pongas plata y no compartas tus datos.", pill: "red" };
+  if (flags === 1 || ans.cnv !== "si" || Object.values(ans).includes("ns")) return { c: "y", t: "Ojo: faltan datos", d: "No es seguro que sea una estafa, pero hay cosas para chequear antes de poner un peso.", pill: "amber" };
+  return { c: "g", t: "No vemos señales de alerta", d: "Igual, invertí solo con empresas registradas en la CNV y nunca compartas tus claves.", pill: "" };
+}
+function scam() {
+  const r = V.scam;
+  return `
+    <div class="page-h"><div><span class="eyebrow">Detector</span><h1 style="margin-top:6px">¿Es estafa?</h1><p class="muted">Pegá o contá la oferta que te llegó. Te mostramos las señales de alerta en un semáforo.</p></div></div>
+    <div class="card">
+      <div class="field"><label for="scam-in">¿Qué te ofrecieron?</label>
+        <textarea class="input" id="scam-in" rows="3" placeholder="Ej.: Me ofrecen 30% mensual garantizado por Instagram" style="resize:vertical">${esc(V.scamText || "")}</textarea></div>
+      <div class="row" style="flex-wrap:wrap;gap:8px;margin-top:12px"><span class="xs faint" style="font-weight:700">PROBÁ CON:</span>${SCAM_EXAMPLES.map(x => `<button class="chip" data-example="${esc(x)}">${esc(x)}</button>`).join("")}</div>
+      <div class="row" style="margin-top:16px"><button class="btn" data-act="analyze">${icon("shield")}Analizar oferta</button><span class="xs faint">Es una guía para aprender, no un análisis legal.</span></div>
+    </div>
+    ${r ? (() => {
+      const v = verdict(r.ans);
+      return `<div class="grid" style="grid-template-columns:auto 1fr;margin-top:18px;align-items:start">
+        <div class="light" aria-label="Semáforo: ${v.t}"><i class="r ${v.c === "r" ? "on" : ""}"></i><i class="y ${v.c === "y" ? "on" : ""}"></i><i class="g ${v.c === "g" ? "on" : ""}"></i></div>
+        <div class="card">
+          <span class="pill ${v.pill}">${v.c === "r" ? "Rojo" : v.c === "y" ? "Amarillo" : "Verde"}</span>
+          <h2 style="margin-top:10px">${v.t}</h2><p class="muted" style="margin-top:4px">${v.d}</p>
+          <div style="margin-top:16px">${SIGNALS.map(s => {
+            const a = r.ans[s.id];
+            return `<div class="chk-row"><div><b>${s.q.replace("CNV", t("cnv", "CNV"))}</b><p class="small muted" style="margin-top:2px">${s.why}</p></div>
+              <div class="tri ${s.inverse ? "inv" : ""}" role="group" aria-label="${s.q}">${[["si", "Sí"], ["no", "No"], ["ns", "No sé"]].map(([k, l]) => `<button class="${a === k ? "on " + k : ""}" data-sig="${s.id}" data-v="${k}">${l}</button>`).join("")}</div></div>`;
+          }).join("")}</div>
+          <p class="xs faint" style="margin-top:8px">Detectamos algunas respuestas a partir de tu texto. Corregilas si hace falta: el semáforo se actualiza solo.</p>
+          <div class="row" style="margin-top:14px;flex-wrap:wrap"><a class="btn ghost" href="https://www.cnv.gov.ar" target="_blank" rel="noopener">Buscar en la CNV ${icon("arrow")}</a><button class="btn ghost" data-go="ask">Preguntar al asistente</button></div>
+        </div></div>`;
+    })() : ""}
+    <div class="card" style="margin-top:18px">
+      <div class="row" style="gap:14px"><div class="icon-box" style="background:var(--petrol-800);color:var(--mint)">${icon("shield")}</div><div><span class="eyebrow">Por qué LBO es confiable</span><h3 style="margin-top:2px">Chequeá lo mismo que le pedimos a cualquiera</h3></div></div>
+      <div class="grid" style="grid-template-columns:1fr 1fr;margin-top:16px">${[
+        ["Registro en la CNV", "Agente registrado N.º", "a completar"],
+        ["Trayectoria", "Años en el mercado de capitales", "a completar"],
+        ["Mercados en los que opera", "BYMA, MAV u otros", "a completar"],
+        ["Tu plata, a tu nombre", "Cómo se custodian las inversiones", "a completar"]
+      ].map(([h, d, x]) => `<div style="background:#F6F9F8;border-radius:12px;padding:14px"><b>${h}</b><p class="small muted" style="margin:2px 0 8px">${d}</p><span class="placeholder">[${x}]</span></div>`).join("")}</div>
+    </div>`;
+}
+
+/* ---------- 8. Simulador ---------- */
+function simSeries() {
+  const a = S.sim.alloc, r = rng(20251010), months = 12;
+  const vals = { mm: [a.mm], bono: [a.bono], cedear: [a.cedear], accion: [a.accion] };
+  for (let m = 1; m <= months; m++) OPTIONS.forEach(o => { const v = vals[o.id]; v.push(v[m - 1] * (1 + o.mu + o.sd * gauss(r))); });
+  const cash = 100000 - Object.values(a).reduce((x, y) => x + y, 0);
+  const total = Array.from({ length: months + 1 }, (_, m) => cash + OPTIONS.reduce((s, o) => s + vals[o.id][m], 0));
+  return { vals, total, cash };
+}
+function sim() {
+  const a = S.sim.alloc, used = Object.values(a).reduce((x, y) => x + y, 0), m = S.sim.month;
+  const { vals, total, cash } = simSeries();
+  const now = total[m], diff = now - 100000;
+  const types = OPTIONS.filter(o => a[o.id] > 0).length;
+  return `
+    <div class="page-h"><div><span class="eyebrow">Simulador</span><h1 style="margin-top:6px">Tu cartera de práctica</h1><p class="muted">Repartí $100.000 virtuales entre 4 opciones y mirá qué podría pasar mes a mes.</p></div>
+      <span class="sim-tag"><i></i>Modo práctica · plata virtual</span></div>
+    <div class="grid" style="grid-template-columns:2fr 1fr;align-items:stretch">
+      <div class="card">
+        <div class="between"><div><span class="eyebrow">Valor de tu cartera</span><div class="big-num num" style="margin-top:4px">${money(now)}</div>
+          <span class="pill ${diff >= 0 ? "" : "red"} num">${pct(diff / 100000)} desde el inicio</span> <span class="pill grey">Mes ${m} de 12 · simulado</span></div>
+          <div class="row" style="flex:none"><button class="btn ghost" style="white-space:nowrap" data-act="simReset" ${m === 0 ? "disabled" : ""}>Reiniciar</button><button class="btn" style="white-space:nowrap" data-act="simStep" ${m >= 12 || used > 100000 ? "disabled" : ""}>Avanzar 1 mes ${icon("arrow")}</button></div></div>
+        <div style="margin-top:18px" id="chart-sim"></div>
+        <p class="note" style="margin-top:8px">Evolución simulada con datos ilustrativos. No son precios reales. Rendimientos pasados no garantizan resultados futuros.</p>
+      </div>
+      <div class="card">
+        <span class="eyebrow">Cómo repartiste</span>
+        <div class="alloc" style="margin:14px 0">${OPTIONS.map(o => `<div style="width:${a[o.id] / 1000}%;background:${o.color}" title="${o.name}"></div>`).join("")}<div style="width:${Math.max(0, cash) / 1000}%;background:#CFDAD8"></div></div>
+        <div class="stack" style="gap:8px">${OPTIONS.map(o => `<div class="between small"><span class="row" style="gap:8px"><i style="width:10px;height:10px;border-radius:3px;background:${o.color};display:inline-block"></i>${o.name}</span><b class="num">${money(vals[o.id][m])}</b></div>`).join("")}
+          <div class="between small"><span class="row" style="gap:8px"><i style="width:10px;height:10px;border-radius:3px;background:#CFDAD8;display:inline-block"></i>Sin invertir</span><b class="num">${money(Math.max(0, cash))}</b></div></div>
+        <div class="callout" style="margin-top:16px;font-size:14px">${types >= 3 ? `Repartiste en ${types} opciones: eso es ${t("diversificar", "diversificar")}, y suma puntos en la liga.` : `Probá repartir en 3 o más opciones: ${t("diversificar", "diversificar")} baja el riesgo y suma puntos en la liga.`}</div>
+        ${used > 100000 ? `<div class="callout red" style="margin-top:10px;font-size:14px">Te pasaste por ${money(used - 100000)}. Bajá alguna opción.</div>` : ""}
+      </div>
+    </div>
+    <h2 style="margin:28px 0 14px">Las 4 opciones, en palabras simples</h2>
+    <div class="opt4">${OPTIONS.map(o => `
+      <div class="card hover inv" style="--c:${o.color}">
+        <div class="between"><div class="row" style="gap:12px"><div class="icon-box">${icon(o.icon)}</div><div><h3>${t(o.term, o.name)}</h3><span class="xs faint">${o.sub}</span></div></div>
+          <div style="text-align:right"><div class="risk" aria-label="${o.riskLabel}">${[1, 2, 3, 4].map(k => `<i class="${k <= o.risk ? "on" : ""}"></i>`).join("")}</div><div class="xs" style="font-weight:700;margin-top:4px">${o.riskLabel}</div></div></div>
+        <p class="muted" style="margin:12px 0 14px">${o.desc}</p>
+        <div class="between small"><label for="r-${o.id}"><b>Cuánto ponés</b></label><b class="num">${money(a[o.id])}</b></div>
+        <input type="range" id="r-${o.id}" min="0" max="100000" step="5000" value="${a[o.id]}" data-alloc="${o.id}" ${m > 0 ? "disabled" : ""}>
+      </div>`).join("")}</div>
+    ${m > 0 ? `<p class="small muted" style="margin-top:10px">Para cambiar cómo repartiste, tocá “Reiniciar”.</p>` : ""}`;
+}
+
+/* ---------- 9. Liga ---------- */
+function myScore() {
+  const types = OPTIONS.filter(o => S.sim.alloc[o.id] > 0).length;
+  const parts = { div: types * 100, days: S.streak * 30, lessons: S.done.length * 80, scams: S.scams * 60 };
+  return { types, pts: 300 + parts.div + parts.days + parts.lessons + parts.scams };
+}
+function leagueRows(kind) {
+  const ms = myScore();
+  const me = { name: myName() + " (vos)", me: true, pts: ms.pts, div: ms.types, days: S.streak, lessons: S.done.length, scams: S.scams };
+  let rows = kind === "curso" ? COURSE.map((n, k) => {
+    const f = FRIENDS.find(x => x.name === n); if (f) return { ...f };
+    const r = rng(k + 7); return { name: n, pts: Math.round(300 + r() * 900), div: 1 + Math.floor(r() * 4), days: 1 + Math.floor(r() * 12), lessons: 1 + Math.floor(r() * 5), scams: Math.floor(r() * 3) };
+  }) : FRIENDS.map(f => ({ ...f }));
+  rows.push(me); rows.sort((x, y) => y.pts - x.pts);
+  return rows;
+}
+function league() {
+  const kind = S.league, rows = leagueRows(kind);
+  return `
+    <div class="page-h"><div><span class="eyebrow">Liga</span><h1 style="margin-top:6px">Liga con amigos</h1><p class="muted">Gana quien mejor administra, no quien más arriesga.</p></div>
+      <div class="row"><span class="sim-tag"><i></i>Plata virtual</span><button class="btn" data-act="invite">${icon("users")}Invitar amigos</button></div></div>
+    <div class="grid" style="grid-template-columns:1fr;align-items:start">
+      <div class="card" style="padding:0;overflow:hidden">
+        <div class="between" style="padding:18px 20px"><div class="tabs"><button class="${kind === "amigos" ? "on" : ""}" data-league="amigos">Mis amigos</button><button class="${kind === "curso" ? "on" : ""}" data-league="curso">Liga de mi curso · 5° B</button></div><span class="xs faint">Temporada de octubre</span></div>
+        <table><thead><tr><th style="padding-left:20px">#</th><th>Jugador</th><th class="c">Diversificación</th><th class="c">Racha</th><th class="c">Niveles</th><th class="c">Estafas</th><th style="text-align:right;padding-right:20px">Puntos</th></tr></thead>
+          <tbody>${rows.map((r, k) => `<tr class="${r.me ? "me-row" : ""}">
+            <td style="padding-left:20px"><span class="rank ${k < 3 ? "r" + (k + 1) : ""}">${k + 1}</span></td>
+            <td><div class="row" style="gap:10px"><div class="avatar" style="width:32px;height:32px;background:${r.me ? "var(--mint)" : "var(--petrol-600)"};color:${r.me ? "#062018" : "#fff"}">${esc(r.name[0])}</div><b style="white-space:nowrap">${esc(r.name)}</b></div></td>
+            <td class="c num">${r.div} de 4</td><td class="c num" style="white-space:nowrap">${r.days} ${r.days === 1 ? "día" : "días"}</td><td class="c num">${r.lessons} de 6</td><td class="c num">${r.scams}</td>
+            <td style="text-align:right;padding-right:20px"><b class="num">${r.pts.toLocaleString("es-AR")}</b></td></tr>`).join("")}</tbody></table>
+        <p class="xs faint" style="padding:12px 20px;border-top:1px solid var(--line)">Nombres ficticios de ejemplo.</p>
+      </div>
+      <div class="stack">
+        <div class="card">
+          <span class="eyebrow">Cómo se suman puntos</span>
+          <div class="grid" style="margin-top:12px;gap:14px;grid-template-columns:repeat(4,1fr)">${[
+            ["sim", "Diversificar", "100 por cada tipo de opción en tu cartera"],
+            ["flame", "Constancia", "30 por cada día de racha"],
+            ["learn", "Completar lecciones", "80 por nivel terminado"],
+            ["shield", "Detectar estafas", "60 por cada oferta que revisás"]
+          ].map(([ic, h, d]) => `<div class="row" style="align-items:flex-start"><div class="icon-box" style="width:36px;height:36px">${icon(ic)}</div><div><b>${h}</b><p class="small muted">${d}</p></div></div>`).join("")}</div>
+          <div class="callout red" style="margin-top:14px;font-size:14px"><b>Arriesgar más no suma.</b> Los puntos no dependen de cuánto ganás: así nadie gana apostando todo.</div>
+        </div>
+      </div>
+    </div>`;
+}
+
+/* ---------- 10. Preguntá ---------- */
+const ANSWERS = [
+  { k: /acci[oó]n/i, a: `Una <b>acción</b> es un pedacito de una empresa. Si comprás una acción de una empresa, sos dueño de una parte muy chiquita de ella.<ul><li>Si a la empresa le va bien, tu pedacito puede valer más.</li><li>Si le va mal, puede valer menos.</li></ul><p style="margin-top:8px">Ejemplo: es como tener una porción de la pizzería del barrio. Las acciones son de <b>riesgo alto</b>, así que conviene empezar con poco y repartir.</p>` },
+  { k: /estaf|ponzi|trucho|seguro|confi/i, a: `Buena pregunta. Fijate en estas señales:<ul><li>Te <b>garantizan</b> ganancias o son altísimas (por ejemplo, 30% por mes).</li><li>Te <b>apuran</b> para decidir.</li><li>Ganás más si <b>traés a otros</b>.</li><li>No están registrados en la <b>CNV</b>.</li><li>Te escribieron por <b>redes o WhatsApp</b> sin que lo pidas.</li></ul><p style="margin-top:8px">Si ves una, frená. Podés pegar la oferta en el detector “¿Es estafa?”.</p>` },
+  { k: /10\.?000|poca|poco|chico|cu[aá]nto/i, a: `¡Sí! Hay opciones, como un <b>fondo de liquidez (Money Market)</b>, que se pueden empezar con montos chicos.<ul><li>Lo importante es que sea plata que no vas a necesitar enseguida.</li><li>Sumar un poco todos los meses vale más que esperar a tener mucho.</li></ul><p style="margin-top:8px">Mirá la calculadora “Empezar con poco” en Mi meta. Los montos mínimos dependen de cada producto: se confirman al abrir la cuenta.</p>` },
+  { k: /cedear/i, a: `Un <b>CEDEAR</b> es un certificado que comprás en pesos y representa acciones de empresas de afuera, como Apple o Coca-Cola. Tiene <b>riesgo medio-alto</b>: se mueve con la empresa y con el dólar.` },
+  { k: /fci|fondo/i, a: `Un <b>FCI</b> (fondo común de inversión) es como hacer una vaquita con otros: mucha gente junta su plata y un equipo profesional la invierte. Cada uno tiene “cuotapartes”, que son su porción del fondo.` }
+];
+const ASK_SUGGEST = ["¿Qué es una acción?", "¿Cómo sé si algo es una estafa?", "¿Con $10.000 puedo invertir?"];
+function ask() {
+  if (!S.chat) S.chat = [
+    { me: false, h: `¡Hola! Preguntame lo que quieras sobre inversiones. <b>Acá no hay preguntas tontas</b>, y nadie más ve lo que preguntás.` },
+    { me: true, h: "¿Qué es una acción?" },
+    { me: false, h: ANSWERS[0].a }
+  ];
+  return `
+    <div class="page-h"><div><span class="eyebrow">Asistente</span><h1 style="margin-top:6px">Preguntá sin vergüenza</h1><p class="muted">Lo que te da vergüenza preguntar en voz alta, preguntalo acá.</p></div></div>
+    <div class="card chat-box">
+      <div class="chat-log" id="chat-log">${S.chat.map(m => `<div class="msg ${m.me ? "me" : "bot"}">${m.me ? esc(m.h) : m.h}</div>`).join("")}${V.typing ? `<div class="msg bot"><span class="typing"><i></i><i></i><i></i></span></div>` : ""}</div>
+      <div class="chat-in">
+        <div class="row" style="flex-wrap:wrap;gap:8px">${ASK_SUGGEST.map(q => `<button class="chip" data-ask="${esc(q)}">${esc(q)}</button>`).join("")}</div>
+        <form class="row" id="ask-form"><input class="input" id="ask-in" placeholder="Escribí tu pregunta…" autocomplete="off" maxlength="200"><button class="btn" aria-label="Enviar">${icon("send")}</button></form>
+        <p class="xs faint">Respuestas educativas y generales. No son recomendaciones personales de inversión.</p>
+      </div>
+    </div>`;
+}
+function answerFor(q) {
+  const f = ANSWERS.find(x => x.k.test(q));
+  return f ? f.a : `Buena pregunta. En este prototipo tengo respuestas para algunos temas: acciones, CEDEARs, fondos, estafas y cuánto hace falta para empezar. Probá con una de las preguntas sugeridas.`;
+}
+
+/* ---------- Mi meta (con ¿Y si…? y Empezar con poco) ---------- */
+function goalPage() {
+  const tab = V.page === "whatif" ? "whatif" : V.page === "small" ? "small" : "goal";
+  const tabs = `<div class="tabs" style="margin-bottom:20px"><button class="${tab === "goal" ? "on" : ""}" data-go="goal">Mi meta</button><button class="${tab === "whatif" ? "on" : ""}" data-go="whatif">¿Y si…?</button><button class="${tab === "small" ? "on" : ""}" data-go="small">Empezar con poco</button></div>`;
+  return (tab === "goal" ? goalMain(tabs) : tab === "whatif" ? whatif(tabs) : small(tabs));
+}
+function goalMain(tabs) {
+  const g = goal();
+  return `
+    <div class="page-h"><div><span class="eyebrow">Mi meta</span><h1 style="margin-top:6px">${esc(g.name)}</h1><p class="muted">Invertir tiene más sentido cuando es para algo que te importa.</p></div></div>
+    ${tabs}
+    <div class="card goal-hero">
+      <div class="row" style="gap:18px"><div class="icon-box" style="background:rgba(43,182,115,.18);color:#7EE2AE;width:64px;height:64px">${icon(g.icon)}</div>
+        <div><span class="eyebrow" style="color:#9FC3C6">Ahorro de práctica</span><div class="big-num">${money(g.target * S.saved)} <span style="font-size:18px;color:#B9D3D5">de ${money(g.target)}</span></div></div>
+        <div style="margin-left:auto" class="big-num">${Math.round(S.saved * 100)}%</div></div>
+      <div class="bar" style="margin-top:18px;height:14px"><span style="width:${S.saved * 100}%"></span></div>
+      <p class="small muted" style="margin-top:10px">Valores de ejemplo para el prototipo.</p>
+    </div>
+    <div class="grid" style="grid-template-columns:1fr 1fr;margin-top:18px">
+      <div class="card hover"><div class="icon-box">${icon("sparkle")}</div><h3 style="margin-top:12px">¿Y si…?</h3><p class="muted small" style="margin:6px 0 14px">¿Qué hubiera pasado si invertías la plata de tu cumpleaños?</p><button class="btn" data-go="whatif">Probar</button></div>
+      <div class="card hover"><div class="icon-box">${icon("calc")}</div><h3 style="margin-top:12px">Empezar con poco</h3><p class="muted small" style="margin:6px 0 14px">Mirá cuánto juntás para tu meta cambiando un par de salidas por mes.</p><button class="btn" data-go="small">Calcular</button></div>
+    </div>`;
+}
+
+const INFL_M = 0.022, INV_M = 0.026; // valores simulados para los ejemplos
+function whatif(tabs) {
+  const amt = V.wiAmt ?? 20000;
+  return `
+    <div class="page-h"><div><span class="eyebrow">Mi meta</span><h1 style="margin-top:6px">¿Y si…?</h1><p class="muted">Poné cuánto te regalaron en tu cumpleaños y compará en 12 meses.</p></div></div>
+    ${tabs}
+    <div class="grid" style="grid-template-columns:300px 1fr;align-items:start">
+      <div class="card">
+        <div class="field"><label for="wi">¿Cuánto te regalaron?</label><div class="money-in"><span>$</span><input class="input num" id="wi" inputmode="numeric" value="${amt.toLocaleString("es-AR")}" data-num="wiAmt"></div></div>
+        <div class="row" style="flex-wrap:wrap;gap:8px;margin-top:12px">${[10000, 20000, 50000].map(v => `<button class="chip" data-wi="${v}">${money(v)}</button>`).join("")}</div>
+        <div id="wi-res" style="margin-top:18px">${wiSummary(amt)}</div>
+      </div>
+      <div class="card">
+        <span class="eyebrow">Qué podés comprar con esa plata, mes a mes</span>
+        <div id="chart-wi" style="margin-top:14px"></div>
+        <div class="callout" style="margin-top:14px;font-size:13.5px"><b>Ejemplo ilustrativo con datos simulados.</b> Rendimientos pasados no garantizan resultados futuros.</div>
+      </div>
+    </div>`;
+}
+function wiData(amt) {
+  const r = rng(7), caj = [], inv = []; let v = amt;
+  for (let m = 0; m <= 12; m++) { if (m) v *= 1 + INV_M + 0.012 * gauss(r); caj.push(amt / (1 + INFL_M) ** m); inv.push(v / (1 + INFL_M) ** m); }
+  return { caj, inv };
+}
+function wiSummary(amt) {
+  const d = wiData(amt);
+  return `<div class="stack" style="gap:10px">
+    <div style="background:#F6F9F8;border-radius:12px;padding:12px"><span class="xs faint" style="font-weight:700">GUARDADO EN EL CAJÓN</span><div style="font-size:22px;font-weight:800" class="num">${money(d.caj[12])}</div><span class="small muted">de poder de compra en 12 meses</span></div>
+    <div style="background:var(--mint-50);border-radius:12px;padding:12px"><span class="xs faint" style="font-weight:700">INVERTIDO (SIMULADO)</span><div style="font-size:22px;font-weight:800;color:#13774a" class="num">${money(d.inv[12])}</div><span class="small muted">de poder de compra en 12 meses</span></div></div>`;
+}
+
+function small(tabs) {
+  const g = goal(), salida = V.salida ?? 10000, n = V.nSal ?? 2, monthly = salida * n;
+  const { aport, inv, tA, tI } = smallData(monthly, g.target);
+  return `
+    <div class="page-h"><div><span class="eyebrow">Mi meta</span><h1 style="margin-top:6px">Empezar con poco</h1><p class="muted">No hace falta mucha plata. Hace falta empezar.</p></div></div>
+    ${tabs}
+    <div class="grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:18px">${[
+      ["coins", "$5.000", "lo que sale una merienda con amigos"], ["music", "$10.000", "una salida un sábado"], ["calc", "$20.000", "dos salidas por mes"]
+    ].map(([ic, a, d]) => `<div class="card hover"><div class="row"><div class="icon-box">${icon(ic)}</div><div><b style="font-size:20px">${a}</b><p class="small muted">${d}</p></div></div></div>`).join("")}</div>
+    <div class="grid" style="grid-template-columns:320px 1fr;align-items:start">
+      <div class="card stack">
+        <div class="field"><label for="sal">¿Cuánto gastás en una salida?</label><div class="money-in"><span>$</span><input class="input num" id="sal" inputmode="numeric" value="${salida.toLocaleString("es-AR")}" data-num="salida"></div></div>
+        <div class="field"><label>¿Cuántas salidas por mes podrías cambiar?</label><div class="tabs">${[1, 2, 3, 4].map(k => `<button class="${n === k ? "on" : ""}" data-nsal="${k}">${k}</button>`).join("")}</div></div>
+        <div style="background:var(--mint-50);border-radius:12px;padding:14px"><span class="xs faint" style="font-weight:700">PONÉS POR MES</span><div style="font-size:26px;font-weight:800" class="num">${money(monthly)}</div>
+          <p class="small" style="margin-top:6px">Con lo que gastás en ${n} ${n === 1 ? "salida" : "salidas"} por mes podés empezar.</p></div>
+        <p class="small">Para “${esc(g.name)}” (${money(g.target)}): <b>${tA ? tA + " meses" : "más de 3 años"}</b> solo ahorrando, <b style="color:#13774a">${tI ? tI + " meses" : "más de 3 años"}</b> invirtiendo (simulado).</p>
+      </div>
+      <div class="card">
+        <span class="eyebrow">Cuánto sumás hacia tu meta</span>
+        <div id="chart-small" style="margin-top:14px"></div>
+        <p class="note" style="margin-top:10px">Datos simulados con fines educativos. Los montos mínimos dependen de cada producto. Rendimientos pasados no garantizan resultados futuros.</p>
+      </div>
+    </div>`;
+}
+function smallData(monthly, target) {
+  const aport = [0], inv = [0]; let tA = null, tI = null;
+  for (let m = 1; m <= 36; m++) {
+    aport.push(aport[m - 1] + monthly); inv.push(inv[m - 1] * (1 + INV_M) + monthly);
+    if (!tA && aport[m] >= target) tA = m; if (!tI && inv[m] >= target) tI = m;
+  }
+  return { aport, inv, tA, tI };
+}
+
+/* ---------- 12. El salto ---------- */
+function leap() {
+  const msg = `¡Hola! Estoy usando Sin Miedo, de LBO, para aprender a invertir. Ya terminé el camino y quiero hacer mi primera inversión real con un monto chico, para mi meta: ${goal().name}. Como soy menor, necesito que un adulto me habilite la cuenta. ¿Lo vemos juntos?`;
+  return `
+    <div class="leap-hero">
+      <div class="medal">${icon("rocket")}</div>
+      <span class="pill" style="background:rgba(43,182,115,.18);color:#7EE2AE">Camino completo</span>
+      <h1 style="font-size:42px;margin-top:14px">¡Ya podés dar el salto!</h1>
+      <p style="color:#B9D3D5;font-size:18px;margin:10px auto 0;max-width:52ch">Aprendiste, detectaste estafas y practicaste sin arriesgar nada. Ahora podés hacer tu primera inversión real, arrancando con poco.</p>
+      <div class="stats4">${[["6/6", "niveles completos"], [S.scams, "ofertas revisadas"], [S.streak, "días de racha"], [leagueRows("amigos").findIndex(r => r.me) + 1 + "°", "en tu liga"]].map(([b, d]) => `<div><b>${b}</b><span class="small" style="color:#B9D3D5">${d}</span></div>`).join("")}</div>
+    </div>
+    <div class="grid" style="grid-template-columns:1.3fr 1fr;margin-top:18px;align-items:start">
+      <div class="card">
+        <span class="eyebrow">Tu primera inversión real</span>
+        <h2 style="margin-top:6px">Empezá con poco, en LBO</h2>
+        <p class="muted" style="margin-top:6px">Por ejemplo, con <b>$5.000</b> en una opción de riesgo bajo, para tu meta “${esc(goal().name)}”. Lo definís vos al abrir tu cuenta.</p>
+        <div class="row" style="margin-top:18px;flex-wrap:wrap"><button class="btn lg" data-act="openAccount">Abrir mi cuenta en LBO ${icon("arrow")}</button><button class="btn lg ghost" data-go="sim">Seguir practicando</button></div>
+        <p class="note" style="margin-top:16px">Invertir tiene riesgos. Antes de invertir, leé las condiciones de cada producto.</p>
+      </div>
+      <div class="card">
+        <label class="toggle"><input type="checkbox" data-act="minor" ${S.minor ? "checked" : ""}><span class="sw"></span>Tengo menos de 18 años</label>
+        ${S.minor ? `<div style="margin-top:16px"><h3>Invitá a tu mamá, papá o tutor para habilitar tu cuenta</h3>
+          <p class="small muted" style="margin:6px 0 12px">En general, los menores necesitan que un adulto los acompañe. Mandale este mensaje:</p>
+          <div style="background:#F6F9F8;border-radius:12px;padding:12px;font-size:14px">${esc(msg)}</div>
+          <a class="btn wa block" style="margin-top:12px" href="https://wa.me/?text=${encodeURIComponent(msg)}" target="_blank" rel="noopener">${icon("wa")}Compartir por WhatsApp</a>
+          <p class="xs faint" style="margin-top:8px">A confirmar con LBO cómo se habilita la cuenta para menores.</p></div>`
+          : `<p class="small muted" style="margin-top:12px">Si sos menor, te ayudamos a invitar a un adulto para habilitar tu cuenta.</p>`}
+      </div>
+    </div>`;
+}
+
+/* =================================================================
+   Gráficos (SVG con tooltip al pasar el mouse)
+   ================================================================= */
+const CHARTS = {};
+function lineChart(id, { labels, series, fmt = money, height = 280, yLabel = "" }) {
+  const el = document.getElementById(id); if (!el) return;
+  const W = el.clientWidth || 600, H = height, L = 64, R = 18, T = 14, B = 30;
+  const all = series.flatMap(s => s.values);
+  let min = Math.min(...all), max = Math.max(...all);
+  const pad = (max - min) * 0.12 || max * 0.1 || 1; min = Math.max(0, min - pad); max += pad;
+  const n = labels.length - 1;
+  const x = i => L + (W - L - R) * (n ? i / n : 0), y = v => T + (H - T - B) * (1 - (v - min) / (max - min));
+  const ticks = 4, grid = Array.from({ length: ticks + 1 }, (_, k) => min + (max - min) * k / ticks);
+  const xEvery = Math.ceil(labels.length / 7);
+  el.innerHTML = `<div class="chart"><svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="${series.map(s => s.name).join(" y ")}">
+    ${grid.map(v => `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="#E6EEEC"/><text x="${L - 10}" y="${y(v) + 4}" text-anchor="end" font-size="11" fill="#7A8C91">${fmt(v)}</text>`).join("")}
+    ${labels.map((l, i) => i % xEvery === 0 || i === n ? `<text x="${x(i)}" y="${H - 8}" text-anchor="middle" font-size="11" fill="#7A8C91">${l}</text>` : "").join("")}
+    ${series.map(s => s.area ? `<path d="M${x(0)},${y(min)} ${s.values.map((v, i) => `L${x(i)},${y(v)}`).join(" ")} L${x(s.values.length - 1)},${y(min)}Z" fill="${s.color}" fill-opacity=".10"/>` : "").join("")}
+    ${series.map(s => `<polyline points="${s.values.map((v, i) => `${x(i)},${y(v)}`).join(" ")}" fill="none" stroke="${s.color}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" ${s.dash ? 'stroke-dasharray="6 5"' : ""}/>`).join("")}
+    ${series.map(s => { const i = s.values.length - 1; return `<circle cx="${x(i)}" cy="${y(s.values[i])}" r="5" fill="${s.color}" stroke="#fff" stroke-width="2"/>`; }).join("")}
+    <line class="xh" x1="0" x2="0" y1="${T}" y2="${H - B}" stroke="#9DB3B6" stroke-dasharray="3 3" opacity="0"/>
+    ${series.map((s, k) => `<circle class="hp" data-k="${k}" r="5" fill="${s.color}" stroke="#fff" stroke-width="2" opacity="0"/>`).join("")}
+    <rect x="${L}" y="${T}" width="${W - L - R}" height="${H - T - B}" fill="transparent" class="hit"/>
+  </svg><div class="hover-tip"></div></div>
+  <div class="legend" style="margin-top:8px">${series.map(s => `<span><i class="${s.dash ? "dash" : "line"}" style="background:${s.color};border-color:${s.color}"></i>${s.name}</span>`).join("")}</div>`;
+  CHARTS[id] = { labels, series, fmt, x, y, L, W, R, n };
+}
+document.addEventListener("mousemove", e => {
+  const hit = e.target.closest?.(".hit");
+  document.querySelectorAll(".chart").forEach(c => {
+    if (hit && c.contains(hit)) return;
+    c.querySelector(".hover-tip")?.classList.remove("on"); c.querySelector(".xh")?.setAttribute("opacity", 0); c.querySelectorAll(".hp").forEach(p => p.setAttribute("opacity", 0));
+  });
+  if (!hit) return;
+  const wrap = hit.closest(".chart"), id = wrap.parentElement.id, C = CHARTS[id]; if (!C) return;
+  const svg = wrap.querySelector("svg"), box = svg.getBoundingClientRect(), scale = C.W / box.width;
+  const px = (e.clientX - box.left) * scale;
+  const i = Math.max(0, Math.min(C.n, Math.round((px - C.L) / (C.W - C.L - C.R) * C.n)));
+  const xx = C.x(i);
+  wrap.querySelector(".xh").setAttribute("x1", xx); wrap.querySelector(".xh").setAttribute("x2", xx); wrap.querySelector(".xh").setAttribute("opacity", 1);
+  wrap.querySelectorAll(".hp").forEach(p => { const s = C.series[+p.dataset.k]; if (s.values[i] == null) return p.setAttribute("opacity", 0); p.setAttribute("cx", xx); p.setAttribute("cy", C.y(s.values[i])); p.setAttribute("opacity", 1); });
+  const tip = wrap.querySelector(".hover-tip");
+  tip.innerHTML = `<b>${C.labels[i]}</b><br>${C.series.filter(s => s.values[i] != null).map(s => `<i style="background:${s.color}"></i>${s.name}: <b>${C.fmt(s.values[i])}</b>`).join("<br>")}`;
+  const top = Math.min(...C.series.filter(s => s.values[i] != null).map(s => C.y(s.values[i])));
+  tip.style.left = (xx / scale) + "px"; tip.style.top = (top / scale) + "px"; tip.classList.add("on");
+});
+
+const shortMoney = v => "$" + (v >= 1e6 ? (v / 1e6).toLocaleString("es-AR", { maximumFractionDigits: 1 }) + " M" : Math.round(v / 1000).toLocaleString("es-AR") + " mil");
+function mountCharts() {
+  if (document.getElementById("chart-sim")) {
+    const { total } = simSeries(), m = S.sim.month;
+    lineChart("chart-sim", { labels: Array.from({ length: 13 }, (_, k) => k === 0 ? "Hoy" : `Mes ${k}`),
+      series: [{ name: "Tu cartera (simulada)", color: "#2BB673", values: total.map((v, k) => k <= m ? v : null).filter(v => v != null), area: true },
+               { name: "Lo que pusiste: $100.000", color: "#7A8C91", dash: true, values: Array(13).fill(100000) }],
+      fmt: shortMoney, height: 270 });
+  }
+  if (document.getElementById("chart-wi")) {
+    const amt = V.wiAmt ?? 20000, d = wiData(amt);
+    lineChart("chart-wi", { labels: Array.from({ length: 13 }, (_, k) => k === 0 ? "Hoy" : `Mes ${k}`),
+      series: [{ name: "Invertido (simulado)", color: "#2BB673", values: d.inv, area: true }, { name: "Guardado en el cajón", color: "#D64545", values: d.caj, dash: true }],
+      fmt: v => money(v), height: 300 });
+  }
+  if (document.getElementById("chart-small")) {
+    const monthly = (V.salida ?? 10000) * (V.nSal ?? 2), g = goal(), d = smallData(monthly, g.target);
+    const horizon = Math.min(36, Math.max(12, (d.tA || 36) + 2));
+    lineChart("chart-small", { labels: Array.from({ length: horizon + 1 }, (_, k) => k === 0 ? "Hoy" : `${k} m`),
+      series: [{ name: "Invirtiendo (simulado)", color: "#2BB673", values: d.inv.slice(0, horizon + 1), area: true },
+               { name: "Solo ahorrando", color: "#2F6FB5", values: d.aport.slice(0, horizon + 1) },
+               { name: `Tu meta: ${money(g.target)}`, color: "#E3A21A", dash: true, values: Array(horizon + 1).fill(g.target) }],
+      fmt: shortMoney, height: 300 });
+  }
+}
+
+/* =================================================================
+   Tooltips de términos, toast, modal, confetti
+   ================================================================= */
+const tipEl = document.getElementById("tip");
+function showTip(el) {
+  const d = TERMS[el.dataset.term]; if (!d) return;
+  tipEl.innerHTML = `<b>${d[0]}</b>${d[1]}<span class="ex">Ejemplo: ${d[2]}</span>`;
+  const r = el.getBoundingClientRect();
+  tipEl.classList.add("on");
+  const tw = tipEl.offsetWidth, th = tipEl.offsetHeight;
+  let left = Math.min(window.innerWidth - tw - 12, Math.max(12, r.left + r.width / 2 - tw / 2));
+  let top = r.top - th - 10; if (top < 10) top = r.bottom + 10;
+  tipEl.style.left = left + "px"; tipEl.style.top = top + "px";
+}
+function hideTip() { tipEl.classList.remove("on"); }
+document.addEventListener("mouseover", e => { const el = e.target.closest?.(".term"); if (el) showTip(el); });
+document.addEventListener("mouseout", e => { if (e.target.closest?.(".term")) hideTip(); });
+document.addEventListener("focusin", e => { if (e.target.classList?.contains("term")) showTip(e.target); });
+document.addEventListener("focusout", e => { if (e.target.classList?.contains("term")) hideTip(); });
+
+let toastT;
+function toast(msg) { const el = document.getElementById("toast"); el.textContent = msg; el.classList.add("on"); clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove("on"), 2600); }
+
+function modal(html) { document.getElementById("modal").innerHTML = html ? `<div class="bg" data-act="closeModal"><div class="box" role="dialog" aria-modal="true">${html}</div></div>` : ""; }
+
+function confetti() {
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const c = document.getElementById("confetti"), ctx = c.getContext("2d");
+  c.width = innerWidth; c.height = innerHeight;
+  const colors = ["#2BB673", "#7EE2AE", "#F7C33B", "#2F6FB5", "#ffffff", "#B0417A"];
+  const P = Array.from({ length: 160 }, () => ({ x: innerWidth / 2 + (Math.random() - .5) * 200, y: innerHeight * .35, vx: (Math.random() - .5) * 16, vy: -Math.random() * 14 - 4, s: 5 + Math.random() * 6, r: Math.random() * 6, vr: (Math.random() - .5) * .3, c: colors[Math.floor(Math.random() * colors.length)] }));
+  const t0 = performance.now();
+  (function frame(t) {
+    ctx.clearRect(0, 0, c.width, c.height);
+    P.forEach(p => { p.vy += .45; p.vx *= .99; p.x += p.vx; p.y += p.vy; p.r += p.vr; ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.r); ctx.fillStyle = p.c; ctx.fillRect(-p.s / 2, -p.s / 4, p.s, p.s / 2); ctx.restore(); });
+    if (t - t0 < 2600) requestAnimationFrame(frame); else ctx.clearRect(0, 0, c.width, c.height);
+  })(t0);
+}
+
+/* =================================================================
+   Eventos
+   ================================================================= */
+document.addEventListener("click", e => {
+  const el = e.target.closest("[data-go],[data-act],[data-diag],[data-lvl],[data-pick],[data-example],[data-sig],[data-league],[data-ask],[data-wi],[data-nsal],[data-scroll],[data-jump]");
+  if (!el || el.disabled) return;
+  const d = el.dataset;
+  if (d.scroll) { document.getElementById(d.scroll)?.scrollIntoView({ behavior: "smooth" }); return; }
+  if (d.jump) { modal(""); jump(d.jump); return; }
+  if (d.go) {
+    if (d.go === "lesson") return go("lesson", { lvl: current(), step: 0 });
+    if (d.go === "diag") return go("diag", { step: 0 });
+    return go(d.go);
+  }
+  if (d.diag) { S[DIAG[V.step || 0].key] = d.diag; save(); render(); return; }
+  if (d.lvl != null) {
+    const i = +d.lvl;
+    if (S.done.includes(i) || i === current()) return go("lesson", { lvl: i, step: 0 });
+    toast("Completá el nivel anterior para desbloquear este."); return;
+  }
+  if (d.pick != null) { V.picked = +d.pick; render(); return; }
+  if (d.example) { V.scamText = d.example; V.scam = { ans: analyze(d.example) }; S.scams++; save(); render(); return; }
+  if (d.sig) { V.scam.ans[d.sig] = d.v; render(); return; }
+  if (d.league) { S.league = d.league; save(); render(); return; }
+  if (d.ask) { sendAsk(d.ask); return; }
+  if (d.wi) { V.wiAmt = +d.wi; render(); return; }
+  if (d.nsal) { V.nSal = +d.nsal; render(); return; }
+  switch (d.act) {
+    case "diagBack": V.step--; render(); break;
+    case "diagNext":
+      if ((V.step || 0) < DIAG.length - 1) { V.step = (V.step || 0) + 1; render(); }
+      else { S.started = true; save(); root.innerHTML = `<div class="diag" style="place-items:center;display:grid;background:var(--petrol-900);color:#fff;text-align:center"><div><div class="medal" style="animation:pop .4s">${icon("sparkle")}</div><h1>Armando tu camino…</h1><p style="color:#A9C7C9;margin-top:8px">Lo personalizamos según tus respuestas.</p></div></div>`; setTimeout(() => go("home"), 1100); }
+      break;
+    case "lstep": V.step = Math.max(0, (V.step || 0) + +d.d); V.picked = null; render(); break;
+    case "retryQ": V.picked = null; render(); break;
+    case "finishLvl": finishLevel(); break;
+    case "analyze": {
+      const txt = document.getElementById("scam-in").value.trim();
+      if (!txt) { toast("Escribí o pegá la oferta que te llegó."); return; }
+      V.scamText = txt; V.scam = { ans: analyze(txt) }; S.scams++; save(); render(); break;
+    }
+    case "simStep": S.simTouched = true; S.sim.month = Math.min(12, S.sim.month + 1); save(); render(); break;
+    case "simReset": S.sim.month = 0; save(); render(); break;
+    case "invite": {
+      const link = "sinmiedo.lbo.com.ar/liga/" + myName().toLowerCase().replace(/\W+/g, "") + "-5b";
+      const msg = `Sumate a mi liga en Sin Miedo: practicamos inversiones con plata virtual y gana quien mejor administra. ${link}`;
+      modal(`<h2>Invitá a tus amigos</h2><p class="muted" style="margin:6px 0 16px">Cada amigo que se suma juega con su propia plata virtual.</p>
+        <div class="field"><label>Tu link de invitación</label><div class="row"><input class="input" value="${link}" readonly id="inv-link"><button class="btn ghost" data-act="copyInvite">Copiar</button></div><span class="xs faint">Link de ejemplo del prototipo.</span></div>
+        <a class="btn wa block" style="margin-top:14px" href="https://wa.me/?text=${encodeURIComponent(msg)}" target="_blank" rel="noopener" data-act="invited">${icon("wa")}Compartir por WhatsApp</a>
+        <button class="btn ghost block" style="margin-top:10px" data-act="closeModal">Cerrar</button>`);
+      break;
+    }
+    case "copyInvite": { const i = document.getElementById("inv-link"); try { navigator.clipboard.writeText(i.value).then(() => toast("Link copiado"), () => { i.select(); }); } catch (err) { i.select(); } S.invited = true; save(); break; }
+    case "invited": S.invited = true; save(); break;
+    case "closeModal": if (e.target === el || el.tagName === "BUTTON") modal(""); break;
+    case "openAccount": modal(`<div class="medal" style="width:72px;height:72px">${icon("rocket")}</div><h2 style="text-align:center">Acá empieza tu cuenta en LBO</h2><p class="muted" style="text-align:center;margin:8px 0 18px">En el producto real, este botón lleva al alta de cuenta en LBO con tu meta y el monto que elegiste. En el prototipo termina acá.</p><button class="btn block" data-act="closeModal">Entendido</button>`); break;
+    case "minor": S.minor = el.checked; save(); render(); break;
+    case "map": showMap(); break;
+    case "reset": try { localStorage.removeItem(KEY); } catch (err) {} S = fresh(); modal(""); go("landing"); break;
+  }
+});
+
+function finishLevel() {
+  const i = V.lvl;
+  const first = !S.done.includes(i);
+  if (first) { S.done.push(i); S.done.sort((a, b) => a - b); }
+  save(); confetti();
+  if (allDone() && first) { setTimeout(() => go("leap"), 700); return; }
+  modal(`<div class="medal" style="width:76px;height:76px">${icon("star")}</div><h2 style="text-align:center">¡Nivel ${i + 1} completo!</h2>
+    <p class="muted" style="text-align:center;margin:8px 0 18px">${first ? "+80 puntos en la liga." : "Buen repaso."} ${allDone() ? "" : `Se desbloqueó el nivel ${current() + 1}: ${LEVELS[current()].title}.`}</p>
+    <div class="row"><button class="btn ghost" style="flex:1" data-go="learn" data-act="closeModal">Ver el camino</button>${allDone() ? `<button class="btn" style="flex:1" data-go="leap">Dar el salto</button>` : `<button class="btn" style="flex:1" data-go="lesson">Siguiente nivel</button>`}</div>`);
+}
+document.getElementById("modal").addEventListener("click", e => { if (e.target.closest("[data-go]")) modal(""); });
+
+function sendAsk(q) {
+  q = q.trim(); if (!q) return;
+  S.chat.push({ me: true, h: q }); V.typing = true; render(); scrollChat();
+  setTimeout(() => { V.typing = false; S.chat.push({ me: false, h: answerFor(q) }); save(); render(); scrollChat(); }, 800);
+}
+function scrollChat() { const l = document.getElementById("chat-log"); if (l) l.scrollTop = l.scrollHeight; }
+
+document.addEventListener("submit", e => { if (e.target.id === "ask-form") { e.preventDefault(); const i = document.getElementById("ask-in"); sendAsk(i.value); } });
+
+document.addEventListener("input", e => {
+  const el = e.target;
+  if (el.dataset.bind) { S[el.dataset.bind] = el.value; save(); return; }
+  if (el.dataset.alloc) {
+    S.sim.alloc[el.dataset.alloc] = +el.value; S.simTouched = true; save();
+    const id = el.id; render(); document.getElementById(id)?.focus(); return;
+  }
+  if (el.dataset.num) {
+    const v = parseInt(el.value.replace(/\D/g, ""), 10) || 0;
+    V[el.dataset.num] = Math.min(v, 99999999);
+    clearTimeout(window._nt); window._nt = setTimeout(() => {
+      const id = el.id; render(); const n = document.getElementById(id); if (n) { n.focus(); n.setSelectionRange(n.value.length, n.value.length); }
+    }, 450);
+  }
+});
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape") { modal(""); hideTip(); }
+  if ((e.key === "m" || e.key === "M") && !/INPUT|TEXTAREA/.test(document.activeElement.tagName)) showMap();
+});
+window.addEventListener("resize", () => mountCharts());
+
+/* ---------- Mapa del prototipo (para presentar) ---------- */
+const SCREENS = [
+  ["landing", "Landing"], ["diag", "Diagnóstico"], ["home", "Inicio"], ["whatif", "¿Y si…?"], ["learn", "Aprender"], ["lesson3", "Lección nivel 3"],
+  ["scam", "¿Es estafa?"], ["sim", "Simulador"], ["league", "Liga con amigos"], ["ask", "Preguntá sin vergüenza"], ["small", "Empezar con poco"], ["leap", "El salto"]
+];
+function showMap() {
+  modal(`<h2>Mapa del prototipo</h2><p class="muted small" style="margin-top:4px">Saltá a cualquier pantalla. Atajo: tecla M.</p>
+    <div class="map-grid">${SCREENS.map(([id, l], k) => `<button data-jump="${id}"><b>${k + 1}</b>${l}</button>`).join("")}</div>
+    <div class="row"><button class="btn ghost" style="flex:1" data-act="reset">Reiniciar el prototipo</button><button class="btn" style="flex:1" data-act="closeModal">Cerrar</button></div>`);
+}
+function jump(id) {
+  if (!S.started && !["landing", "diag"].includes(id)) { S.started = true; S.freno = S.freno || "miedo"; S.goal = S.goal || "viaje"; S.exp = S.exp || "nunca"; save(); }
+  if (id === "lesson3") return go("lesson", { lvl: 2, step: 0 });
+  if (id === "leap") { if (!allDone()) { S.done = [0, 1, 2, 3, 4, 5]; save(); } go("leap"); confetti(); return; }
+  if (id === "diag") return go("diag", { step: 0 });
+  go(id);
+}
+
+render();
+if (V.page === "leap") confetti();
+</script>
+</body>
+</html>
