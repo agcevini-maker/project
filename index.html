@@ -1287,7 +1287,7 @@ function portfolio() {
     </div>
     <p></p>
     <button class="link" data-act="resetBroker">Reiniciar el simulador con $100.000</button>
-    <p class="note">Simulación con valores inventados para aprender. No es una recomendación ni refleja productos ni precios reales.</p>`;
+    <p class="note">${REAL ? "Precios de cierre reales; la plata es de mentira." : "Precios simulados; la plata es de mentira."} No es una recomendación de inversión.</p>`;
 }
 
 function activity() {
@@ -1318,7 +1318,7 @@ function activity() {
         }).join("")}</tbody>
       </table>` : `<div class="empty small">Todavía no hiciste ninguna operación.<p></p><button class="btn inline" data-act="tab" data-tab="market">Ir al mercado</button></div>`}
     </div>
-    <p class="note">Simulación con valores inventados para aprender.</p>`;
+    <p class="note">Operaciones con plata de mentira, a precios de cierre ${REAL ? "reales" : "simulados"}.</p>`;
 }
 
 /* ---------- Mi meta y "¿Y si…?" ---------- */
@@ -1755,7 +1755,7 @@ function loadDemo() {
     const r = execute(o, px(sym));
     if (r.ok) S.broker.orders.unshift({ id: S.broker.nextId++, ...o, day: S.broker.day, status: "Ejecutada", price: r.price, qty: r.qty, fee: r.fee, total: r.total });
   };
-  buy("MM", 0, 20000); buy("AL30", 15, 0); buy("KO", 1, 0);
+  buy("MM", 0, 25000); buy("KO", 1, 0); buy("SPY", 1, 0);
   advance(25, { silent: true });
   buy("GGAL", 2, 0);
   advance(15, { silent: true });
