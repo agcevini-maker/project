@@ -236,6 +236,22 @@
   .thesis { border-left: 3px solid var(--accent); padding-left: 14px; font-size: 17px; margin: 0 0 20px; max-width: 46ch; }
   .status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--up); margin-right: 6px; box-shadow: 0 0 0 3px var(--up-soft); }
 
+  /* Meta, ¿Y si…?, liga y asistente */
+  .bars { display: flex; flex-direction: column; gap: 8px; }
+  .bar-row { display: grid; grid-template-columns: minmax(120px, 200px) 1fr auto; gap: 12px; align-items: center; font-size: 14px; }
+  .bar { height: 12px; background: var(--bg); border-radius: 99px; overflow: hidden; }
+  .bar > div { height: 100%; border-radius: 99px; }
+  .funnel { display: flex; flex-direction: column; gap: 6px; align-items: center; }
+  .funnel > div { background: var(--accent-soft); color: var(--accent); font-weight: 600; text-align: center; padding: 10px; border-radius: 8px; font-size: 14px; }
+  .ask-fab { position: fixed; right: 20px; bottom: 20px; z-index: 25; background: var(--ink); color: var(--card); border: 0; border-radius: 99px; padding: 12px 18px; font: inherit; font-weight: 600; font-size: 14px; cursor: pointer; box-shadow: 0 8px 24px rgba(0,0,0,.2); }
+  .chat-bg { position: fixed; inset: 0; background: rgba(5,10,15,.45); z-index: 45; display: flex; align-items: flex-end; justify-content: flex-end; padding: 20px; }
+  .chat { background: var(--card); color: var(--ink); width: 100%; max-width: 420px; height: min(620px, 80vh); border-radius: 14px; padding: 18px; display: flex; flex-direction: column; box-shadow: 0 20px 60px rgba(0,0,0,.3); }
+  .chat-log { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+  .msg { padding: 10px 12px; border-radius: 12px; font-size: 14px; max-width: 90%; white-space: pre-wrap; }
+  .msg.user { align-self: flex-end; background: var(--ink); color: var(--card); }
+  .msg.bot { align-self: flex-start; background: var(--bg); }
+  textarea.search { font: inherit; }
+
   /* Navegación inferior y saldo (solo celular) */
   nav.bottom { display: none; }
   .acct-m { display: none; }
@@ -280,13 +296,21 @@
     .resp svg.spark { width: 100%; max-width: 90px; }
     .hide-m { display: none; }
     .kpis, .stats { grid-template-columns: 1fr 1fr; }
-    .toasts { bottom: 80px; right: 16px; }
+    .toasts { bottom: 130px; right: 16px; }
+    .bar-row { grid-template-columns: 1fr auto; }
+    .bar-row .bar { grid-column: 1 / -1; grid-row: 2; }
     .grid-2 { grid-template-columns: 1fr; }
     .fields { grid-template-columns: 1fr; }
     .sheet-bg { align-items: flex-end; padding: 0; }
     .sheet { border-radius: 18px 18px 0 0; max-width: none; padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px)); }
     nav.bottom { display: block; position: fixed; left: 0; right: 0; bottom: 0; background: var(--card); border-top: 1px solid var(--line); z-index: 20; padding-bottom: env(safe-area-inset-bottom, 0px); }
-    nav.bottom .in { display: grid; grid-template-columns: repeat(4, 1fr); }
+    nav.bottom .in { display: grid; grid-template-columns: repeat(5, 1fr); }
+    nav.bottom button { font-size: 11px; }
+    .ask-fab { bottom: calc(74px + env(safe-area-inset-bottom, 0px)); right: 12px; width: 48px; height: 48px; padding: 0; font-size: 0; }
+    .ask-fab::before { content: "?"; font-size: 22px; font-weight: 700; }
+    main.wrap { padding-bottom: 150px; }
+    .chat-bg { align-items: flex-end; padding: 0; }
+    .chat { border-radius: 18px 18px 0 0; max-width: none; height: 85vh; }
     nav.bottom button { border: 0; background: none; color: var(--muted); font: inherit; font-size: 12px; font-weight: 600; padding: 9px 4px 10px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px; }
     nav.bottom button.on { color: var(--accent); }
     nav.bottom svg { width: 22px; height: 22px; }
@@ -299,6 +323,7 @@
 <div id="nav"></div>
 <div id="sheet"></div>
 <div class="toasts" id="toasts" aria-live="polite"></div>
+<div id="chat"></div>
 
 <script>
 /* =========================================================
@@ -408,8 +433,30 @@ const LEVELS = [
 const ONBOARDING = [
   { key: "exp", q: "¿Alguna vez invertiste?", opts: ["Nunca", "Alguna vez, pero poco", "Sí, seguido"] },
   { key: "fear", q: "¿Qué te frena más?", opts: ["Miedo a perder plata", "No entiendo las palabras", "No sé por dónde empezar", "Creo que no me alcanza"] },
-  { key: "amount", q: "¿Cuánto podrías llegar a poner?", opts: ["Menos de $10.000", "Entre $10.000 y $50.000", "Entre $50.000 y $200.000", "Más de $200.000"] }
+  { key: "amount", q: "¿Cuánto podrías llegar a poner?", opts: ["Menos de $10.000", "Entre $10.000 y $50.000", "Entre $50.000 y $200.000", "Más de $200.000"] },
+  { key: "goal", q: "¿Para qué te gustaría juntar plata?", opts: ["El viaje de egresados", "Unas zapatillas", "Un recital", "Otra cosa"] },
+  { key: "adult", q: "¿Tenés 18 años o más?", opts: ["Sí", "No, soy menor"], why: "Lo preguntamos porque, en general, los menores necesitan que un adulto les habilite la cuenta para invertir de verdad." }
 ];
+
+// Metas de ejemplo: precio de hoy y ahorro por mes. La persona los cambia en "Mi meta".
+const GOALS = [
+  { name: "Viaje de egresados", target: 900000, monthly: 75000 },
+  { name: "Zapatillas", target: 220000, monthly: 30000 },
+  { name: "Entrada para un recital", target: 120000, monthly: 20000 },
+  { name: "Mi meta", target: 300000, monthly: 30000 }
+];
+
+// Supuestos de ejemplo para "Mi meta" y "¿Y si…?". NO son datos reales:
+// reemplazar por inflación del INDEC y rendimientos históricos reales (por ejemplo, provistos por LBO).
+const SUPUESTOS = {
+  inflacionMensual: 2.3,      // %
+  fondoMensual: 2.5,          // % rendimiento mensual de un fondo conservador
+  opcionesAnual: [            // % rendimiento en 12 meses
+    { name: "Fondo conservador", anual: 34 },
+    { name: "Bonos", anual: 45 },
+    { name: "CEDEAR del S&P 500", anual: 40 }
+  ]
+};
 
 /* =========================================================
    Mercado simulado
@@ -453,7 +500,7 @@ const INFL = 0.0011; // inflación simulada por día hábil (~2,3% por mes), val
    Estado
    ========================================================= */
 
-const KEY = "sinmiedo.v2";
+const KEY = "sinmiedo.v3";
 const fresh = () => ({ profile: null, done: [], demo: false, tips: {}, broker: null, market: null });
 let S = load();
 let view = S.profile ? { name: "path" } : { name: "welcome", step: -1, answers: {} };
@@ -465,6 +512,18 @@ function load() {
 }
 function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
 
+// Números al azar "con semilla": dan lo mismo en todos los aparatos para el mismo activo y día.
+function hashRand(str) {
+  let h = 1779033703 ^ str.length;
+  for (let i = 0; i < str.length; i++) { h = Math.imul(h ^ str.charCodeAt(i), 3432918353); h = h << 13 | h >>> 19; }
+  h = Math.imul(h ^ h >>> 16, 2246822507); h = Math.imul(h ^ h >>> 13, 3266489909);
+  return ((h ^= h >>> 16) >>> 0) / 4294967296;
+}
+const SEASON = "temporada-1";
+function sgauss(sym, d) {
+  const u = Math.max(hashRand(`${SEASON}:${sym}:${d}:a`), 1e-9), v = hashRand(`${SEASON}:${sym}:${d}:b`);
+  return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+}
 function gauss() { let u = 0, v = 0; while (!u) u = Math.random(); while (!v) v = Math.random(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); }
 
 function ensureMarket() {
@@ -472,9 +531,9 @@ function ensureMarket() {
   const m = {};
   INSTRUMENTS.forEach(i => {
     const hist = [i.base];
-    for (let d = 1; d < HIST_DAYS; d++) hist.push(hist[d - 1] * (1 + i.mu + i.sigma * gauss()));
-    const p = hist[HIST_DAYS - 1] * (1 + i.mu + i.sigma * gauss());
-    m[i.sym] = { hist, px: p, hi: Math.max(p, hist[HIST_DAYS - 1]), lo: Math.min(p, hist[HIST_DAYS - 1]) };
+    for (let d = 1; d < HIST_DAYS; d++) hist.push(hist[d - 1] * (1 + i.mu + i.sigma * sgauss(i.sym, d - HIST_DAYS)));
+    const p = hist[HIST_DAYS - 1] * (1 + i.mu + i.sigma * sgauss(i.sym, 0));
+    m[i.sym] = { hist, ref: p, px: p, hi: Math.max(p, hist[HIST_DAYS - 1]), lo: Math.min(p, hist[HIST_DAYS - 1]) };
   });
   S.market = m;
 }
@@ -609,6 +668,7 @@ function execute(o, price) {
   }
   const p = B.pos[o.sym];
   if (!p || qty > p.qty + 1e-6) return { ok: false, why: "No tenés esa cantidad" };
+  if (gross - fee < p.cost * (qty / p.qty) && dayVar(o.sym) < -0.01) B.panic = (B.panic || 0) + 1;
   p.cost -= p.cost * (qty / p.qty);
   p.qty -= qty;
   if (p.qty < 1e-6) delete B.pos[o.sym];
@@ -658,9 +718,10 @@ function advance(n, opts = {}) {
   for (let d = 0; d < n; d++) {
     INSTRUMENTS.forEach(i => {
       const m = S.market[i.sym];
-      m.hist.push(m.px);
+      m.hist.push(m.ref);
       if (m.hist.length > 260) m.hist.shift();
-      m.px = m.px * (1 + i.mu + i.sigma * gauss());
+      m.ref = m.ref * (1 + i.mu + i.sigma * sgauss(i.sym, B.day));
+      m.px = m.ref;
       m.hi = Math.max(m.px, m.hist[m.hist.length - 1]); m.lo = Math.min(m.px, m.hist[m.hist.length - 1]);
     });
     B.day++;
@@ -697,24 +758,24 @@ const topEl = document.getElementById("top");
 const app = document.getElementById("app");
 const navEl = document.getElementById("nav");
 const sheet = document.getElementById("sheet");
-const TAB_OF = { glossary: "learn", path: "learn", lesson: "learn", quiz: "learn", leap: "learn", market: "market", portfolio: "portfolio", activity: "activity" };
-const TABS = [["learn", "Aprender"], ["market", "Mercado"], ["portfolio", "Cartera"], ["activity", "Movimientos"]];
+const TAB_OF = { glossary: "learn", path: "learn", lesson: "learn", quiz: "learn", leap: "learn", project: "learn", goal: "goal", market: "market", portfolio: "portfolio", activity: "portfolio", league: "league" };
+const TABS = [["learn", "Aprender"], ["goal", "Mi meta"], ["market", "Mercado"], ["portfolio", "Cartera"], ["league", "Liga"]];
 const wide = () => window.innerWidth > 900;
 
 function go(v) { view = v; render(); window.scrollTo(0, 0); }
 
 function render() {
-  const inBroker = ["market", "portfolio", "activity"].includes(view.name);
+  const inBroker = ["market", "portfolio", "activity", "league"].includes(view.name);
   topEl.innerHTML = topbar() + (S.profile && S.broker && brokerOpen() ? tape() : "");
-  app.innerHTML = inBroker && !brokerOpen() ? lockedBroker() : ({ welcome, path, lesson, quiz, leap, market, portfolio, activity, glossary })[view.name]() + footer();
-  navEl.innerHTML = S.profile ? bottomNav() : "";
+  app.innerHTML = inBroker && !brokerOpen() ? lockedBroker() : ({ welcome, path, lesson, quiz, leap, market, portfolio, activity, glossary, goal, league, project })[view.name]() + footer();
+  navEl.innerHTML = S.profile ? bottomNav() + `<button class="ask-fab" data-act="askOpen" aria-label="Preguntá sin vergüenza">Preguntá sin vergüenza</button>` : "";
   renderModal();
 }
 
 function footer() {
   return `<footer class="foot">
     <span>Sin Miedo · Prototipo educativo. No es una plataforma real ni ofrece productos financieros. Los precios son simulados.</span>
-    <span>${S.profile ? `<button class="link" data-act="reset">Reiniciar todo</button> · ` : ""}<button class="link" data-act="loadDemo">Cargar ejemplo para presentar</button></span>
+    <span>${S.profile ? `<button class="link" data-act="reset">Reiniciar todo</button> · ` : ""}<button class="link" data-act="project">Sobre el proyecto</button> · <button class="link" data-act="loadDemo">Cargar ejemplo para presentar</button></span>
   </footer>`;
 }
 
@@ -728,7 +789,7 @@ function topbar() {
     </div>` : S.profile ? `<div class="acct"><button class="link" data-act="reset">Reiniciar</button></div>` : "";
   return `<header class="topbar"><div class="wrap">
     <button class="brand" data-act="${S.profile ? "path" : ""}">Sin <span>Miedo</span></button>
-    ${S.profile ? `<nav class="topnav">${TABS.map(([id, l]) => `<button class="${tab === id ? "on" : ""}" data-act="tab" data-tab="${id}">${l}</button>`).join("")}</nav>` : ""}
+    ${S.profile ? `<nav class="topnav">${TABS.concat([["activity", "Movimientos"]]).map(([id, l]) => `<button class="${(id === "activity" ? view.name === "activity" : tab === id && view.name !== "activity") ? "on" : ""}" data-act="tab" data-tab="${id}">${l}</button>`).join("")}</nav>` : ""}
     ${acct}
   </div></header>
   ${S.broker && brokerOpen() ? `<div class="acct-m"><div class="wrap">
@@ -750,6 +811,8 @@ const ICONS = {
   learn: '<path d="M4 6.5 12 3l8 3.5-8 3.5L4 6.5Z"/><path d="M7 8v5c0 1.7 2.2 3 5 3s5-1.3 5-3V8"/><path d="M20 6.5V12"/>',
   market: '<path d="M4 19V5"/><path d="M4 19h16"/><path d="m7 14 4-4 3 3 5-6"/>',
   portfolio: '<rect x="3.5" y="7" width="17" height="12" rx="2"/><path d="M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7"/><path d="M3.5 12h17"/>',
+  goal: '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/>',
+  league: '<path d="M8 4h8v5a4 4 0 0 1-8 0V4Z"/><path d="M16 5h3v2a3 3 0 0 1-3 3"/><path d="M8 5H5v2a3 3 0 0 0 3 3"/><path d="M12 13v4"/><path d="M8.5 20h7"/>',
   activity: '<path d="M8 6h12"/><path d="M8 12h12"/><path d="M8 18h12"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/>'
 };
 function bottomNav() {
@@ -773,23 +836,27 @@ function welcome() {
     <section class="hero">
       <div>
         <h1>Invertir, sin miedo.</h1>
-        <p class="lead">Aprendé en lecciones de 1 minuto, entendé las palabras raras y practicá en un broker de mentira antes de poner plata real.</p>
-        <p class="thesis">El miedo no se va con más información: se va practicando. Primero entendés, después probás sin riesgo y recién ahí ponés plata.</p>
-        <button class="btn inline" data-act="start" style="padding-inline:28px">Empezar</button>
-        <p class="small muted" style="margin-top:12px">Te hacemos 3 preguntas rápidas para adaptar el camino.</p>
+        <p class="lead">Aprendé a invertir practicando para una meta real, con tus amigos. Y cuando estés listo, das el salto con plata de verdad.</p>
+        <p class="thesis">El miedo no se va leyendo. Se va practicando, con amigos y para algo que te importa.</p>
+        <div class="row" style="max-width:420px">
+          <button class="btn" data-act="start">Empezar</button>
+          <button class="btn ghost" data-act="project">Sobre el proyecto</button>
+        </div>
+        <p class="small muted" style="margin-top:12px">Te hacemos ${ONBOARDING.length} preguntas rápidas para adaptar el camino.</p>
       </div>
       <div class="pillars">
-        <div class="card"><b>Aprendé</b><span class="small muted">5 niveles de 1 minuto, con una pregunta de práctica cada uno.</span></div>
-        <div class="card"><b>Entendé</b><span class="small muted">Tocá cualquier palabra subrayada y te la explicamos con un ejemplo.</span></div>
-        <div class="card"><b>Practicá</b><span class="small muted">$100.000 de mentira en un simulador igual a un broker.</span></div>
-        <div class="card"><b>Animate</b><span class="small muted">Al final, el primer paso real con un monto chico.</span></div>
+        <div class="card"><b>Tu meta</b><span class="small muted">El viaje de egresados, unas zapatillas, un recital: mirá cuánto antes llegás invirtiendo.</span></div>
+        <div class="card"><b>¿Y si…?</b><span class="small muted">Qué hubiera pasado con lo que te regalaron, contra tenerlo en el cajón.</span></div>
+        <div class="card"><b>Liga con amigos</b><span class="small muted">Un broker de mentira para todo el curso. Gana quien mejor administra.</span></div>
+        <div class="card"><b>Preguntá sin vergüenza</b><span class="small muted">Lo que no te animás a preguntar en voz alta, y las palabras raras explicadas.</span></div>
       </div>
     </section>`;
   const o = ONBOARDING[step];
   return `<div class="narrow" style="max-width:560px;padding-top:24px">
-    <div class="small muted">Pregunta ${step + 1} de 3</div>
-    <div class="progress"><div style="width:${(step + 1) / 3 * 100}%"></div></div>
-    <h1 style="margin-bottom:16px">${o.q}</h1>
+    <div class="small muted">Pregunta ${step + 1} de ${ONBOARDING.length}</div>
+    <div class="progress"><div style="width:${(step + 1) / ONBOARDING.length * 100}%"></div></div>
+    <h1 style="margin-bottom:${o.why ? 6 : 16}px">${o.q}</h1>
+    ${o.why ? `<p class="small muted" style="margin-bottom:16px">${o.why}</p>` : ""}
     ${o.opts.map((t, i) => `<button class="opt ${answers[o.key] === i ? "sel" : ""}" data-act="onb" data-i="${i}">${t}</button>`).join("")}
   </div>`;
 }
@@ -903,6 +970,14 @@ function leap() {
       <p class="big num" style="margin:6px 0">${suggestion()}</p>
       <p class="small muted" style="margin:0">Un monto chico, según lo que nos dijiste al principio. Lo mismo que hiciste en el simulador, ahora con plata real.</p>
     </div>
+    ${S.goal ? `<p class="small">Y si lo hacés para "${esc(S.goal.name)}": invirtiendo llegarías en ${months(goalPlan(S.goal).tInv)}, contra ${months(goalPlan(S.goal).tCaj)} guardando en el cajón (con supuestos de ejemplo).</p>` : ""}
+    ${S.profile?.adult === 1 ? `<div class="card" style="margin-bottom:16px">
+      <h2>Invitá a tu mamá, papá o tutor</h2>
+      <p class="small muted">En general, los menores necesitan que un adulto les habilite la cuenta. Mandale este mensaje para verlo juntos.</p>
+      <textarea class="search" id="invite" rows="4" style="width:100%;resize:vertical" readonly>${esc(inviteText())}</textarea>
+      <div class="row" style="max-width:360px;margin-top:8px"><button class="btn ghost" data-act="copyInvite">Copiar mensaje</button></div>
+      <p class="xs muted" style="margin:8px 0 0">Pendiente: confirmar con LBO cómo funciona la cuenta para menores.</p>
+    </div>` : ""}
     <div class="row" style="max-width:480px">
       <button class="btn" data-act="lbo">Hacerlo en LBO</button>
       <button class="btn ghost" data-act="tab" data-tab="market">Seguir practicando</button>
@@ -1173,7 +1248,7 @@ function portfolio() {
         <p class="xs muted" style="margin:10px 0 0">Repartir entre distintos tipos es ${T("diversificar")}.</p>
       </div>
     </div>
-    <div class="between" style="margin-bottom:8px"><h2 style="margin:0">Tenencias</h2></div>
+    <div class="between" style="margin-bottom:8px"><h2 style="margin:0">Tenencias</h2><span><button class="link" data-act="tab" data-tab="activity">Ver movimientos</button> · <button class="link" data-act="tab" data-tab="league">Ver la liga</button></span></div>
     <div class="tbl-wrap">
       ${syms.length ? `<table class="resp">
         <thead><tr><th>Activo</th><th class="r">Cantidad</th><th class="r hide-m">${T("precio promedio", "Precio prom.")}</th><th class="r">Último</th><th class="r hide-m">Var. día</th><th class="r">Valor</th><th class="r">${T("ganancia o pérdida", "Resultado")}</th><th class="hide-m"></th></tr></thead>
@@ -1228,6 +1303,312 @@ function activity() {
     <p class="note">Simulación con valores inventados para aprender.</p>`;
 }
 
+/* ---------- Mi meta y "¿Y si…?" ---------- */
+
+function goalPlan(g) {
+  const i = SUPUESTOS.inflacionMensual / 100, r = SUPUESTOS.fondoMensual / 100;
+  const rows = []; let caj = 0, inv = 0, tCaj = null, tInv = null;
+  for (let t = 0; t <= 60; t++) {
+    const price = g.target * (1 + i) ** t;
+    if (t > 0) { caj += g.monthly; inv = inv * (1 + r) + g.monthly; }
+    rows.push({ t, price, caj, inv });
+    if (tCaj == null && t > 0 && caj >= price) tCaj = t;
+    if (tInv == null && t > 0 && inv >= price) tInv = t;
+  }
+  return { rows, tCaj, tInv };
+}
+
+const months = t => t == null ? "más de 5 años" : t === 1 ? "1 mes" : `${t} meses`;
+
+function lineChart(series, n, label) {
+  const W = 640, H = 220, PL = 4, PB = 22;
+  const all = series.flatMap(s => s.values.slice(0, n + 1));
+  const max = Math.max(...all) * 1.05 || 1;
+  const x = t => PL + t / n * (W - PL * 2), y = v => (H - PB) - v / max * (H - PB - 8);
+  const ticks = [0, Math.round(n / 4), Math.round(n / 2), Math.round(3 * n / 4), n];
+  return `<svg class="chart tall" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="${label}">
+    ${[0.25, 0.5, 0.75].map(f => `<line x1="0" x2="${W}" y1="${y(max * f)}" y2="${y(max * f)}" stroke="var(--line)" vector-effect="non-scaling-stroke"/>`).join("")}
+    ${series.map(s => `<polyline points="${s.values.slice(0, n + 1).map((v, t) => `${x(t).toFixed(1)},${y(v).toFixed(1)}`).join(" ")}" fill="none" stroke="${s.color}" stroke-width="2" ${s.dash ? 'stroke-dasharray="6 4"' : ""} vector-effect="non-scaling-stroke"/>`).join("")}
+  </svg>
+  <div class="between xs muted num">${ticks.map(t => `<span>${t === 0 ? "Hoy" : t + " m"}</span>`).join("")}</div>
+  <div class="legend-line">${series.map(s => `<span><i style="border-color:${s.color};${s.dash ? "border-top-style:dashed" : ""}"></i>${s.name}</span>`).join("")}</div>`;
+}
+
+function goal() {
+  const g = S.goal || (S.goal = { ...GOALS[(S.profile || {}).goal ?? 3] });
+  const plan = goalPlan(g);
+  const n = Math.min(60, Math.max(12, (plan.tCaj ?? 60) + 2, (plan.tInv ?? 0) + 2));
+  const gain = plan.tCaj == null ? null : plan.tInv == null ? null : plan.tCaj - plan.tInv;
+  const w = view.whatif || { amount: 50000, m: 12 };
+  const infl = (1 + SUPUESTOS.inflacionMensual / 100) ** w.m;
+  const opts = [{ name: "Guardado en el cajón", v: w.amount }].concat(SUPUESTOS.opcionesAnual.map(o => ({ name: o.name, v: w.amount * (1 + o.anual / 100) ** (w.m / 12) })));
+  const maxReal = Math.max(...opts.map(o => o.v / infl), 1);
+  return `
+    <div class="page-h">
+      <div><h1>Mi meta</h1><p class="small muted">Invertir tiene más sentido cuando es para algo que te importa.</p></div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="between"><span class="label">Tu meta</span><span class="pill warn">Valores de ejemplo: cambialos</span></div>
+        <div class="fields" style="margin:12px 0">
+          <div class="field"><label class="label" for="g-name">Para qué</label><input class="search" style="flex:none" id="g-name" data-gf="name" value="${esc(g.name)}" maxlength="40"></div>
+          <div class="field"><label class="label" for="g-target">Cuánto cuesta hoy ($)</label><input class="search num" style="flex:none" id="g-target" data-gf="target" inputmode="numeric" value="${Math.round(g.target)}"></div>
+          <div class="field"><label class="label" for="g-monthly">Cuánto podés juntar por mes ($)</label><input class="search num" style="flex:none" id="g-monthly" data-gf="monthly" inputmode="numeric" value="${Math.round(g.monthly)}"></div>
+        </div>
+        ${lineChart([
+          { name: `Precio de la meta (sube con la ${"inflación"})`, values: plan.rows.map(r => r.price), color: "var(--warn)", dash: true },
+          { name: "Guardando en el cajón", values: plan.rows.map(r => r.caj), color: "var(--muted)" },
+          { name: "Invirtiendo en un fondo conservador", values: plan.rows.map(r => r.inv), color: "var(--up)" }
+        ], n, "Cuándo llegás a tu meta")}
+      </div>
+      <div class="stack">
+        <div class="card kpi"><div class="label">Guardando en el cajón llegás en</div><div class="v">${months(plan.tCaj)}</div></div>
+        <div class="card kpi"><div class="label">Invirtiendo llegás en</div><div class="v up">${months(plan.tInv)}</div></div>
+        <div class="card"><p style="margin:0">${gain > 0 ? `Invirtiendo llegás <b>${months(gain)} antes</b> a "${esc(g.name)}".`
+          : plan.tCaj == null && plan.tInv != null ? `Guardando en el cajón, la ${T("inflación")} hace que la meta se te escape. Invirtiendo, llegás.`
+          : `Con estos números no hay mucha diferencia. Probá con otro monto o con más tiempo.`}</p>
+          <p class="xs muted" style="margin:8px 0 0">El precio de la meta sube todos los meses por la ${T("inflación")}. Por eso la plata guardada pierde carrera.</p></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:16px">
+      <h2>¿Y si…?</h2>
+      <p class="small muted">Poné lo que te regalaron en tu último cumpleaños y mirá qué hubiera pasado si lo invertías.</p>
+      <div class="fields" style="max-width:520px;margin-bottom:14px">
+        <div class="field"><label class="label" for="wi-amount">Me regalaron ($)</label><input class="search num" style="flex:none" id="wi-amount" data-wi="amount" inputmode="numeric" value="${w.amount}"></div>
+        <div class="field"><span class="label">Hace</span><div class="seg">${[6, 12, 24].map(m => `<button class="${w.m === m ? "on" : ""}" data-act="wiM" data-m="${m}">${m} meses</button>`).join("")}</div></div>
+      </div>
+      <div class="label" style="margin-bottom:6px">Qué podrías comprar hoy con esa plata (en pesos de hoy)</div>
+      <div class="bars">${opts.map(o => {
+        const real = o.v / infl;
+        return `<div class="bar-row"><span>${o.name}</span><div class="bar"><div style="width:${real / maxReal * 100}%;background:${real >= w.amount ? "var(--up)" : "var(--down)"}"></div></div>
+          <b class="num ${cls(real - w.amount)}">${money0(real)}</b></div>`;
+      }).join("")}</div>
+      <p class="small" style="margin-top:12px">Guardados en el cajón, tus ${money0(w.amount)} hoy compran lo que antes compraban <b>${money0(w.amount / infl)}</b>.</p>
+      <p class="note" style="margin-top:8px">Supuestos de ejemplo, no datos reales: inflación ${nf2.format(SUPUESTOS.inflacionMensual)}% por mes; ${SUPUESTOS.opcionesAnual.map(o => `${o.name.toLowerCase()} ${o.anual}% en 12 meses`).join(", ")}. Para la versión final hay que cargar la inflación del INDEC y rendimientos históricos reales. Lo que pasó antes no garantiza lo que va a pasar.</p>
+    </div>`;
+}
+
+/* ---------- Liga ---------- */
+
+const cloud = { db: null, uid: null, rows: null, canWrite: false, err: "" };
+
+async function initCloud() {
+  if (!window.claude || typeof window.claude.use !== "function") return;
+  try {
+    const [db, user] = await Promise.all([window.claude.use("db"), window.claude.use("user")]);
+    if (!db || !user) return;
+    cloud.uid = await user.id();
+    cloud.canWrite = (await user.can("data.write")) !== false;
+    cloud.db = db;
+    db.collection("liga").onSnapshot(snap => {
+      cloud.rows = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      if (view.name === "league") render();
+    }, () => { cloud.err = "No se pudo cargar la liga."; if (view.name === "league") render(); });
+  } catch (e) { /* sin liga compartida: se muestra la de ejemplo */ }
+}
+
+function scoreInfo() {
+  const B = S.broker, total = equity();
+  const ret = total / START_CASH - 1, infl = (1 + INFL) ** (B.day - 1) - 1;
+  let peak = -Infinity, dd = 0;
+  B.equity.concat(total).forEach(v => { peak = Math.max(peak, v); dd = Math.min(dd, v / peak - 1); });
+  const types = new Set(Object.keys(B.pos).map(s => INS[s].type)).size;
+  const panic = B.panic || 0;
+  const parts = [
+    ["Rendimiento contra la inflación", 1000 * (ret - infl)],
+    ["Peor caída (resta)", -500 * Math.abs(dd)],
+    ["Diversificación: tipos distintos", 25 * types],
+    ["Ventas en pánico (resta)", -50 * panic]
+  ];
+  const pts = Math.max(0, Math.round(500 + parts.reduce((a, p) => a + p[1], 0)));
+  return { pts, parts, ret, infl, dd, types, panic };
+}
+
+const EXAMPLE_LEAGUE = [
+  { apodo: "Ejemplo · Sofi", pts: 612, ret: 0.071, dd: -0.021, types: 3, day: 41 },
+  { apodo: "Ejemplo · Tomi", pts: 538, ret: 0.144, dd: -0.162, types: 1, day: 38 },
+  { apodo: "Ejemplo · Juli", pts: 571, ret: 0.052, dd: -0.034, types: 4, day: 44 },
+  { apodo: "Ejemplo · Fran", pts: 489, ret: 0.012, dd: -0.051, types: 2, day: 30 }
+];
+
+function league() {
+  const sc = scoreInfo();
+  const live = !!cloud.db;
+  const me = live ? (cloud.rows || []).find(r => r.id === cloud.uid) : null;
+  let rows = live ? (cloud.rows || []).map(r => ({ apodo: String(r.apodo || "Sin apodo").slice(0, 24), pts: +r.pts || 0, ret: +r.ret || 0, dd: +r.dd || 0, types: +r.types || 0, day: +r.day || 0, mine: r.id === cloud.uid }))
+    : EXAMPLE_LEAGUE.concat({ apodo: S.apodo || "Vos", pts: sc.pts, ret: sc.ret, dd: sc.dd, types: sc.types, day: S.broker.day, mine: true });
+  rows.sort((a, b) => b.pts - a.pts);
+  return `
+    <div class="page-h">
+      <div><h1>Liga del curso</h1><p class="small muted">Gana quien mejor administra, no quien más arriesga.</p></div>
+    </div>
+    ${tip("league", "Todos juegan con el mismo mercado y $100.000 de mentira. El puntaje premia ganarle a la inflación, repartir el riesgo y no vender por miedo. Apostar todo a una sola cosa resta.")}
+    <div class="grid-2">
+      <div>
+        <div class="tbl-wrap">
+          ${rows.length ? `<table class="resp">
+            <thead><tr><th>#</th><th>Jugador</th><th class="r">Puntaje</th><th class="r">Rendimiento</th><th class="r">Peor caída</th><th class="r">Tipos</th><th class="r">Día</th></tr></thead>
+            <tbody>${rows.map((r, k) => `<tr class="${r.mine ? "sel" : ""}">
+              <td class="num" data-label="Puesto">${k + 1}</td>
+              <td class="head"><b>${esc(r.apodo)}</b>${r.mine ? ` <span class="pill">Vos</span>` : ""}</td>
+              <td class="r num" data-label="Puntaje"><b>${r.pts}</b></td>
+              <td class="r num ${cls(r.ret)}" data-label="Rendimiento">${pct(r.ret)}</td>
+              <td class="r num down" data-label="Peor caída">${pct(r.dd)}</td>
+              <td class="r num" data-label="Tipos">${r.types}</td>
+              <td class="r num" data-label="Día">${r.day}</td>
+            </tr>`).join("")}</tbody>
+          </table>` : `<div class="empty small">Todavía nadie subió su puntaje. ¡Sé el primero!</div>`}
+        </div>
+        <p class="note">${live ? "La liga la comparten todos los que abren este link. Solo se guarda el apodo y el puntaje."
+          : "Liga de ejemplo: los demás jugadores son inventados. En la versión publicada con link, la liga es real y la comparten todos los que la abren."}</p>
+      </div>
+      <div class="stack">
+        <div class="card">
+          <div class="label">Tu puntaje</div>
+          <div class="big num" style="margin:4px 0 10px">${sc.pts}</div>
+          <div class="kv"><span>Base</span><b class="num">500</b></div>
+          ${sc.parts.map(([n, v]) => `<div class="kv"><span>${n}</span><b class="num ${cls(v)}">${v >= 0 ? "+" : "−"}${Math.round(Math.abs(v))}</b></div>`).join("")}
+          <p class="xs muted" style="margin:10px 0 0">Ganarle a la ${T("inflación")} suma. Una caída fuerte resta, aunque después recuperes: así no conviene apostar todo. ${T("diversificar", "Diversificar")} suma.</p>
+        </div>
+        ${live ? `<div class="card">
+          <label class="label" for="apodo">Tu apodo en la liga</label>
+          <input class="search" style="flex:none;width:100%;margin:6px 0 10px" id="apodo" maxlength="20" placeholder="Por ejemplo: LaInversora" value="${esc(S.apodo || me?.apodo || "")}">
+          <p class="xs muted">Usá un apodo, no tu nombre completo.</p>
+          ${cloud.canWrite ? `<button class="btn" data-act="leagueSave">${me ? "Actualizar mi puntaje" : "Unirme a la liga"}</button>`
+            : `<p class="small muted">Para sumarte, pedile a quien compartió el link que te dé permiso de "Colaborador".</p>`}
+          ${cloud.err ? `<p class="small down">${cloud.err}</p>` : ""}
+        </div>` : `<div class="card"><p class="small" style="margin:0">Para jugar con tus amigos de verdad, compartí el link de la versión publicada: cada uno se une con un apodo y aparece en esta tabla.</p></div>`}
+        <button class="btn ghost" data-act="tab" data-tab="portfolio">Ir a mi cartera</button>
+      </div>
+    </div>`;
+}
+
+async function leagueSave() {
+  const input = app.querySelector("#apodo");
+  const apodo = (input?.value || "").trim().replace(/\s+/g, " ").slice(0, 20);
+  if (!apodo) { toast("Escribí un apodo para unirte."); return; }
+  S.apodo = apodo; save();
+  const sc = scoreInfo();
+  try {
+    await cloud.db.doc("liga/" + cloud.uid).set({ apodo, pts: sc.pts, ret: +sc.ret.toFixed(4), dd: +sc.dd.toFixed(4), types: sc.types, day: S.broker.day, updatedAt: Date.now() });
+    toast("Listo: tu puntaje está en la liga.");
+  } catch (e) {
+    cloud.err = e?.code === "invalid_argument" ? "No tenés permiso para escribir en la liga." : "No se pudo guardar. Probá de nuevo en un rato.";
+    render();
+  }
+}
+
+/* ---------- Preguntá sin vergüenza ---------- */
+
+const FAQ = [
+  { k: ["estafa", "trucho", "seguro", "confiable", "ponzi", "piramide", "pirámide"], a: "Señales de alerta: te prometen ganancias seguras o altísimas, te apuran (“solo por hoy”), te piden claves o que mandes plata a una persona, o no podés encontrar a la empresa registrada. Una inversión real nunca garantiza ganancias. Ante la duda, consultalo con un adulto y verificá que la empresa esté registrada en la CNV (Comisión Nacional de Valores)." },
+  { k: ["perder todo", "perder", "pierdo"], a: "Depende de qué compres. Un fondo conservador sube y baja poco; una acción puede bajar mucho. Por eso conviene empezar con poco, repartir la plata (diversificar) y usar plata que no vas a necesitar pronto." },
+  { k: ["cuanto", "cuánto", "empezar", "minimo", "mínimo", "poca plata"], a: "Se puede empezar con montos chicos. Lo importante no es cuánto, sino que sea plata que puedas dejar quieta un tiempo sin preocuparte." },
+  { k: ["menor", "edad", "18", "padres", "papá", "mamá"], a: "En general, los menores de 18 necesitan que un adulto (madre, padre o tutor) les habilite la cuenta. Conviene preguntarlo directamente al broker." },
+  { k: ["dolar", "dólar"], a: "El dólar también sube y baja. Algunos productos, como los CEDEARs, se mueven en parte con el dólar. Guardar dólares no es lo mismo que invertirlos: no generan rendimiento por sí solos." }
+];
+
+const chat = { open: false, msgs: [], busy: false };
+const ASK_SUGGESTIONS = ["¿Qué es una acción?", "¿Esto es una estafa? Me ofrecen duplicar mi plata", "¿Puedo perder todo?", "¿Con cuánto se puede empezar?"];
+
+function localAnswer(q) {
+  const n = q.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+  const f = FAQ.find(x => x.k.some(k => n.includes(k.normalize("NFD").replace(/[̀-ͯ]/g, ""))));
+  if (f) return f.a;
+  const g = Object.entries(GLOSSARY).find(([k]) => n.includes(k.normalize("NFD").replace(/[̀-ͯ]/g, "")));
+  if (g) return `${g[1][0]} Ejemplo: ${g[1][1]}`;
+  return "No tengo esa respuesta guardada. Probá con otras palabras o buscala en el Diccionario. En la versión publicada con link, estas preguntas las responde Claude.";
+}
+
+function renderChat() {
+  const el = document.getElementById("chat");
+  if (!chat.open) { el.innerHTML = ""; return; }
+  el.innerHTML = `<div class="chat-bg" data-act="askClose"><div class="chat" role="dialog" aria-label="Preguntá sin vergüenza">
+    <div class="between"><h3 style="margin:0">Preguntá sin vergüenza</h3><button class="link" data-act="askClose">Cerrar</button></div>
+    <p class="xs muted" style="margin:4px 0 10px">Ninguna pregunta es tonta. No guardamos lo que preguntás. Es información general, no un consejo personal de inversión.</p>
+    <div class="chat-log" id="chat-log">${chat.msgs.length ? chat.msgs.map(m => `<div class="msg ${m.role}">${esc(m.text)}</div>`).join("")
+      : `<div class="chips" style="flex-wrap:wrap">${ASK_SUGGESTIONS.map(q => `<button class="chip" data-act="askQ" data-q="${esc(q)}">${esc(q)}</button>`).join("")}</div>`}</div>
+    <form class="row" id="chat-form" style="margin-top:10px"><input class="search" style="flex:1" id="chat-in" placeholder="Escribí tu pregunta" autocomplete="off" maxlength="300"><button class="btn inline" ${chat.busy ? "disabled" : ""}>Preguntar</button></form>
+  </div></div>`;
+  const log = document.getElementById("chat-log"); log.scrollTop = log.scrollHeight;
+}
+
+async function askQuestion(q) {
+  q = q.trim(); if (!q || chat.busy) return;
+  chat.msgs.push({ role: "user", text: q });
+  const ans = { role: "bot", text: "Pensando…" };
+  chat.msgs.push(ans); chat.busy = true; renderChat();
+  let sample = null;
+  try { sample = window.claude?.use ? await window.claude.use("sample") : null; } catch (e) {}
+  if (!sample) { ans.text = localAnswer(q); chat.busy = false; renderChat(); return; }
+  const instructions = `Sos el asistente de "Sin Miedo", una app educativa para chicos y chicas de secundaria en Argentina que quieren aprender a invertir.
+Respondé en español rioplatense, con palabras simples, en no más de 110 palabras, y sumá un ejemplo cotidiano.
+No recomiendes qué comprar ni des consejos personalizados de inversión. No inventes precios ni datos de mercado.
+Si preguntan si algo es una estafa, explicá las señales de alerta (ganancias garantizadas, apuro, pedir claves o transferir a personas) y sugerí consultar a un adulto y verificar que la entidad esté registrada en la CNV.
+Si no sabés algo, decilo. Palabras que la app explica: ${Object.keys(GLOSSARY).join(", ")}.`;
+  const history = chat.msgs.slice(0, -1).slice(-6).map(m => ({ role: m.role === "user" ? "user" : "assistant", content: m.text }));
+  while (history.length && history[0].role !== "user") history.shift();
+  history[0] = { role: "user", content: instructions + "\n\nPregunta: " + history[0].content };
+  try {
+    const r = await sample(history, { cache: false, modelTier: "quick", onText: ({ text }) => { ans.text = text; const last = document.querySelector(".msg.bot:last-child"); if (last) last.textContent = text; } });
+    ans.text = r.text;
+  } catch (e) {
+    ans.text = localAnswer(q);
+  }
+  chat.busy = false; renderChat();
+}
+
+/* ---------- Invitación al adulto ---------- */
+
+function inviteText() {
+  const B = S.broker;
+  return `¡Hola! Estoy aprendiendo a invertir con Sin Miedo. Ya terminé el camino${B ? ` y practiqué ${B.day} días en un simulador` : ""}${S.goal ? ` para mi meta: ${S.goal.name}` : ""}. Para hacer mi primera inversión real, con un monto chico (${suggestion()}), necesito que un adulto me habilite la cuenta en LBO. ¿Lo vemos juntos?`;
+}
+
+/* ---------- Sobre el proyecto ---------- */
+
+function project() {
+  return `<div class="narrow" style="max-width:900px">
+    <button class="link" data-act="path">← Volver</button>
+    <h1>Sobre el proyecto</h1>
+    <p class="thesis">El miedo no se va leyendo. Se va practicando, con amigos y para algo que te importa.</p>
+    <div class="card" style="margin-bottom:16px">
+      <h2>Lo honesto</h2>
+      <p style="margin:0">Ya existen apps de educación financiera con lecciones y simuladores de inversión. “Lecciones + simulador” solo no es nuevo. Lo distinto está en para qué y con quién se practica:</p>
+    </div>
+    <div class="pillars" style="grid-template-columns:repeat(auto-fill,minmax(250px,1fr));margin-bottom:16px">
+      <div class="card"><b>1. Una meta real</b><span class="small muted">El viaje de egresados, unas zapatillas, un recital. La app muestra cuánto antes llegás invirtiendo.</span></div>
+      <div class="card"><b>2. ¿Y si…?</b><span class="small muted">Con lo que te regalaron en tu cumpleaños: qué hubiera pasado invirtiéndolo, contra tenerlo en el cajón.</span></div>
+      <div class="card"><b>3. Liga con amigos</b><span class="small muted">Todos con el mismo mercado y plata de mentira. Gana quien mejor administra, no quien más arriesga.</span></div>
+      <div class="card"><b>4. Preguntá sin vergüenza</b><span class="small muted">Lo que da vergüenza preguntar en voz alta: “¿qué es una acción?”, “¿esto es estafa?”.</span></div>
+      <div class="card"><b>5. El salto real</b><span class="small muted">Al terminar, la primera inversión real con un monto chico en LBO. Si sos menor, invitás a un adulto.</span></div>
+    </div>
+    <h2>Cómo se podría vender</h2>
+    <div class="tbl-wrap" style="margin-bottom:16px"><table class="resp">
+      <thead><tr><th>Quién paga</th><th>Por qué le sirve</th></tr></thead>
+      <tbody>
+        <tr><td class="head"><b>LBO</b> (principal)</td><td data-label="Por qué le sirve" style="white-space:normal">Clientes nuevos y jóvenes que llegan educados y con confianza. Además entra el adulto que habilita la cuenta.</td></tr>
+        <tr><td class="head"><b>Colegios</b></td><td data-label="Por qué le sirve" style="white-space:normal">Educación financiera como programa: la liga se juega por curso y el profe ve el progreso.</td></tr>
+        <tr><td class="head"><b>Otras empresas</b> (a futuro)</td><td data-label="Por qué le sirve" style="white-space:normal">Versión con otra marca para bancos o billeteras virtuales.</td></tr>
+      </tbody>
+    </table></div>
+    <h2>La métrica clave</h2>
+    <div class="card" style="margin-bottom:16px">
+      <div class="funnel">
+        <div style="width:100%">Practican en el simulador</div>
+        <div style="width:72%">Completan el camino</div>
+        <div style="width:44%">Dan el salto a una inversión real</div>
+      </div>
+      <p class="small muted" style="margin:12px 0 0">¿Cuántos de los que practican se animan a invertir de verdad? Eso es lo que le importa a un negocio. El dibujo es ilustrativo: todavía no hay datos.</p>
+    </div>
+    <div class="card">
+      <h2>Para validar</h2>
+      <p style="margin:0">Preguntarle a compañeros si usarían una liga con el curso y para qué meta juntarían plata.</p>
+    </div>
+  </div>`;
+}
+
 /* ---------- Precios en vivo ---------- */
 
 function liveTick() {
@@ -1235,7 +1616,7 @@ function liveTick() {
   INSTRUMENTS.forEach(i => {
     if (i.type === "fci") return;
     const m = S.market[i.sym];
-    m.px *= 1 + i.sigma * 0.08 * gauss();
+    m.px = 0.7 * m.px + 0.3 * m.ref * (1 + i.sigma * 0.15 * gauss());
     m.hi = Math.max(m.hi ?? m.px, m.px); m.lo = Math.min(m.lo ?? m.px, m.px);
   });
   const filled = checkLimits();
@@ -1283,8 +1664,8 @@ document.addEventListener("click", e => {
     case "start": go({ ...view, step: 0 }); break;
     case "onb":
       view.answers[ONBOARDING[view.step].key] = i;
-      if (view.step < 2) go({ ...view, step: view.step + 1 });
-      else { S.profile = view.answers; save(); go({ name: "path" }); }
+      if (view.step < ONBOARDING.length - 1) go({ ...view, step: view.step + 1 });
+      else { S.profile = view.answers; S.goal = { ...GOALS[view.answers.goal] }; save(); go({ name: "goal" }); }
       break;
     case "path": go({ name: "path" }); break;
     case "lesson": go({ name: "lesson", i }); break;
@@ -1298,6 +1679,19 @@ document.addEventListener("click", e => {
       go(view.i === 2 ? { name: "market" } : view.i === LEVELS.length - 1 ? { name: "leap" } : { name: "path" });
       break;
     case "leap": go({ name: "leap" }); break;
+    case "project": go({ name: "project" }); break;
+    case "wiM": view.whatif = { ...(view.whatif || { amount: 50000 }), m: +el.dataset.m }; render(); break;
+    case "leagueSave": leagueSave(); break;
+    case "askOpen": chat.open = true; renderChat(); document.getElementById("chat-in")?.focus(); break;
+    case "askClose": if (e.target === el || el.tagName === "BUTTON") { chat.open = false; renderChat(); } break;
+    case "askQ": askQuestion(el.dataset.q); break;
+    case "copyInvite": {
+      const ta = app.querySelector("#invite");
+      const done = () => toast("Mensaje copiado. Pegalo en WhatsApp o donde quieras.");
+      try { navigator.clipboard.writeText(ta.value).then(done, () => { ta.select(); toast("Seleccioné el mensaje: copialo con Ctrl+C o mantené apretado."); }); }
+      catch (err) { ta.select(); }
+      break;
+    }
     case "glossary": go({ name: "glossary" }); break;
     case "loadDemo": ask("Cargar ejemplo para presentar", "Se reemplaza lo que haya ahora por un ejemplo: perfil completo, 3 niveles hechos y una cartera con dos meses de historia.", "Cargar ejemplo", loadDemo); break;
     case "lbo": ask("Próximamente", "Acá se abriría el alta en LBO con el monto sugerido. En este prototipo todavía no está conectado.", "Entendido"); break;
@@ -1311,6 +1705,7 @@ document.addEventListener("click", e => {
       const t = el.dataset.tab;
       if (t !== "learn" && brokerOpen()) ensureBroker();
       go({ name: t === "learn" ? "path" : t });
+      if (t === "league" && brokerOpen()) initCloudOnce();
       break;
     }
     case "tipOk": S.tips[el.dataset.id] = true; save(); render(); break;
@@ -1354,6 +1749,17 @@ document.addEventListener("input", e => {
     app.querySelectorAll("[data-g]").forEach(c => c.hidden = !!q && !c.dataset.g.includes(q));
     return;
   }
+  if (e.target.dataset.gf) {
+    const f = e.target.dataset.gf, raw = e.target.value;
+    S.goal[f] = f === "name" ? raw.slice(0, 40) : Math.max(0, parseInt(raw.replace(/\D/g, ""), 10) || 0);
+    save(); clearTimeout(window._gt); window._gt = setTimeout(() => { const id = e.target.id; render(); const el2 = document.getElementById(id); if (el2) { el2.focus(); el2.setSelectionRange?.(el2.value.length, el2.value.length); } }, 500);
+    return;
+  }
+  if (e.target.dataset.wi) {
+    view.whatif = { ...(view.whatif || { m: 12 }), amount: Math.max(0, parseInt(e.target.value.replace(/\D/g, ""), 10) || 0) };
+    clearTimeout(window._wt); window._wt = setTimeout(() => { render(); const el2 = document.getElementById("wi-amount"); if (el2) { el2.focus(); el2.setSelectionRange?.(el2.value.length, el2.value.length); } }, 500);
+    return;
+  }
   if (e.target.id === "ack") { view.ticket.ack = e.target.checked; updateTicket(); return; }
   if (e.target.id === "search") {
     view.q = e.target.value;
@@ -1372,7 +1778,8 @@ document.addEventListener("input", e => {
 
 function loadDemo() {
   S = fresh();
-  S.profile = { exp: 0, fear: 0, amount: 1 };
+  S.profile = { exp: 0, fear: 0, amount: 1, goal: 0, adult: 1 };
+  S.goal = { ...GOALS[0] };
   S.done = [0, 1, 2];
   ensureBroker();
   const buy = (sym, qty, amount) => {
@@ -1389,10 +1796,22 @@ function loadDemo() {
   save(); go({ name: "portfolio" });
 }
 
-document.addEventListener("keydown", e => { if (e.key === "Escape" && modal) { modal = null; renderModal(); } });
+document.addEventListener("submit", e => {
+  if (e.target.id !== "chat-form") return;
+  e.preventDefault();
+  const inp = document.getElementById("chat-in");
+  askQuestion(inp.value);
+});
+
+let cloudStarted = false;
+function initCloudOnce() { if (!cloudStarted) { cloudStarted = true; initCloud(); } }
+
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape" && chat.open) { chat.open = false; renderChat(); return; } if (e.key === "Escape" && modal) { modal = null; renderModal(); } });
 
 if (brokerOpen()) ensureBroker();
 render();
+initCloudOnce();
 </script>
 </body>
 </html>

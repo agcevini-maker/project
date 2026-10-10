@@ -1,5 +1,16 @@
 # Sin Miedo — prototipo
 
+> "El miedo no se va leyendo. Se va practicando, con amigos y para algo que te importa."
+
+**Novedades de esta versión** (ver también "Sobre el proyecto" dentro de la app):
+- **Mi meta**: el viaje de egresados, unas zapatillas, un recital. Muestra en cuántos meses llegás guardando en el cajón contra invirtiendo, con el precio de la meta subiendo por la inflación.
+- **¿Y si…?**: con lo que te regalaron, qué podrías comprar hoy si lo hubieras invertido hace 6, 12 o 24 meses.
+- **Liga del curso**: todos con el mismo mercado (los precios usan una semilla fija) y $100.000 de mentira. El puntaje premia ganarle a la inflación, diversificar y no vender en pánico; resta las caídas fuertes. En la versión publicada con link la liga es compartida (solo se guarda un apodo y el puntaje); en el archivo local muestra una liga de ejemplo.
+- **Preguntá sin vergüenza**: asistente para preguntas básicas. En la versión publicada responde Claude; en el archivo local usa respuestas guardadas y el diccionario.
+- **Salto con un adulto**: si sos menor, la app arma un mensaje para invitar a tu mamá, papá o tutor a habilitar la cuenta (pendiente confirmar con LBO cómo funciona).
+
+**Supuestos de ejemplo**: los valores de inflación y rendimientos de "Mi meta" y "¿Y si…?" están en el objeto `SUPUESTOS` de `index.html`. No son datos reales: hay que reemplazarlos por la inflación del INDEC y rendimientos históricos reales antes de mostrarlos como tales.
+
 Prototipo de app para animarse a invertir: **aprender** con lecciones de 1 minuto, **entender** las palabras raras tocándolas, **practicar** con plata de mentira y **animarse** a dar el primer paso real.
 
 Abrí `index.html` en el navegador (no necesita instalar nada). En la compu se ve como la plataforma web de un broker (barra superior, cinta de cotizaciones, tabla de mercado con panel de operación al costado); en el celular pasa a una columna con barra inferior.
