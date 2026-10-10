@@ -793,7 +793,7 @@ function render() {
 function footer() {
   return `<footer class="foot">
     <span>Sin Miedo · Prototipo educativo con plata de mentira: no es una plataforma real ni ofrece productos financieros.
-      ${REAL ? `Precios de cierre reales de BYMA al ${fmtDate(DATA.asOf)} (vía Yahoo Finance). Inflación: INDEC.${DATA.fund ? ` Fondo: ${esc(DATA.fund)} (CAFCI).` : ""} No es una recomendación de inversión.` : "Precios simulados: todavía no se descargaron los datos reales."}</span>
+      ${REAL ? `Precios de cierre reales al ${fmtDate(DATA.asOf)}. Fuente: ${esc(DATA.sources?.precios || "BYMA")}. Inflación: INDEC.${DATA.fund ? ` Fondo: ${esc(DATA.fund)} (CAFCI).` : ""} No es una recomendación de inversión.` : "Precios simulados: todavía no se descargaron los datos reales."}</span>
     <span>${S.profile ? `<button class="link" data-act="reset">Reiniciar todo</button> · ` : ""}<button class="link" data-act="loadDemo">Cargar ejemplo para presentar</button></span>
   </footer>`;
 }
@@ -1053,7 +1053,7 @@ function market() {
           <thead><tr><th>Activo</th><th class="r">${T("cotización", "Último")}</th><th class="r">${T("variación", "Var. día")}</th><th class="r hide-m hide-l">Cierre anterior</th><th class="hide-m">20 días</th><th class="hide-m">${T("riesgo", "Riesgo")}</th><th class="hide-m"></th></tr></thead>
           <tbody>${rows}</tbody>
         </table></div>
-        <p class="note">${REAL ? `Precios de cierre reales de BYMA (vía Yahoo Finance), del día en el que estás en la temporada.` : "Precios simulados."} La plata es de mentira. No es una recomendación de inversión.</p>
+        <p class="note">${REAL ? `Precios de cierre reales de BYMA del día en el que estás en la temporada.` : "Precios simulados."} La plata es de mentira. No es una recomendación de inversión.</p>
       </div>
       <aside class="side">${view.sel ? sidePanel() : ""}</aside>
     </div>`;
