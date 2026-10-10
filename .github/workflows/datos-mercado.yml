@@ -1,0 +1,41 @@
+# Baja precios reales de cierre (BYMA), inflación (INDEC) y un fondo money market,
+# y los guarda dentro de index.html y data/mercado.json.
+# Corre los días hábiles después del cierre del mercado, a mano ("Run workflow") o al cambiar el script.
+name: Datos de mercado
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "37 22 * * 1-5"
+  push:
+    paths:
+      - "scripts/update_market.py"
+      - ".github/workflows/datos-mercado.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: datos-mercado
+  cancel-in-progress: false
+
+jobs:
+  actualizar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python3 scripts/update_market.py
+      - name: Guardar los datos nuevos
+        run: |
+          if git diff --quiet; then echo "Sin cambios"; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898333+github-actions[bot]@users.noreply.github.com"
+          git add index.html data/mercado.json
+          git commit -m "Actualizar precios reales de mercado"
+          git pull --no-rebase --no-edit origin "${GITHUB_REF_NAME}" || true
+          git push origin "HEAD:${GITHUB_REF_NAME}"
