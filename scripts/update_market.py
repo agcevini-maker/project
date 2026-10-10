@@ -2,7 +2,7 @@
 """Baja precios reales de cierre y la inflación, y los guarda dentro de la app.
 
 Fuentes:
-  - Precios de cierre diarios en pesos (BYMA) desde Yahoo Finance (tickers .BA).
+  - Precios de cierre diarios en pesos (BYMA): data912.com; si falla, Yahoo Finance (yfinance o la API directa).
   - Inflación mensual (IPC, INDEC) desde api.argentinadatos.com, con datos.gob.ar como respaldo.
   - Valor de cuotaparte de un fondo money market desde api.argentinadatos.com (CAFCI).
 
@@ -31,6 +31,7 @@ TICKERS = {
     "SPY": "SPY.BA", "KO": "KO.BA", "AAPL": "AAPL.BA", "MELI": "MELI.BA",
     "YPFD": "YPFD.BA", "GGAL": "GGAL.BA", "PAMP": "PAMP.BA", "ALUA": "ALUA.BA",
 }
+KIND = {"AL30": "bonds", "GD30": "bonds", "SPY": "cedears", "KO": "cedears", "AAPL": "cedears", "MELI": "cedears"}  # el resto: stocks
 REFERENCE = "GGAL"   # sus fechas de operación definen el calendario
 YEARS = 3
 FUND_NAME_HINTS = ["Fima Premium", "Mercado Pago", "Balanz Money Market", "Galileo Ahorro", "Santander Super Ahorro"]
@@ -53,6 +54,64 @@ def get_json(url, tries=2):
             last = e
             time.sleep(2)
     raise RuntimeError(f"{url}: {last}")
+
+
+def parse_rows(rows):
+    """Lista de dicts con fecha y cierre, en el formato que venga."""
+    out = {}
+    for r in rows if isinstance(rows, list) else []:
+        if not isinstance(r, dict):
+            continue
+        d = r.get("date") or r.get("fecha") or r.get("d")
+        c = r.get("c", r.get("close", r.get("cierre")))
+        try:
+            c = float(c)
+        except (TypeError, ValueError):
+            continue
+        if d and math.isfinite(c) and c > 0:
+            out[str(d)[:10]] = round(c, 4)
+    return out
+
+
+def data912_closes(code):
+    kind = KIND.get(code, "stocks")
+    url = f"https://data912.com/historical/{kind}/{code}"
+    try:
+        rows = get_json(url)
+        out = parse_rows(rows)
+        if not out:
+            log(f"{code} data912: sin datos reconocibles; ejemplo: {str(rows)[:200]}")
+        cut = (dt.date.today() - dt.timedelta(days=365 * YEARS)).isoformat()
+        out = {d: v for d, v in out.items() if d >= cut}
+        if out:
+            log(f"{code} data912: {len(out)} cierres, último {max(out)} = {out[max(out)]}")
+        return out
+    except Exception as e:  # noqa: BLE001
+        notes.append(f"{code} data912: {e}")
+        log(f"{code} data912: falló ({e})")
+        return {}
+
+
+def yfinance_closes(ticker):
+    try:
+        import yfinance as yf  # se instala en el workflow
+        hist = yf.Ticker(ticker).history(period=f"{YEARS}y", interval="1d", auto_adjust=False)
+        out = {i.date().isoformat(): round(float(c), 4) for i, c in hist["Close"].items() if c == c and c > 0}
+        if out:
+            log(f"{ticker} yfinance: {len(out)} cierres")
+        return out
+    except Exception as e:  # noqa: BLE001
+        notes.append(f"{ticker} yfinance: {e}")
+        log(f"{ticker} yfinance: falló ({e})")
+        return {}
+
+
+def closes_for(code, ticker):
+    for fn in (lambda: data912_closes(code), lambda: yfinance_closes(ticker), lambda: yahoo_closes(ticker)):
+        out = fn()
+        if len(out) > 100:
+            return out
+    return {}
 
 
 def yahoo_closes(ticker):
@@ -150,7 +209,9 @@ def money_market(dates):
 
 
 def main():
-    closes = {k: yahoo_closes(t) for k, t in TICKERS.items()}
+    infl, infl_src = inflation()
+    log(f"inflación: {len(infl)} meses ({infl_src})")
+    closes = {k: closes_for(k, t) for k, t in TICKERS.items()}
     if not closes.get(REFERENCE):
         print("No se pudo bajar el calendario de referencia; no se cambia nada.", file=sys.stderr)
         print("\n".join(notes), file=sys.stderr)
@@ -168,8 +229,6 @@ def main():
         first = next(v for v in vals if v is not None)
         series[k] = [v if v is not None else first for v in vals]
 
-    infl, infl_src = inflation()
-    log(f"inflación: {len(infl)} meses ({infl_src})")
     fund, mm = money_market(dates)
     if mm:
         first = next(v for v in mm if v is not None)
@@ -183,7 +242,7 @@ def main():
         "inflation": dict(sorted(infl.items())[-48:]),
         "fund": fund,
         "sources": {
-            "precios": "BYMA, precios de cierre diarios en pesos (vía Yahoo Finance)",
+            "precios": "BYMA, precios de cierre diarios en pesos (vía data912.com / Yahoo Finance)",
             "inflacion": infl_src,
             "fondo": f"{fund}, valor de cuotaparte (CAFCI vía argentinadatos.com)" if fund else None,
         },
