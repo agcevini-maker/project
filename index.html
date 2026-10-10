@@ -449,22 +449,11 @@ const GOALS = [
   { name: "Mi meta", target: 300000, monthly: 30000 }
 ];
 
-// Supuestos de ejemplo para "Mi meta" y "¿Y si…?". NO son datos reales:
-// reemplazar por inflación del INDEC y rendimientos históricos reales (por ejemplo, provistos por LBO).
-const SUPUESTOS = {
-  inflacionMensual: 2.3,      // %
-  fondoMensual: 2.5,          // % rendimiento mensual de un fondo conservador
-  opcionesAnual: [            // % rendimiento en 12 meses
-    { name: "Fondo conservador", anual: 34 },
-    { name: "Bonos", anual: 45 },
-    { name: "CEDEAR del S&P 500", anual: 40 }
-  ]
-};
 
 /* =========================================================
-   Mercado simulado
-   Precios y comportamiento INVENTADOS. No son cotizaciones reales
-   ni la oferta de productos de LBO (pendiente de definir).
+   Mercado
+   Precios reales de cierre (MARKET_DATA). La lista de activos es de ejemplo:
+   no es la oferta de productos de LBO.
    ========================================================= */
 
 const TYPES = {
@@ -479,9 +468,9 @@ const TYPES = {
 };
 const RISK = ["", "Riesgo bajo", "Riesgo medio", "Riesgo alto"];
 
-const INSTRUMENTS = [
-  { sym: "MM",   name: "Fondo Money Market (ejemplo)",  type: "fci",    base: 118,   mu: 0.0010, sigma: 0.0002 },
-  { sym: "RF",   name: "Fondo Renta Fija (ejemplo)",    type: "fci",    base: 245,   mu: 0.0011, sigma: 0.0030 },
+// base, mu y sigma solo se usan si todavía no hay datos reales (serie simulada).
+const ALL_INSTRUMENTS = [
+  { sym: "MM",   name: "Fondo money market",            type: "fci",    base: 118,   mu: 0.0010, sigma: 0.0002 },
   { sym: "AL30", name: "Bono Argentina 2030",           type: "bono",   base: 812,   mu: 0.0008, sigma: 0.0120 },
   { sym: "GD30", name: "Bono Argentina 2030 (ley NY)",  type: "bono",   base: 845,   mu: 0.0008, sigma: 0.0110 },
   { sym: "SPY",  name: "S&P 500 (500 empresas de EE.UU.)", type: "cedear", base: 41850, mu: 0.0009, sigma: 0.0110 },
@@ -493,11 +482,43 @@ const INSTRUMENTS = [
   { sym: "PAMP", name: "Pampa Energía",                 type: "accion", base: 3290,  mu: 0.0010, sigma: 0.0250 },
   { sym: "ALUA", name: "Aluar",                         type: "accion", base: 905,   mu: 0.0009, sigma: 0.0240 }
 ];
+const REAL = !!(MARKET_DATA && MARKET_DATA.series && MARKET_DATA.dates);
+const DATA = REAL ? MARKET_DATA : syntheticData();
+const INSTRUMENTS = ALL_INSTRUMENTS.filter(i => DATA.series[i.sym]);
 const INS = Object.fromEntries(INSTRUMENTS.map(i => [i.sym, i]));
+if (INS.MM && DATA.fund) INS.MM.name = DATA.fund;
+
+// Temporada: todos arrancan el mismo día del pasado y avanzan por lo que pasó de verdad, hasta hoy.
+const SEASON_START = "2025-10-01";
+let START_IDX = DATA.dates.findIndex(d => d >= SEASON_START);
+if (START_IDX < 1) START_IDX = Math.max(1, DATA.dates.length - 250);
+const SEASON_DAYS = DATA.dates.length - START_IDX;
+// Índice de precios diario armado con la inflación mensual (repartida en ~21 días hábiles).
+const CPI = (() => {
+  const months = Object.keys(DATA.inflation || {}).sort();
+  const lastKnown = months.length ? DATA.inflation[months[months.length - 1]] : 2.3;
+  const out = [1];
+  for (let k = 1; k < DATA.dates.length; k++) {
+    const p = (DATA.inflation?.[DATA.dates[k].slice(0, 7)] ?? lastKnown) / 100;
+    out.push(out[k - 1] * (1 + p) ** (1 / 21));
+  }
+  return out;
+})();
+const fmtDate = d => new Date(d + "T12:00:00").toLocaleDateString("es-AR", { day: "numeric", month: "short", year: "numeric" });
+
+function syntheticData() {
+  const dates = [], today = new Date(); today.setUTCHours(12, 0, 0, 0);
+  for (let k = 0; dates.length < 780; k++) {
+    const x = new Date(today.getTime() - k * 864e5), wd = x.getUTCDay();
+    if (wd && wd < 6) dates.unshift(x.toISOString().slice(0, 10));
+  }
+  const series = {};
+  ALL_INSTRUMENTS.forEach(i => { const v = [i.base]; for (let k = 1; k < dates.length; k++) v.push(v[k - 1] * (1 + i.mu + i.sigma * sgauss(i.sym, k))); series[i.sym] = v; });
+  const inflation = {}; dates.forEach(x => inflation[x.slice(0, 7)] = 2.3);
+  return { asOf: dates[dates.length - 1], dates, series, inflation, fund: null, sources: {} };
+}
 const START_CASH = 100000;
 const FEE = 0.006; // comisión + derechos de mercado, valor de ejemplo
-const HIST_DAYS = 90;
-const INFL = 0.0011; // inflación simulada por día hábil (~2,3% por mes), valor de ejemplo
 
 /* =========================================================
    Estado
@@ -522,31 +543,30 @@ function hashRand(str) {
   h = Math.imul(h ^ h >>> 16, 2246822507); h = Math.imul(h ^ h >>> 13, 3266489909);
   return ((h ^= h >>> 16) >>> 0) / 4294967296;
 }
-const SEASON = "temporada-1";
 function sgauss(sym, d) {
-  const u = Math.max(hashRand(`${SEASON}:${sym}:${d}:a`), 1e-9), v = hashRand(`${SEASON}:${sym}:${d}:b`);
+  const u = Math.max(hashRand(`t1:${sym}:${d}:a`), 1e-9), v = hashRand(`t1:${sym}:${d}:b`);
   return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
 }
 function gauss() { let u = 0, v = 0; while (!u) u = Math.random(); while (!v) v = Math.random(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); }
 
-function ensureMarket() {
-  if (S.market) return;
-  const m = {};
-  INSTRUMENTS.forEach(i => {
-    const hist = [i.base];
-    for (let d = 1; d < HIST_DAYS; d++) hist.push(hist[d - 1] * (1 + i.mu + i.sigma * sgauss(i.sym, d - HIST_DAYS)));
-    const p = hist[HIST_DAYS - 1] * (1 + i.mu + i.sigma * sgauss(i.sym, 0));
-    m[i.sym] = { hist, ref: p, px: p, hi: Math.max(p, hist[HIST_DAYS - 1]), lo: Math.min(p, hist[HIST_DAYS - 1]) };
-  });
-  S.market = m;
-}
+function ensureMarket() {}
 function ensureBroker() {
-  ensureMarket();
   if (!S.broker) S.broker = { cash: START_CASH, day: 1, pos: {}, orders: [], equity: [START_CASH], nextId: 1 };
 }
 
-const px = sym => S.market[sym].px;
-const prevClose = sym => { const h = S.market[sym].hist; return h[h.length - 1]; };
+const dayIdx = () => START_IDX + Math.min(S.broker ? S.broker.day : 1, SEASON_DAYS) - 1;
+const simDate = () => DATA.dates[dayIdx()];
+const atEnd = () => !!S.broker && S.broker.day >= SEASON_DAYS;
+const px = sym => DATA.series[sym][dayIdx()];
+const prevClose = sym => DATA.series[sym][dayIdx() - 1];
+const histUpTo = sym => DATA.series[sym].slice(0, dayIdx());
+const inflSinceStart = () => CPI[dayIdx()] / CPI[START_IDX] - 1;
+function volOf(sym) {
+  const v = DATA.series[sym].slice(Math.max(1, dayIdx() - 250), dayIdx() + 1);
+  const r = v.slice(1).map((x, k) => Math.log(x / v[k]));
+  const m = r.reduce((a, b) => a + b, 0) / (r.length || 1);
+  return Math.sqrt(r.reduce((a, b) => a + (b - m) ** 2, 0) / (r.length || 1));
+}
 const dayVar = sym => px(sym) / prevClose(sym) - 1;
 const isFci = sym => INS[sym].type === "fci";
 const posValue = () => Object.entries(S.broker.pos).reduce((a, [s, p]) => a + p.qty * px(s), 0);
@@ -590,7 +610,7 @@ function profileTip() {
 /* ---------- Gráficos ---------- */
 
 function spark(sym) {
-  const h = S.market[sym].hist.slice(-20).concat(px(sym));
+  const h = histUpTo(sym).slice(-20).concat(px(sym));
   const min = Math.min(...h), max = Math.max(...h), span = max - min || 1;
   const pts = h.map((v, i) => `${(i / (h.length - 1) * 80).toFixed(1)},${(22 - (v - min) / span * 20).toFixed(1)}`).join(" ");
   const up = h[h.length - 1] >= h[0];
@@ -617,7 +637,7 @@ function chart(values, opts = {}) {
   <div class="between xs muted num"><span>Mín ${money(min)}</span><span>Máx ${money(max)}</span></div>`;
 }
 
-const RANGES = { "1S": 5, "1M": 21, "3M": 63 };
+const RANGES = { "1S": 5, "1M": 21, "3M": 63, "1A": 250 };
 
 /* ---------- Órdenes (cálculo y ejecución) ---------- */
 
@@ -718,20 +738,15 @@ function coach(dayPnl, pnl) {
 
 function advance(n, opts = {}) {
   const B = S.broker;
-  for (let d = 0; d < n; d++) {
-    INSTRUMENTS.forEach(i => {
-      const m = S.market[i.sym];
-      m.hist.push(m.ref);
-      if (m.hist.length > 260) m.hist.shift();
-      m.ref = m.ref * (1 + i.mu + i.sigma * sgauss(i.sym, B.day));
-      m.px = m.ref;
-      m.hi = Math.max(m.px, m.hist[m.hist.length - 1]); m.lo = Math.min(m.px, m.hist[m.hist.length - 1]);
-    });
+  for (let d = 0; d < n && B.day < SEASON_DAYS; d++) {
     B.day++;
     notifyFills(checkLimits());
     B.equity.push(equity());
   }
-  if (!opts.silent) { save(); render(); }
+  if (!opts.silent) {
+    if (atEnd()) toast(`Llegaste a hoy (${fmtDate(DATA.asOf)}): estos son los precios de cierre más recientes.`);
+    save(); render();
+  }
 }
 
 /* ---------- Glosario y diálogos ---------- */
@@ -761,7 +776,7 @@ const topEl = document.getElementById("top");
 const app = document.getElementById("app");
 const navEl = document.getElementById("nav");
 const sheet = document.getElementById("sheet");
-const TAB_OF = { glossary: "learn", path: "learn", lesson: "learn", quiz: "learn", leap: "learn", project: "learn", goal: "goal", market: "market", portfolio: "portfolio", activity: "portfolio", league: "league" };
+const TAB_OF = { glossary: "learn", path: "learn", lesson: "learn", quiz: "learn", leap: "learn", goal: "goal", market: "market", portfolio: "portfolio", activity: "portfolio", league: "league" };
 const TABS = [["learn", "Aprender"], ["goal", "Mi meta"], ["market", "Mercado"], ["portfolio", "Cartera"], ["league", "Liga"]];
 const wide = () => window.innerWidth > 900;
 
@@ -770,15 +785,16 @@ function go(v) { view = v; render(); window.scrollTo(0, 0); }
 function render() {
   const inBroker = ["market", "portfolio", "activity", "league"].includes(view.name);
   topEl.innerHTML = topbar() + (S.profile && S.broker && brokerOpen() ? tape() : "");
-  app.innerHTML = inBroker && !brokerOpen() ? lockedBroker() : ({ welcome, path, lesson, quiz, leap, market, portfolio, activity, glossary, goal, league, project })[view.name]() + footer();
+  app.innerHTML = inBroker && !brokerOpen() ? lockedBroker() : ({ welcome, path, lesson, quiz, leap, market, portfolio, activity, glossary, goal, league })[view.name]() + footer();
   navEl.innerHTML = S.profile ? bottomNav() + `<button class="ask-fab" data-act="askOpen" aria-label="Preguntá sin vergüenza">Preguntá sin vergüenza</button>` : "";
   renderModal();
 }
 
 function footer() {
   return `<footer class="foot">
-    <span>Sin Miedo · Prototipo educativo. No es una plataforma real ni ofrece productos financieros. Los precios son simulados.</span>
-    <span>${S.profile ? `<button class="link" data-act="reset">Reiniciar todo</button> · ` : ""}<button class="link" data-act="project">Sobre el proyecto</button> · <button class="link" data-act="loadDemo">Cargar ejemplo para presentar</button></span>
+    <span>Sin Miedo · Prototipo educativo con plata de mentira: no es una plataforma real ni ofrece productos financieros.
+      ${REAL ? `Precios de cierre reales de BYMA al ${fmtDate(DATA.asOf)} (vía Yahoo Finance). Inflación: INDEC.${DATA.fund ? ` Fondo: ${esc(DATA.fund)} (CAFCI).` : ""} No es una recomendación de inversión.` : "Precios simulados: todavía no se descargaron los datos reales."}</span>
+    <span>${S.profile ? `<button class="link" data-act="reset">Reiniciar todo</button> · ` : ""}<button class="link" data-act="loadDemo">Cargar ejemplo para presentar</button></span>
   </footer>`;
 }
 
@@ -841,16 +857,14 @@ function welcome() {
         <h1>Invertir, sin miedo.</h1>
         <p class="lead">Aprendé a invertir practicando para una meta real, con tus amigos. Y cuando estés listo, das el salto con plata de verdad.</p>
         <p class="thesis">El miedo no se va leyendo. Se va practicando, con amigos y para algo que te importa.</p>
-        <div class="row" style="max-width:420px">
-          <button class="btn" data-act="start">Empezar</button>
-          <button class="btn ghost" data-act="project">Sobre el proyecto</button>
-        </div>
+        <button class="btn inline" data-act="start" style="padding-inline:28px">Empezar</button>
         <p class="small muted" style="margin-top:12px">Te hacemos ${ONBOARDING.length} preguntas rápidas para adaptar el camino.</p>
       </div>
       <div class="pillars">
         <div class="card"><b>Tu meta</b><span class="small muted">El viaje de egresados, unas zapatillas, un recital: mirá cuánto antes llegás invirtiendo.</span></div>
         <div class="card"><b>¿Y si…?</b><span class="small muted">Qué hubiera pasado con lo que te regalaron, contra tenerlo en el cajón.</span></div>
-        <div class="card"><b>Liga con amigos</b><span class="small muted">Un broker de mentira para todo el curso. Gana quien mejor administra.</span></div>
+        <div class="card"><b>Practicá con lo que pasó de verdad</b><span class="small muted">Precios reales de la bolsa: arrancás en el pasado con $100.000 de mentira y avanzás hasta hoy.</span></div>
+        <div class="card"><b>Liga con amigos</b><span class="small muted">Todo el curso con el mismo mercado. Gana quien mejor administra, no quien más arriesga.</span></div>
         <div class="card"><b>Preguntá sin vergüenza</b><span class="small muted">Lo que no te animás a preguntar en voz alta, y las palabras raras explicadas.</span></div>
       </div>
     </section>`;
@@ -1015,7 +1029,7 @@ function market() {
         <td class="head"><div class="sym">${i.sym}</div><div class="tname">${i.name}</div></td>
         <td class="r num" data-label="Último" data-px="${i.sym}">${money(px(i.sym))}</td>
         <td class="r" data-label="Var. día"><span class="pill ${cls(v)} num" data-var="${i.sym}">${pct(v)}</span></td>
-        <td class="r num hide-l" data-label="Cierre ant.">${money(S.market[i.sym].hist.slice(-1)[0])}</td>
+        <td class="r num hide-l" data-label="Cierre ant.">${money(prevClose(i.sym))}</td>
         <td data-label="20 días">${spark(i.sym)}</td>
         <td data-label="Riesgo">${riskPill(TYPES[t].risk)}</td>
         <td class="r act"><button class="btn sm" data-act="select" data-sym="${i.sym}">Operar</button></td>
@@ -1023,7 +1037,7 @@ function market() {
     }).join("")}`).join("");
   return `
     <div class="page-h">
-      <div><h1>Mercado</h1><p class="small muted"><span class="status-dot"></span>Mercado abierto (simulado) · Día ${S.broker.day} · Precios en pesos</p></div>
+      <div><h1>Mercado</h1><p class="small muted">${dataPill()} Cierre del <b>${fmtDate(simDate())}</b> · Día ${S.broker.day} de ${SEASON_DAYS} · Precios en pesos</p></div>
       <div class="tools">
         <input class="search" id="search" type="search" placeholder="Buscar por nombre o código" value="${esc(view.q || "")}" autocomplete="off">
         <div class="chips">
@@ -1032,14 +1046,14 @@ function market() {
         </div>
       </div>
     </div>
-    ${tip("market", `Así se ve el mercado en un broker. Cada fila es algo que podés comprar: el código, la ${T("cotización")} y la ${T("variación")} del día. Los precios se mueven solos mientras mirás. Elegí uno para ver su gráfico y operar.`)}
+    ${tip("market", `Así se ve el mercado en un broker. Cada fila es algo que podés comprar: el código, la ${T("cotización")} y la ${T("variación")} del día. Ves los precios de cierre reales del día en el que estás. Elegí uno para ver su gráfico y operar.`)}
     <div class="split ${view.sel ? "has-sel" : ""}">
       <div class="main-col">
         <div class="tbl-wrap"><table class="resp">
           <thead><tr><th>Activo</th><th class="r">${T("cotización", "Último")}</th><th class="r">${T("variación", "Var. día")}</th><th class="r hide-m hide-l">Cierre anterior</th><th class="hide-m">20 días</th><th class="hide-m">${T("riesgo", "Riesgo")}</th><th class="hide-m"></th></tr></thead>
           <tbody>${rows}</tbody>
         </table></div>
-        <p class="note">Precios simulados con fines educativos. No son cotizaciones reales ni una recomendación de inversión.</p>
+        <p class="note">${REAL ? `Precios de cierre reales de BYMA (vía Yahoo Finance), del día en el que estás en la temporada.` : "Precios simulados."} La plata es de mentira. No es una recomendación de inversión.</p>
       </div>
       <aside class="side">${view.sel ? sidePanel() : ""}</aside>
     </div>`;
@@ -1048,7 +1062,8 @@ function market() {
 function sidePanel() {
   const sym = view.sel, i = INS[sym], t = TYPES[i.type], v = dayVar(sym);
   const range = view.range || "1M";
-  const values = S.market[sym].hist.slice(-RANGES[range]).concat(px(sym));
+  const values = histUpTo(sym).slice(-RANGES[range]).concat(px(sym));
+  const year = histUpTo(sym).slice(-250).concat(px(sym));
   const rv = values[values.length - 1] / values[0] - 1;
   const pos = S.broker.pos[sym];
   return `
@@ -1061,9 +1076,9 @@ function sidePanel() {
       <div style="margin-top:10px"><span class="big num" data-px="${sym}">${money(px(sym))}</span></div>
       <div class="small"><span class="pill ${cls(v)} num" data-var="${sym}">${pct(v)}</span> <span class="muted">hoy ·</span> <span class="${cls(rv)} num">${pct(rv)}</span> <span class="muted">en ${range}</span></div>
       <div class="mstat">
-        <div><div class="label">${T("apertura", "Apertura")}</div><div class="num small">${money(prevClose(sym))}</div></div>
-        <div><div class="label">Máx. día</div><div class="num small" data-hi="${sym}">${money(S.market[sym].hi ?? px(sym))}</div></div>
-        <div><div class="label">Mín. día</div><div class="num small" data-lo="${sym}">${money(S.market[sym].lo ?? px(sym))}</div></div>
+        <div><div class="label">Cierre anterior</div><div class="num small">${money(prevClose(sym))}</div></div>
+        <div><div class="label">Mín. 1 año</div><div class="num small">${money(Math.min(...year))}</div></div>
+        <div><div class="label">Máx. 1 año</div><div class="num small">${money(Math.max(...year))}</div></div>
       </div>
       <div class="seg" style="margin:12px 0 8px">${Object.keys(RANGES).map(r => `<button class="${r === range ? "on" : ""}" data-act="range" data-r="${r}">${r}</button>`).join("")}</div>
       ${chart(values, { label: `Precio de ${sym} en ${range}` })}
@@ -1082,7 +1097,7 @@ function sidePanel() {
       <p class="small">${t.simple}</p>
       <div class="kv"><span>Tipo</span><b>${T(t.term, t.short)}</b></div>
       <div class="kv"><span>${T("liquidez", "Liquidez")}</span><b>${i.type === "fci" ? "Alta (24hs)" : "Alta, en horario de mercado"}</b></div>
-      <div class="kv"><span>${T("volatilidad", "Volatilidad")}</span><b>${i.sigma < .005 ? "Muy baja" : i.sigma < .015 ? "Media" : "Alta"}</b></div>
+      <div class="kv"><span>${T("volatilidad", "Volatilidad")}</span><b>${volOf(sym) < .005 ? "Muy baja" : volOf(sym) < .018 ? "Media" : "Alta"}</b></div>
     </div>`;
 }
 
@@ -1240,7 +1255,7 @@ function portfolio() {
       <div class="card">
         <div class="between"><span class="label">Evolución de tu cartera</span><span class="xs muted">Día 1 a día ${B.day}</span></div>
         ${B.equity.length > 1 ? chart(B.equity.concat(total), { base: START_CASH, label: "Evolución de tu cartera", tall: true,
-            ref: B.equity.concat(total).map((_, i) => START_CASH * (1 + INFL) ** Math.min(i, B.day - 1)) }) + `
+            ref: B.equity.concat(total).map((_, k) => START_CASH * CPI[START_IDX + Math.min(k, B.day - 1)] / CPI[START_IDX]) }) + `
           <div class="legend-line"><span><i style="border-color:var(--up)"></i>Tu cartera</span><span><i style="border-color:var(--muted);border-top-style:dashed"></i>Lo que pusiste ($100.000)</span><span><i style="border-color:var(--warn);border-top-style:dashed"></i>Lo que necesitás para no perder contra la ${T("inflación")}</span></div>`
           : `<div class="empty small">Comprá algo y adelantá el tiempo para ver cómo se mueve tu plata.</div>`}
       </div>
@@ -1308,8 +1323,34 @@ function activity() {
 
 /* ---------- Mi meta y "¿Y si…?" ---------- */
 
+// Promedios de los últimos 12 meses (datos reales cuando los hay) para proyectar la meta.
+function trailing() {
+  const ms = Object.keys(DATA.inflation || {}).sort().slice(-12);
+  const inflM = ms.length ? ms.reduce((a, m) => a + DATA.inflation[m], 0) / ms.length : 2.3;
+  const mm = DATA.series.MM;
+  let fundM = null;
+  if (mm) { const L = mm.length - 1, j = Math.max(0, L - 250); fundM = ((mm[L] / mm[j]) ** (21 / (L - j)) - 1) * 100; }
+  return { inflM, fundM: fundM ?? inflM, months: ms };
+}
+
+// "¿Y si…?": qué pasó de verdad con una plata invertida hace m meses, hasta el último cierre.
+function whatIf(amount, m) {
+  const L = DATA.dates.length - 1, t = new Date(DATA.asOf + "T12:00:00");
+  t.setMonth(t.getMonth() - m);
+  const from = t.toISOString().slice(0, 10);
+  let j = DATA.dates.findIndex(d => d >= from); if (j < 0) j = 0;
+  const infl = CPI[L] / CPI[j];
+  const picks = [["MM", "Fondo money market"], ["AL30", "Bono AL30"], ["SPY", "CEDEAR del S&P 500"], ["GGAL", "Acción de Galicia"]].filter(([k]) => DATA.series[k]);
+  const opts = [{ name: "Guardado en el cajón", v: amount }].concat(picks.map(([k, n]) => ({ name: n, v: amount * DATA.series[k][L] / DATA.series[k][j] })));
+  return { opts, infl, from: DATA.dates[j], to: DATA.dates[L], short: DATA.dates[j] > from };
+}
+
+function dataPill() {
+  return REAL ? `<span class="pill" title="Precios de cierre reales">Precios reales</span>` : `<span class="pill warn">Precios simulados</span>`;
+}
+
 function goalPlan(g) {
-  const i = SUPUESTOS.inflacionMensual / 100, r = SUPUESTOS.fondoMensual / 100;
+  const tr = trailing(), i = tr.inflM / 100, r = tr.fundM / 100;
   const rows = []; let caj = 0, inv = 0, tCaj = null, tInv = null;
   for (let t = 0; t <= 60; t++) {
     const price = g.target * (1 + i) ** t;
@@ -1343,8 +1384,8 @@ function goal() {
   const n = Math.min(60, Math.max(12, (plan.tCaj ?? 60) + 2, (plan.tInv ?? 0) + 2));
   const gain = plan.tCaj == null ? null : plan.tInv == null ? null : plan.tCaj - plan.tInv;
   const w = view.whatif || { amount: 50000, m: 12 };
-  const infl = (1 + SUPUESTOS.inflacionMensual / 100) ** w.m;
-  const opts = [{ name: "Guardado en el cajón", v: w.amount }].concat(SUPUESTOS.opcionesAnual.map(o => ({ name: o.name, v: w.amount * (1 + o.anual / 100) ** (w.m / 12) })));
+  const wi = whatIf(w.amount, w.m), tr = trailing();
+  const opts = wi.opts, infl = wi.infl;
   const maxReal = Math.max(...opts.map(o => o.v / infl), 1);
   return `
     <div class="page-h">
@@ -1361,8 +1402,9 @@ function goal() {
         ${lineChart([
           { name: `Precio de la meta (sube con la ${"inflación"})`, values: plan.rows.map(r => r.price), color: "var(--warn)", dash: true },
           { name: "Guardando en el cajón", values: plan.rows.map(r => r.caj), color: "var(--muted)" },
-          { name: "Invirtiendo en un fondo conservador", values: plan.rows.map(r => r.inv), color: "var(--up)" }
+          { name: "Invirtiendo en un fondo money market", values: plan.rows.map(r => r.inv), color: "var(--up)" }
         ], n, "Cuándo llegás a tu meta")}
+        <p class="note">${REAL ? `Proyección con los promedios reales de los últimos 12 meses: inflación ${nf2.format(tr.inflM)}% por mes (INDEC) y fondo money market ${nf2.format(tr.fundM)}% por mes${DATA.fund ? ` (${esc(DATA.fund)})` : ""}.` : "Proyección con valores simulados."} El futuro puede ser distinto.</p>
       </div>
       <div class="stack">
         <div class="card kpi"><div class="label">Guardando en el cajón llegás en</div><div class="v">${months(plan.tCaj)}</div></div>
@@ -1376,19 +1418,19 @@ function goal() {
 
     <div class="card" style="margin-bottom:16px">
       <h2>¿Y si…?</h2>
-      <p class="small muted">Poné lo que te regalaron en tu último cumpleaños y mirá qué hubiera pasado si lo invertías.</p>
+      <p class="small muted">Poné lo que te regalaron en tu último cumpleaños y mirá qué hubiera pasado de verdad si lo invertías.</p>
       <div class="fields" style="max-width:520px;margin-bottom:14px">
         <div class="field"><label class="label" for="wi-amount">Me regalaron ($)</label><input class="search num" style="flex:none" id="wi-amount" data-wi="amount" inputmode="numeric" value="${w.amount}"></div>
         <div class="field"><span class="label">Hace</span><div class="seg">${[6, 12, 24].map(m => `<button class="${w.m === m ? "on" : ""}" data-act="wiM" data-m="${m}">${m} meses</button>`).join("")}</div></div>
       </div>
-      <div class="label" style="margin-bottom:6px">Qué podrías comprar hoy con esa plata (en pesos de hoy)</div>
+      <div class="label" style="margin-bottom:6px">Cuánto vale hoy, medido en pesos del ${fmtDate(wi.from)}</div>
       <div class="bars">${opts.map(o => {
         const real = o.v / infl;
         return `<div class="bar-row"><span>${o.name}</span><div class="bar"><div style="width:${real / maxReal * 100}%;background:${real >= w.amount ? "var(--up)" : "var(--down)"}"></div></div>
           <b class="num ${cls(real - w.amount)}">${money0(real)}</b></div>`;
       }).join("")}</div>
-      <p class="small" style="margin-top:12px">Guardados en el cajón, tus ${money0(w.amount)} hoy compran lo que antes compraban <b>${money0(w.amount / infl)}</b>.</p>
-      <p class="note" style="margin-top:8px">Supuestos de ejemplo, no datos reales: inflación ${nf2.format(SUPUESTOS.inflacionMensual)}% por mes; ${SUPUESTOS.opcionesAnual.map(o => `${o.name.toLowerCase()} ${o.anual}% en 12 meses`).join(", ")}. Para la versión final hay que cargar la inflación del INDEC y rendimientos históricos reales. Lo que pasó antes no garantiza lo que va a pasar.</p>
+      <p class="small" style="margin-top:12px">Guardados en el cajón desde el ${fmtDate(wi.from)}, tus ${money0(w.amount)} hoy compran lo que en ese momento comprabas con <b>${money0(w.amount / infl)}</b>.</p>
+      <p class="note" style="margin-top:8px">${REAL ? `Datos reales del ${fmtDate(wi.from)} al ${fmtDate(wi.to)}: precios de cierre de BYMA e inflación del INDEC${DATA.fund ? `; fondo: ${esc(DATA.fund)}` : ""}.` : "Valores simulados."}${wi.short ? " No hay datos tan viejos: se usó el primer día disponible." : ""} Lo que pasó antes no garantiza lo que va a pasar.</p>
     </div>`;
 }
 
@@ -1413,7 +1455,7 @@ async function initCloud() {
 
 function scoreInfo() {
   const B = S.broker, total = equity();
-  const ret = total / START_CASH - 1, infl = (1 + INFL) ** (B.day - 1) - 1;
+  const ret = total / START_CASH - 1, infl = inflSinceStart();
   let peak = -Infinity, dd = 0;
   B.equity.concat(total).forEach(v => { peak = Math.max(peak, v); dd = Math.min(dd, v / peak - 1); });
   const types = new Set(Object.keys(B.pos).map(s => INS[s].type)).size;
@@ -1569,82 +1611,6 @@ function inviteText() {
   return `¡Hola! Estoy aprendiendo a invertir con Sin Miedo. Ya terminé el camino${B ? ` y practiqué ${B.day} días en un simulador` : ""}${S.goal ? ` para mi meta: ${S.goal.name}` : ""}. Para hacer mi primera inversión real, con un monto chico (${suggestion()}), necesito que un adulto me habilite la cuenta en LBO. ¿Lo vemos juntos?`;
 }
 
-/* ---------- Sobre el proyecto ---------- */
-
-function project() {
-  return `<div class="narrow" style="max-width:900px">
-    <button class="link" data-act="path">← Volver</button>
-    <h1>Sobre el proyecto</h1>
-    <p class="thesis">El miedo no se va leyendo. Se va practicando, con amigos y para algo que te importa.</p>
-    <div class="card" style="margin-bottom:16px">
-      <h2>Lo honesto</h2>
-      <p style="margin:0">Ya existen apps de educación financiera con lecciones y simuladores de inversión. “Lecciones + simulador” solo no es nuevo. Lo distinto está en para qué y con quién se practica:</p>
-    </div>
-    <div class="pillars" style="grid-template-columns:repeat(auto-fill,minmax(250px,1fr));margin-bottom:16px">
-      <div class="card"><b>1. Una meta real</b><span class="small muted">El viaje de egresados, unas zapatillas, un recital. La app muestra cuánto antes llegás invirtiendo.</span></div>
-      <div class="card"><b>2. ¿Y si…?</b><span class="small muted">Con lo que te regalaron en tu cumpleaños: qué hubiera pasado invirtiéndolo, contra tenerlo en el cajón.</span></div>
-      <div class="card"><b>3. Liga con amigos</b><span class="small muted">Todos con el mismo mercado y plata de mentira. Gana quien mejor administra, no quien más arriesga.</span></div>
-      <div class="card"><b>4. Preguntá sin vergüenza</b><span class="small muted">Lo que da vergüenza preguntar en voz alta: “¿qué es una acción?”, “¿esto es estafa?”.</span></div>
-      <div class="card"><b>5. El salto real</b><span class="small muted">Al terminar, la primera inversión real con un monto chico en LBO. Si sos menor, invitás a un adulto.</span></div>
-    </div>
-    <h2>Cómo se podría vender</h2>
-    <div class="tbl-wrap" style="margin-bottom:16px"><table class="resp">
-      <thead><tr><th>Quién paga</th><th>Por qué le sirve</th></tr></thead>
-      <tbody>
-        <tr><td class="head"><b>LBO</b> (principal)</td><td data-label="Por qué le sirve" style="white-space:normal">Clientes nuevos y jóvenes que llegan educados y con confianza. Además entra el adulto que habilita la cuenta.</td></tr>
-        <tr><td class="head"><b>Colegios</b></td><td data-label="Por qué le sirve" style="white-space:normal">Educación financiera como programa: la liga se juega por curso y el profe ve el progreso.</td></tr>
-        <tr><td class="head"><b>Otras empresas</b> (a futuro)</td><td data-label="Por qué le sirve" style="white-space:normal">Versión con otra marca para bancos o billeteras virtuales.</td></tr>
-      </tbody>
-    </table></div>
-    <h2>La métrica clave</h2>
-    <div class="card" style="margin-bottom:16px">
-      <div class="funnel">
-        <div style="width:100%">Practican en el simulador</div>
-        <div style="width:72%">Completan el camino</div>
-        <div style="width:44%">Dan el salto a una inversión real</div>
-      </div>
-      <p class="small muted" style="margin:12px 0 0">¿Cuántos de los que practican se animan a invertir de verdad? Eso es lo que le importa a un negocio. El dibujo es ilustrativo: todavía no hay datos.</p>
-    </div>
-    <div class="card">
-      <h2>Para validar</h2>
-      <p style="margin:0">Preguntarle a compañeros si usarían una liga con el curso y para qué meta juntarían plata.</p>
-    </div>
-  </div>`;
-}
-
-/* ---------- Precios en vivo ---------- */
-
-function liveTick() {
-  if (!S.market || !S.broker || !brokerOpen() || document.hidden || modal) return;
-  INSTRUMENTS.forEach(i => {
-    if (i.type === "fci") return;
-    const m = S.market[i.sym];
-    m.px = 0.7 * m.px + 0.3 * m.ref * (1 + i.sigma * 0.15 * gauss());
-    m.hi = Math.max(m.hi ?? m.px, m.px); m.lo = Math.min(m.lo ?? m.px, m.px);
-  });
-  const filled = checkLimits();
-  notifyFills(filled);
-  document.querySelectorAll("[data-px]").forEach(el => {
-    const s = el.dataset.px, old = parseFloat(el.dataset.last || px(s));
-    el.textContent = money(px(s));
-    const row = el.closest("tr");
-    if (row) { row.classList.remove("flash-up", "flash-down"); void row.offsetWidth; row.classList.add(px(s) >= old ? "flash-up" : "flash-down"); }
-    el.dataset.last = px(s);
-  });
-  document.querySelectorAll("[data-var]").forEach(el => { const v = dayVar(el.dataset.var); el.textContent = pct(v); el.className = `pill ${cls(v)} num`; });
-  document.querySelectorAll("[data-var-t]").forEach(el => { const v = dayVar(el.dataset.varT); el.textContent = pct(v); el.className = `${cls(v)} num`; });
-  const total = equity(), pnl = total - START_CASH;
-  document.querySelectorAll("[data-total], [data-total-h]").forEach(el => el.textContent = money(total));
-  document.querySelectorAll("[data-cash-h]").forEach(el => el.textContent = money(S.broker.cash));
-  document.querySelectorAll("[data-pnl]").forEach(el => { el.textContent = money(pnl); el.className = `v ${cls(pnl)}`; });
-  updateTicket();
-  save();
-  document.querySelectorAll("[data-hi]").forEach(el => el.textContent = money(S.market[el.dataset.hi].hi ?? px(el.dataset.hi)));
-  document.querySelectorAll("[data-lo]").forEach(el => el.textContent = money(S.market[el.dataset.lo].lo ?? px(el.dataset.lo)));
-  if (filled.length && view.name !== "market") render();
-}
-setInterval(liveTick, 2500);
-
 /* =========================================================
    Eventos
    ========================================================= */
@@ -1682,7 +1648,6 @@ document.addEventListener("click", e => {
       go(view.i === 2 ? { name: "market" } : view.i === LEVELS.length - 1 ? { name: "leap" } : { name: "path" });
       break;
     case "leap": go({ name: "leap" }); break;
-    case "project": go({ name: "project" }); break;
     case "wiM": view.whatif = { ...(view.whatif || { amount: 50000 }), m: +el.dataset.m }; render(); break;
     case "leagueSave": leagueSave(); break;
     case "askOpen": chat.open = true; renderChat(); document.getElementById("chat-in")?.focus(); break;
