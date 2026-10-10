@@ -269,6 +269,57 @@
   .chart .hover-tip.on { opacity: 1; }
   .chart .hover-tip i { display: inline-block; width: 10px; height: 3px; border-radius: 2px; margin-right: 6px; vertical-align: middle; }
 
+  /* Broker de práctica */
+  .shell.wide { grid-template-columns: 252px minmax(0, 1fr); }
+  .shell.wide .main-in { max-width: 1240px; padding-top: 0; }
+  .practice-strip { position: sticky; top: 0; z-index: 15; margin: 0 -36px 18px; padding: 10px 36px; background: #FCF1D8; color: #6b4600; border-bottom: 1px solid #f1d58e; font-size: 13.5px; display: flex; gap: 8px; align-items: center; }
+  .practice-strip .ic { width: 16px; height: 16px; }
+  .bk-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; }
+  .bk-controls { display: flex; gap: 18px; align-items: center; }
+  .mkt { display: flex; gap: 10px; align-items: center; background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 8px 14px; }
+  .mkt i { width: 10px; height: 10px; border-radius: 50%; background: #9DB3B6; flex: none; }
+  .mkt.open i { background: var(--mint); box-shadow: 0 0 0 4px rgba(43,182,115,.2); }
+  .mkt b { display: block; font-size: 14px; }
+  .bk-bar { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin: 18px 0 12px; background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 12px 16px; }
+  .bk-kpis { display: flex; gap: 28px; }
+  .bk-kpis b { display: block; font-size: 17px; }
+  .bk-tabs { margin-top: 4px; }
+  .btn.sm { padding: 8px 12px; font-size: 13.5px; border-radius: 10px; }
+  .btn.danger { background: var(--red-100); color: #a52a2a; }
+  .btn.danger:hover { background: #f8d2d2; box-shadow: none; }
+  .up { color: #13774a; } .down { color: #b33232; }
+  .explain { display: flex; gap: 10px; align-items: flex-start; background: var(--mint-50); border: 1px dashed #9fd8bb; color: #145c3c; border-radius: 12px; padding: 10px 14px; font-size: 13.5px; margin: 10px 0; }
+  .explain .ic { width: 18px; height: 18px; flex: none; margin-top: 1px; }
+  .qbtn { width: 18px; height: 18px; border-radius: 50%; border: 0; background: #E3ECEA; color: var(--ink-2); font-size: 11px; font-weight: 800; padding: 0; display: inline-grid; place-items: center; vertical-align: 1px; margin-left: 3px; }
+  .qbtn:hover { background: var(--mint); color: #062018; }
+  .bk-table th { font-size: 11px; white-space: nowrap; }
+  .bk-table td { padding: 11px 12px; font-size: 14px; }
+  .bk-table td.num, .bk-table td.r b { white-space: nowrap; }
+  .bk-table th.r, .bk-table td.r { text-align: right; }
+  .bk-table tbody tr.click { cursor: pointer; transition: background .12s; }
+  .bk-table tbody tr.click:hover { background: #F4F8F7; }
+  .tk { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; letter-spacing: .02em; }
+  .chg { display: inline-block; min-width: 72px; text-align: right; font-weight: 700; padding: 3px 8px; border-radius: 8px; font-variant-numeric: tabular-nums; }
+  .chg.up { background: var(--mint-100); } .chg.down { background: var(--red-100); }
+  .bk-asset { display: grid; grid-template-columns: minmax(0, 1fr) 370px; gap: 18px; align-items: start; }
+  .bk-ticket { position: sticky; top: 64px; margin-top: 44px; }
+  .ticket { display: flex; flex-direction: column; gap: 14px; }
+  .seg2 { display: grid; grid-template-columns: 1fr 1fr; background: #EEF3F2; border-radius: 12px; padding: 4px; gap: 4px; }
+  .seg2 button { border: 0; background: none; padding: 10px; border-radius: 9px; font-weight: 800; color: var(--ink-2); }
+  .seg2 button.on.buy { background: var(--mint); color: #062018; }
+  .seg2 button.on.sell { background: var(--petrol-800); color: #fff; }
+  .tabs.full { display: flex; width: 100%; } .tabs.full button { flex: 1; font-size: 13.5px; padding: 8px; }
+  .sum { display: flex; flex-direction: column; gap: 0; background: #F6F9F8; border-radius: 12px; padding: 6px 14px; }
+  .sum > div { display: flex; justify-content: space-between; gap: 10px; padding: 7px 0; font-size: 13.5px; border-top: 1px solid #E6EEEC; }
+  .sum > div:first-child { border-top: 0; }
+  .sum > div span { color: var(--ink-2); }
+  .sum .tot { font-size: 15px; } .sum .tot span { color: var(--ink); font-weight: 800; }
+  .kv-card { padding: 14px 16px; } .kv-card b { display: block; margin-top: 2px; font-size: 16px; }
+  .risk-bar { position: relative; height: 12px; border-radius: 99px; margin-top: 14px; background: linear-gradient(90deg, #2BB673, #E3A21A 50%, #D64545); }
+  .risk-bar i { position: absolute; top: -5px; width: 6px; height: 22px; border-radius: 3px; background: var(--ink); transform: translateX(-50%); box-shadow: 0 0 0 2px #fff; }
+  .dd { width: 120px; height: 8px; background: #EEF3F2; border-radius: 99px; overflow: hidden; display: inline-block; }
+  .dd i { display: block; height: 100%; border-radius: 99px; }
+
   /* Liga */
   .tabs { display: inline-flex; background: #E6EEEC; border-radius: 12px; padding: 4px; gap: 4px; }
   .tabs button { border: 0; background: none; padding: 8px 16px; border-radius: 9px; font-weight: 700; color: var(--ink-2); }
@@ -546,7 +597,8 @@ function logo(light = true) {
 function shell() {
   const active = NAV_OF[V.page] || V.page;
   const pages = { home, learn, lesson, sim, league, scam, ask, goal: goalPage, whatif: goalPage, small: goalPage, leap };
-  return `<div class="shell">
+  const wide = V.page === "sim";
+  return `<div class="shell ${wide ? "wide" : ""}">
     <aside class="side">
       ${logo()}
       ${NAV.map(([id, l, ic]) => `<button class="nav-i ${active === id ? "on" : ""}" data-go="${id}">${icon(ic)}${l}${id === "learn" && !allDone() ? `<span class="badge">${current() + 1}/6</span>` : ""}</button>`).join("")}
@@ -556,7 +608,7 @@ function shell() {
       </div>
     </aside>
     <main class="main"><div class="main-in">${pages[V.page]()}</div></main>
-    ${rail()}
+    ${wide ? "" : rail()}
   </div>`;
 }
 
@@ -866,55 +918,547 @@ function scam() {
     </div>`;
 }
 
-/* ---------- 8. Simulador ---------- */
-function simSeries() {
-  const a = S.sim.alloc, r = rng(20251010), months = 12;
-  const vals = { mm: [a.mm], bono: [a.bono], cedear: [a.cedear], accion: [a.accion] };
-  for (let m = 1; m <= months; m++) OPTIONS.forEach(o => { const v = vals[o.id]; v.push(v[m - 1] * (1 + o.mu + o.sd * gauss(r))); });
-  const cash = 100000 - Object.values(a).reduce((x, y) => x + y, 0);
-  const total = Array.from({ length: months + 1 }, (_, m) => cash + OPTIONS.reduce((s, o) => s + vals[o.id][m], 0));
-  return { vals, total, cash };
+/* ---------- 8. Simulador: broker en modo práctica ---------- */
+
+// Configuración editable del motor de precios. Todos los valores son de referencia y simulados.
+const BROKER_CFG = {
+  startCash: 1000000,
+  commission: 0.005,      // comisión del broker
+  marketRights: 0.0008,   // derechos de mercado
+  iva: 0.21,              // IVA sobre la comisión
+  seed: "sin-miedo-demo-1",
+  ccl: { vol: 0.15, drift: 0.25 },   // dólar CCL: mueve a los CEDEARs
+  hours: { open: 11, close: 17, tz: "America/Argentina/Buenos_Aires" },
+  assets: [
+    { t: "MM", name: "Fondo Money Market", cls: "fci", px: 1250, vol: 0.01, drift: 0.30, spread: 0, per: 1, unit: "cuotapartes", vMoney: 0, term: "mm",
+      simple: "Tu plata disponible cuando la necesites: rinde de a poco y casi no baja.", tag: "Liquidez inmediata" },
+    { t: "S30N6", name: "Lecap corta (vence en noviembre)", cls: "ars", px: 108.5, vol: 0.04, drift: 0.32, spread: 0.001, per: 100, unit: "VN", vMoney: 9e9, term: "lecap",
+      simple: "Le prestás plata al Estado por pocos meses, a una tasa fija en pesos." },
+    { t: "AL30", name: "Bono Argentina 2030 (ley local)", cls: "usd", px: 85000, vol: 0.22, drift: 0.20, spread: 0.003, per: 100, unit: "VN", vMoney: 25e9, term: "bono",
+      simple: "Le prestás dólares al Estado argentino hasta 2030 y te devuelve con intereses." },
+    { t: "GD30", name: "Bono Argentina 2030 (ley Nueva York)", cls: "usd", px: 89000, vol: 0.22, drift: 0.20, spread: 0.003, per: 100, unit: "VN", vMoney: 14e9, term: "bono",
+      simple: "Parecido al AL30, pero con contrato bajo ley de Nueva York." },
+    { t: "SPY", name: "CEDEAR SPDR S&P 500", cls: "cedear", px: 42000, vol: 0.17, drift: 0.10, spread: 0.004, per: 1, unit: "CEDEARs", vMoney: 6e9, ccl: true, term: "cedear",
+      simple: "Con un solo papel invertís en las 500 empresas más grandes de Estados Unidos." },
+    { t: "AAPL", name: "CEDEAR Apple", cls: "cedear", px: 16500, vol: 0.28, drift: 0.12, spread: 0.004, per: 1, unit: "CEDEARs", vMoney: 3e9, ccl: true, term: "cedear",
+      simple: "Un pedacito de Apple, la empresa del iPhone, comprado en pesos." },
+    { t: "KO", name: "CEDEAR Coca-Cola", cls: "cedear", px: 19000, vol: 0.16, drift: 0.06, spread: 0.004, per: 1, unit: "CEDEARs", vMoney: 1.5e9, ccl: true, term: "cedear",
+      simple: "Un pedacito de Coca-Cola: una empresa grande y estable, comprado en pesos." },
+    { t: "MELI", name: "CEDEAR MercadoLibre", cls: "cedear", px: 21500, vol: 0.45, drift: 0.15, spread: 0.004, per: 1, unit: "CEDEARs", vMoney: 2.5e9, ccl: true, term: "cedear",
+      simple: "Un pedacito de MercadoLibre. Puede subir o bajar mucho." },
+    { t: "GGAL", name: "Grupo Financiero Galicia", cls: "accion", px: 6200, vol: 0.50, drift: 0.25, spread: 0.005, per: 1, unit: "acciones", vMoney: 12e9, term: "accion",
+      simple: "Acción de un banco argentino. Sube y baja mucho con la economía del país." },
+    { t: "YPFD", name: "YPF", cls: "accion", px: 41000, vol: 0.50, drift: 0.25, spread: 0.005, per: 1, unit: "acciones", vMoney: 10e9, term: "accion",
+      simple: "Acción de la petrolera más grande del país." },
+    { t: "PAMP", name: "Pampa Energía", cls: "accion", px: 3300, vol: 0.50, drift: 0.25, spread: 0.005, per: 1, unit: "acciones", vMoney: 5e9, term: "accion",
+      simple: "Acción de una empresa de energía argentina." }
+  ]
+};
+const CLASSES = {
+  fci: { name: "FCI", color: "#1F9D63" },
+  ars: { name: "Bonos en pesos", color: "#2F6FB5" },
+  cedear: { name: "CEDEARs", color: "#C76A12" },
+  accion: { name: "Acciones argentinas", color: "#B0417A" },
+  usd: { name: "Bonos en dólares", color: "#7A5BC7" }
+};
+const TAB_ORDER = ["fci", "ars", "usd", "cedear", "accion"];
+const A = Object.fromEntries(BROKER_CFG.assets.map(a => [a.t, a]));
+const HIST = 260, STEPS = 24; // 24 tramos de 15 minutos: de 11 a 17 hs
+
+Object.assign(TERMS, {
+  lecap: ["Lecap", "Letra del Tesoro en pesos de corto plazo, con tasa fija.", "Prestarle a alguien por 3 meses y saber desde el día uno cuánto te devuelve."],
+  compradora: ["Punta compradora", "El mejor precio al que alguien está dispuesto a comprar ahora. Es el precio al que podés vender ya.", "En una feria, lo máximo que te ofrecen por tus figuritas."],
+  vendedora: ["Punta vendedora", "El mejor precio al que alguien está dispuesto a vender ahora. Es el precio al que podés comprar ya.", "Lo mínimo que te piden por una figurita que querés."],
+  volumen: ["Volumen", "Cuánta plata se operó hoy en ese activo.", "Cuánta gente pasó por la caja de un negocio en el día."],
+  mercado: ["Orden a mercado", "Comprás o vendés ya, al mejor precio disponible en ese momento.", "Como comprar en el súper: pagás el precio de la góndola."],
+  limitada: ["Orden limitada", "Ponés el precio máximo para comprar (o mínimo para vender). Solo se ejecuta si el precio llega.", "“Compro la remera solo si baja a $20.000”."],
+  ci: ["Contado inmediato (CI)", "La operación se paga y se recibe en el mismo día.", "Pagás y te llevás el producto en el momento."],
+  h24: ["24 hs", "La operación se paga y se recibe al día hábil siguiente.", "Comprás hoy y te lo entregan mañana."],
+  comision: ["Comisión del broker", "Lo que cobra el broker por hacer la operación por vos (0,5% en este simulador).", "Como el costo de envío de una compra online."],
+  derechos: ["Derechos de mercado", "Lo que cobra el mercado por cada operación (0,08% en este simulador).", "Como la entrada a la feria."],
+  ivacom: ["IVA sobre comisión", "El impuesto que se suma a la comisión del broker (21%).", "Igual que el IVA que pagás en cualquier servicio."],
+  ppc: ["Precio promedio de compra (PPC)", "Lo que pagaste, en promedio, por cada unidad que tenés, con gastos incluidos.", "Compraste 1 a $100 y 1 a $120: tu PPC es $110."],
+  vn: ["Valor nominal (VN)", "La unidad en la que se compran los bonos. El precio se muestra cada 100 VN.", "Como el precio de los huevos por docena: pagás según cuántos lleves."],
+  ccl: ["Dólar CCL", "El dólar que se usa para comprar activos del exterior. Los CEDEARs se mueven con él.", "Si sube el dólar, tus CEDEARs en pesos valen más, aunque la empresa no cambie."],
+  saldo: ["Saldo disponible", "La plata virtual que tenés para invertir, sin contar lo que ya invertiste ni lo reservado en órdenes pendientes.", "La plata que todavía está en tu billetera."]
+});
+const q = key => `<button class="qbtn" data-q="${key}" aria-label="¿Qué es?">?</button>`;
+const ex = text => S.bk && S.bk.explain ? `<div class="explain">${icon("bulb", "ic")}<span>${text}</span></div>` : "";
+const nf2 = new Intl.NumberFormat("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const m2 = n => (n < -0.004 ? "−$" : "$") + nf2.format(Math.abs(n));
+const pc2 = n => (n >= 0 ? "+" : "−") + nf2.format(Math.abs(n * 100)) + "%";
+const big = n => "$" + (n >= 1e9 ? nf2.format(n / 1e9) + " mil M" : n >= 1e6 ? nf2.format(n / 1e6) + " M" : Math.round(n).toLocaleString("es-AR"));
+const qtyF = (a, n) => a.cls === "fci" ? nf2.format(n) : Math.round(n).toLocaleString("es-AR");
+
+/* ---------- Motor de precios: paseo aleatorio geométrico con semilla fija ---------- */
+function hrand(str) {
+  let h1 = 0xdeadbeef, h2 = 0x41c6ce57;
+  for (let i = 0; i < str.length; i++) { const c = str.charCodeAt(i); h1 = Math.imul(h1 ^ c, 2654435761); h2 = Math.imul(h2 ^ c, 1597334677); }
+  h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+  return ((h1 >>> 0) % 1e9) / 1e9;
 }
+function zz(key) { const u = Math.max(hrand(key + "u"), 1e-12), v = hrand(key + "v"); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); }
+function zDay(sym, d) {
+  if (S.bk.shocks[d]) return sym === "CCL" ? 1.2 : -2.1 - 0.8 * hrand(`malo:${sym}:${d}`);   // día malo: todo cae entre 2 y 3 desvíos; el dólar sube
+  return zz(`${BROKER_CFG.seed}:${sym}:${d}`);
+}
+let PX = { key: "", data: {} };
+function series(upto) {
+  const key = upto + ":" + Object.keys(S.bk.shocks).join(",");
+  if (PX.key === key) return PX.data;
+  const dt = 1 / 252, out = {};
+  const step = (mu, vol, z) => Math.exp((mu - vol * vol / 2) * dt + vol * Math.sqrt(dt) * z);
+  const ccl = [1];
+  for (let d = -HIST + 1; d <= upto; d++) ccl.push(ccl[ccl.length - 1] * step(BROKER_CFG.ccl.drift, BROKER_CFG.ccl.vol, zDay("CCL", d)));
+  BROKER_CFG.assets.forEach(a => {
+    const p = [1];
+    for (let d = -HIST + 1; d <= upto; d++) {
+      const k = p.length;
+      p.push(p[k - 1] * step(a.drift, a.vol, zDay(a.t, d)) * (a.ccl ? ccl[k] / ccl[k - 1] : 1));
+    }
+    const scale = a.px / p[HIST];   // el día 0 vale el precio de referencia
+    out[a.t] = p.map(v => v * scale);
+  });
+  PX = { key, data: out };
+  return out;
+}
+const closeOf = (t, d) => series(Math.max(d, S.bk.day))[t][d + HIST];
+const INTRA = {};
+function intraday(t, d) {
+  const k = t + ":" + d + ":" + Object.keys(S.bk.shocks).join(",");
+  if (INTRA[k]) return INTRA[k];
+  const a = A[t], c0 = closeOf(t, d - 1), c1 = closeOf(t, d);
+  const sd = a.vol / Math.sqrt(252) / Math.sqrt(STEPS) * 0.9;
+  const w = [0]; for (let i = 1; i <= STEPS; i++) w.push(w[i - 1] + sd * zz(`${BROKER_CFG.seed}:${t}:${d}:i${i}`));
+  const pts = w.map((x, i) => Math.exp(Math.log(c0) + (i / STEPS) * Math.log(c1 / c0) + x - (i / STEPS) * w[STEPS]));
+  return (INTRA[k] = pts);
+}
+function ohlc(t, d) { const p = intraday(t, d); return { o: p[0], h: Math.max(...p), l: Math.min(...p), c: p[STEPS] }; }
+
+/* ---------- Reloj de mercado (horario real de BYMA) ---------- */
+function argClock() {
+  const parts = new Intl.DateTimeFormat("en-US", { timeZone: BROKER_CFG.hours.tz, hour: "numeric", minute: "numeric", weekday: "short", hour12: false }).formatToParts(new Date());
+  const g = k => parts.find(p => p.type === k)?.value;
+  return { h: +g("hour") % 24, m: +g("minute"), wd: g("weekday") };
+}
+function session() {
+  const c = argClock(), mins = c.h * 60 + c.m, o = BROKER_CFG.hours.open * 60, cl = BROKER_CFG.hours.close * 60;
+  const weekday = !["Sat", "Sun"].includes(c.wd);
+  let f = Math.min(1, Math.max(0, (mins - o) / (cl - o)));
+  let open = weekday && mins >= o && mins < cl;
+  let pre = weekday && mins < o;          // antes de la apertura: se muestra la última rueda completa
+  if (!weekday) f = 1;                    // fin de semana: la rueda del viernes ya cerró
+  if (S.bk.forceOpen && !open) { open = true; pre = false; f = mins < o ? 0.1 : 0.9; }
+  const time = `${String(c.h).padStart(2, "0")}:${String(c.m).padStart(2, "0")}`;
+  const label = open ? (S.bk.forceOpen && !(weekday && mins >= o && mins < cl) ? "Abierto (demo)" : "Abierto") : !weekday ? "Cerrado · fin de semana" : mins < o ? "Cerrado · abre a las 11 hs" : "Cerrado · cerró a las 17 hs";
+  return { open, pre, f: open ? f : pre ? 0 : 1, time, label };
+}
+function priceAt(t, d, f) { const p = intraday(t, d), x = f * STEPS, i = Math.floor(x); return i >= STEPS ? p[STEPS] : p[i] + (p[i + 1] - p[i]) * (x - i); }
+const last = t => session().pre ? closeOf(t, S.bk.day - 1) : priceAt(t, S.bk.day, session().f);
+const prevClose = t => closeOf(t, S.bk.day - (session().pre ? 2 : 1));
+const bidPx = t => last(t) * (1 - A[t].spread / 2);
+const askPx = t => last(t) * (1 + A[t].spread / 2);
+const dayVar = t => last(t) / prevClose(t) - 1;
+function volumeToday(t) {
+  const a = A[t]; if (!a.vMoney) return 0;
+  const ses = session(), d = ses.pre ? S.bk.day - 1 : S.bk.day;
+  const r = Math.abs(closeOf(t, d) / closeOf(t, d - 1) - 1);
+  return a.vMoney * (0.6 + 0.8 * hrand(`v:${t}:${d}`)) * (1 + 20 * r) * (ses.pre ? 1 : ses.f);
+}
+function simDate(d) {
+  const base = new Date(); base.setHours(12, 0, 0, 0);
+  while ([0, 6].includes(base.getDay())) base.setDate(base.getDate() - 1);
+  let n = d; const x = new Date(base);
+  while (n !== 0) { x.setDate(x.getDate() + Math.sign(n)); if (![0, 6].includes(x.getDay())) n -= Math.sign(n); }
+  return x;
+}
+const fmtD = d => simDate(d).toLocaleDateString("es-AR", { weekday: "short", day: "2-digit", month: "2-digit" });
+
+/* ---------- Estado del broker ---------- */
+function ensureBk() {
+  if (!S.bk) S.bk = { day: 0, cash: BROKER_CFG.startCash, hold: {}, orders: [], nextId: 10231, shocks: {}, forceOpen: false, explain: true, view: "quotes", tab: "fci" };
+  return S.bk;
+}
+const units = (a, qty, px) => qty * px / a.per;
+function costs(a, gross) {
+  if (a.cls === "fci") return { com: 0, der: 0, iva: 0 };
+  const com = gross * BROKER_CFG.commission;
+  return { com, der: gross * BROKER_CFG.marketRights, iva: com * BROKER_CFG.iva };
+}
+const pendingSellQty = t => S.bk.orders.filter(o => o.status === "Pendiente" && o.side === "sell" && o.t === t).reduce((s, o) => s + o.qty, 0);
+function calc(o) {
+  const a = A[o.t], px = o.type === "lim" ? (+o.limit || 0) : (o.side === "buy" ? askPx(o.t) : bidPx(o.t));
+  let qty = o.mode === "monto" ? (a.cls === "fci" ? (+o.amount || 0) / px : Math.floor((+o.amount || 0) * a.per / px)) : (+o.qty || 0);
+  if (a.cls !== "fci") qty = Math.floor(qty);
+  const gross = units(a, qty, px), c = costs(a, gross), fees = c.com + c.der + c.iva;
+  const total = o.side === "buy" ? gross + fees : gross - fees;
+  const held = (S.bk.hold[o.t]?.qty || 0) - pendingSellQty(o.t);
+  let err = "";
+  if (!(px > 0)) err = "Ingresá un precio límite.";
+  else if (!(qty > 0)) err = o.mode === "monto" ? "Con ese monto no alcanza para 1 unidad." : "Ingresá una cantidad mayor a cero.";
+  else if (o.side === "buy" && total > S.bk.cash + 0.01) err = `No te alcanza el saldo disponible (${m2(S.bk.cash)}).`;
+  else if (o.side === "sell" && qty > held + 1e-9) err = `Podés vender hasta ${qtyF(a, Math.max(0, held))} ${a.unit}.`;
+  return { a, px, qty, gross, ...c, fees, total, after: o.side === "buy" ? S.bk.cash - total : S.bk.cash + total, err };
+}
+function fill(o, px, d, time) {
+  const a = A[o.t], gross = units(a, o.qty, px), c = costs(a, gross), fees = c.com + c.der + c.iva, B = S.bk;
+  if (o.side === "buy") {
+    const total = gross + fees;
+    B.cash += (o.reserved || 0) - total; o.reserved = 0;
+    if (B.cash < -0.01) { B.cash += total; Object.assign(o, { status: "Rechazada", why: "Saldo insuficiente" }); return; }
+    const h = B.hold[o.t] || (B.hold[o.t] = { qty: 0, cost: 0 }); h.qty += o.qty; h.cost += total;
+    Object.assign(o, { status: "Ejecutada", price: px, fees, total, exec: { d, time } });
+  } else {
+    const h = B.hold[o.t]; if (!h || h.qty < o.qty - 1e-9) { Object.assign(o, { status: "Rechazada", why: "No tenés esa cantidad" }); return; }
+    const total = gross - fees; h.cost -= h.cost * o.qty / h.qty; h.qty -= o.qty; if (h.qty < 1e-9) delete B.hold[o.t];
+    B.cash += total;
+    Object.assign(o, { status: "Ejecutada", price: px, fees, total, exec: { d, time } });
+  }
+  S.simTouched = true;
+}
+function tryPending(d, mode) {
+  // mode "live": mercado abierto ahora; "day": se completó el día d (se usa la apertura y el rango del día)
+  const filled = [];
+  S.bk.orders.filter(o => o.status === "Pendiente").forEach(o => {
+    let px = null;
+    if (mode === "live") {
+      const cur = o.side === "buy" ? askPx(o.t) : bidPx(o.t);
+      if (o.type === "mkt" || (o.side === "buy" ? cur <= o.limit : cur >= o.limit)) px = cur;
+    } else {
+      const k = ohlc(o.t, d), open = intraday(o.t, d)[1];
+      if (o.type === "mkt") px = open;
+      else if (o.side === "buy" && k.l <= o.limit) px = Math.min(open, o.limit);
+      else if (o.side === "sell" && k.h >= o.limit) px = Math.max(open, o.limit);
+    }
+    if (px != null) { fill(o, px, d, mode === "live" ? session().time : "11:00"); filled.push(o); }
+  });
+  return filled;
+}
+function advanceDays(n, shock = false) {
+  const B = S.bk, filled = [];
+  for (let i = 0; i < n; i++) {
+    B.day++;
+    if (shock && i === 0) B.shocks[B.day] = true;
+    filled.push(...tryPending(B.day, "day"));
+  }
+  save();
+  filled.forEach(o => toast(`Orden ${o.id} ${o.status === "Ejecutada" ? "ejecutada" : "rechazada"}: ${o.side === "buy" ? "compra" : "venta"} de ${o.t}`));
+}
+const holdValue = () => Object.entries(S.bk.hold).reduce((s, [t, h]) => s + units(A[t], h.qty, last(t)), 0);
+const reserved = () => S.bk.orders.filter(o => o.status === "Pendiente" && o.side === "buy").reduce((s, o) => s + (o.reserved || 0), 0);
+const totalValue = () => S.bk.cash + reserved() + holdValue();
+const dayResult = () => Object.entries(S.bk.hold).reduce((s, [t, h]) => s + units(A[t], h.qty, last(t) - prevClose(t)), 0);
+
+/* ---------- Vistas del simulador ---------- */
 function sim() {
-  const a = S.sim.alloc, used = Object.values(a).reduce((x, y) => x + y, 0), m = S.sim.month;
-  const { vals, total, cash } = simSeries();
-  const now = total[m], diff = now - 100000;
-  const types = OPTIONS.filter(o => a[o.id] > 0).length;
+  const B = ensureBk(), ses = session();
+  if (ses.open) { const f = tryPending(B.day, "live"); if (f.length) { save(); f.forEach(o => toast(`Orden ${o.id} ejecutada: ${o.side === "buy" ? "compra" : "venta"} de ${o.t}`)); } }
+  const sub = V.sym ? "asset" : B.view;
+  const tot = totalValue(), res = tot - BROKER_CFG.startCash;
   return `
-    <div class="page-h"><div><span class="eyebrow">Simulador</span><h1 style="margin-top:6px">Tu cartera de práctica</h1><p class="muted">Repartí $100.000 virtuales entre 4 opciones y mirá qué podría pasar mes a mes.</p></div>
-      <span class="sim-tag"><i></i>Modo práctica · plata virtual</span></div>
-    <div class="grid" style="grid-template-columns:2fr 1fr;align-items:stretch">
-      <div class="card">
-        <div class="between"><div><span class="eyebrow">Valor de tu cartera</span><div class="big-num num" style="margin-top:4px">${money(now)}</div>
-          <span class="pill ${diff >= 0 ? "" : "red"} num">${pct(diff / 100000)} desde el inicio</span> <span class="pill grey">Mes ${m} de 12 · simulado</span></div>
-          <div class="row" style="flex:none"><button class="btn ghost" style="white-space:nowrap" data-act="simReset" ${m === 0 ? "disabled" : ""}>Reiniciar</button><button class="btn" style="white-space:nowrap" data-act="simStep" ${m >= 12 || used > 100000 ? "disabled" : ""}>Avanzar 1 mes ${icon("arrow")}</button></div></div>
-        <div style="margin-top:18px" id="chart-sim"></div>
-        <p class="note" style="margin-top:8px">Evolución simulada con datos ilustrativos. No son precios reales. Rendimientos pasados no garantizan resultados futuros.</p>
-      </div>
-      <div class="card">
-        <span class="eyebrow">Cómo repartiste</span>
-        <div class="alloc" style="margin:14px 0">${OPTIONS.map(o => `<div style="width:${a[o.id] / 1000}%;background:${o.color}" title="${o.name}"></div>`).join("")}<div style="width:${Math.max(0, cash) / 1000}%;background:#CFDAD8"></div></div>
-        <div class="stack" style="gap:8px">${OPTIONS.map(o => `<div class="between small"><span class="row" style="gap:8px"><i style="width:10px;height:10px;border-radius:3px;background:${o.color};display:inline-block"></i>${o.name}</span><b class="num">${money(vals[o.id][m])}</b></div>`).join("")}
-          <div class="between small"><span class="row" style="gap:8px"><i style="width:10px;height:10px;border-radius:3px;background:#CFDAD8;display:inline-block"></i>Sin invertir</span><b class="num">${money(Math.max(0, cash))}</b></div></div>
-        <div class="callout" style="margin-top:16px;font-size:14px">${types >= 3 ? `Repartiste en ${types} opciones: eso es ${t("diversificar", "diversificar")}, y suma puntos en la liga.` : `Probá repartir en 3 o más opciones: ${t("diversificar", "diversificar")} baja el riesgo y suma puntos en la liga.`}</div>
-        ${used > 100000 ? `<div class="callout red" style="margin-top:10px;font-size:14px">Te pasaste por ${money(used - 100000)}. Bajá alguna opción.</div>` : ""}
+    <div class="practice-strip">${icon("alert", "ic")}<b>MODO PRÁCTICA</b> · Plata virtual · Precios simulados, no son cotizaciones en vivo</div>
+    <div class="bk-head">
+      <div><span class="eyebrow">Simulador</span><h1 style="margin-top:4px">Tu broker de práctica</h1></div>
+      <div class="bk-controls">
+        <div class="mkt ${ses.open ? "open" : ""}"><i></i><div><b>Mercado ${ses.label}</b><span class="xs faint">${fmtD(B.day)} · ${ses.time} hs · BYMA 11 a 17 hs</span></div></div>
+        <label class="toggle small"><input type="checkbox" data-bk="explain" ${B.explain ? "checked" : ""}><span class="sw"></span>Modo explicado</label>
       </div>
     </div>
-    <h2 style="margin:28px 0 14px">Las 4 opciones, en palabras simples</h2>
-    <div class="opt4">${OPTIONS.map(o => `
-      <div class="card hover inv" style="--c:${o.color}">
-        <div class="between"><div class="row" style="gap:12px"><div class="icon-box">${icon(o.icon)}</div><div><h3>${t(o.term, o.name)}</h3><span class="xs faint">${o.sub}</span></div></div>
-          <div style="text-align:right"><div class="risk" aria-label="${o.riskLabel}">${[1, 2, 3, 4].map(k => `<i class="${k <= o.risk ? "on" : ""}"></i>`).join("")}</div><div class="xs" style="font-weight:700;margin-top:4px">${o.riskLabel}</div></div></div>
-        <p class="muted" style="margin:12px 0 14px">${o.desc}</p>
-        <div class="between small"><label for="r-${o.id}"><b>Cuánto ponés</b></label><b class="num">${money(a[o.id])}</b></div>
-        <input type="range" id="r-${o.id}" min="0" max="100000" step="5000" value="${a[o.id]}" data-alloc="${o.id}" ${m > 0 ? "disabled" : ""}>
-      </div>`).join("")}</div>
-    ${m > 0 ? `<p class="small muted" style="margin-top:10px">Para cambiar cómo repartiste, tocá “Reiniciar”.</p>` : ""}`;
+    <div class="bk-bar">
+      <div class="bk-kpis">
+        <div><span class="xs faint">${t("saldo", "Saldo disponible")}</span><b class="num">${m2(B.cash)}</b></div>
+        <div><span class="xs faint">Valor total</span><b class="num">${m2(tot)}</b></div>
+        <div><span class="xs faint">Resultado total</span><b class="num ${res >= 0 ? "up" : "down"}">${m2(res)} (${pc2(res / BROKER_CFG.startCash)})</b></div>
+      </div>
+      <div class="row" style="gap:8px;flex-wrap:wrap;justify-content:flex-end">
+        <button class="btn ghost sm" data-bkact="adv" data-n="1">Avanzar 1 día</button>
+        <button class="btn ghost sm" data-bkact="adv" data-n="5">1 semana</button>
+        <button class="btn ghost sm" data-bkact="adv" data-n="21">1 mes</button>
+        <button class="btn sm danger" data-bkact="bad">${icon("alert")}Simular un día malo</button>
+        ${!session().open || B.forceOpen ? `<button class="btn ghost sm" data-bkact="force">${B.forceOpen ? "Usar horario real" : "Abrir mercado (demo)"}</button>` : ""}
+      </div>
+    </div>
+    ${ex("Arriba ves tu plata: el saldo disponible es lo que podés usar; el valor total suma lo que tenés invertido. Con los botones adelantás el tiempo para ver cómo cambia.")}
+    <div class="tabs bk-tabs">${[["quotes", "Cotizaciones"], ["port", "Mi cartera"], ["hist", "Historial"]].map(([k, l]) => `<button class="${sub === k || (sub === "asset" && k === "quotes") ? "on" : ""}" data-bkview="${k}">${l}</button>`).join("")}</div>
+    ${sub === "asset" ? assetView(V.sym) : sub === "port" ? portView() : sub === "hist" ? histView() : quotesView()}`;
 }
+
+function sparkDay(t) {
+  const ses = session(), d = S.bk.day, f = ses.f;
+  const p = f > 0 ? intraday(t, d).slice(0, Math.max(2, Math.ceil(f * STEPS) + 1)) : intraday(t, d - 1);
+  const min = Math.min(...p), max = Math.max(...p), sp = max - min || 1;
+  const pts = p.map((v, i) => `${(i / STEPS * 90).toFixed(1)},${(26 - (v - min) / sp * 22).toFixed(1)}`).join(" ");
+  const up = p[p.length - 1] >= (f > 0 ? prevClose(t) : closeOf(t, d - 2));
+  return `<svg width="90" height="28" viewBox="0 0 90 28" aria-hidden="true"><polyline points="${pts}" fill="none" stroke="${up ? "#1F9D63" : "#D64545"}" stroke-width="1.6" ${f > 0 ? "" : 'stroke-dasharray="3 2" opacity=".6"'}/></svg>`;
+}
+
+function quotesView() {
+  const B = S.bk, tab = B.tab, list = BROKER_CFG.assets.filter(a => a.cls === tab);
+  return `
+    <div class="tabs" style="margin:14px 0 12px">${TAB_ORDER.map(k => `<button class="${tab === k ? "on" : ""}" data-bktab="${k}">${CLASSES[k].name}</button>`).join("")}</div>
+    ${ex("Esta es la pizarra: cada fila es algo que podés comprar. Verde quiere decir que hoy sube y rojo que baja, comparado con el cierre de ayer. Tocá una fila para ver su ficha y operar.")}
+    <div class="card" style="padding:0;overflow:hidden">
+      <table class="bk-table">
+        <thead><tr><th>Ticker</th><th>Nombre</th><th class="r">Último precio</th><th class="r">Var. % día</th><th class="r">${tab === "fci" ? "Cuotaparte" : `Punta compradora ${q("compradora")}`}</th><th class="r">${tab === "fci" ? "" : `Punta vendedora ${q("vendedora")}`}</th><th class="r">Volumen ${q("volumen")}</th><th>Hoy</th></tr></thead>
+        <tbody>${list.map(a => {
+          const v = dayVar(a.t);
+          return `<tr class="click" data-sym="${a.t}">
+            <td><b class="tk">${a.t}</b></td>
+            <td><div>${a.name}</div><div class="xs faint">${a.tag || (a.per === 100 ? "Precio cada 100 VN" : a.ccl ? "En pesos · se mueve con el dólar CCL" : "En pesos")}</div></td>
+            <td class="r num"><b>${m2(last(a.t))}</b></td>
+            <td class="r"><span class="chg ${v >= 0 ? "up" : "down"}">${pc2(v)}</span></td>
+            <td class="r num">${a.cls === "fci" ? "Suscripción y rescate" : m2(bidPx(a.t))}</td>
+            <td class="r num">${a.cls === "fci" ? "" : m2(askPx(a.t))}</td>
+            <td class="r num">${a.vMoney ? big(volumeToday(a.t)) : "—"}</td>
+            <td>${sparkDay(a.t)}</td></tr>`;
+        }).join("")}</tbody>
+      </table>
+    </div>
+    <p class="note" style="margin-top:10px">Precios simulados con un modelo de paseo aleatorio a partir de precios de referencia. No son cotizaciones en vivo.</p>`;
+}
+
+function riskMeter(a) {
+  const eff = a.ccl ? Math.sqrt(a.vol ** 2 + BROKER_CFG.ccl.vol ** 2) : a.vol;
+  const drop = Math.min(0.95, 2 * eff);
+  const label = drop < 0.1 ? "Bajo" : drop < 0.4 ? "Medio" : drop < 0.7 ? "Alto" : "Muy alto";
+  return `<div class="card">
+    <div class="between"><span class="eyebrow">Riesgo</span><span class="pill ${drop < 0.1 ? "" : drop < 0.4 ? "amber" : "red"}">${label}</span></div>
+    <p style="margin-top:8px;font-size:16px">En un año malo podrías ver aprox. <b>${Math.round(drop * 100)}% de baja</b>.</p>
+    <div class="risk-bar"><i style="left:${Math.min(98, drop / 0.95 * 100)}%"></i></div>
+    <div class="between xs faint" style="margin-top:4px"><span>Bajo</span><span>Medio</span><span>Alto</span></div>
+    <p class="xs faint" style="margin-top:8px">Cálculo: 2 veces la volatilidad anual de referencia (${Math.round(eff * 100)}%${a.ccl ? ", sumando el dólar CCL" : ""}). Es una estimación simple, no un máximo.</p>
+  </div>`;
+}
+
+const RANGES = { "1D": 0, "1S": 5, "1M": 21, "6M": 126, "1A": 252 };
+function assetView(tk) {
+  const a = A[tk], B = S.bk, r = V.range || "1M", style = V.cstyle || "line", ses = session();
+  const v = dayVar(tk), k = ohlc(tk, B.day);
+  const dayHigh = ses.f > 0 ? Math.max(...intraday(tk, B.day).slice(0, Math.ceil(ses.f * STEPS) + 1)) : prevClose(tk);
+  const dayLow = ses.f > 0 ? Math.min(...intraday(tk, B.day).slice(0, Math.ceil(ses.f * STEPS) + 1)) : prevClose(tk);
+  const h = B.hold[tk];
+  return `
+    <div class="bk-asset">
+      <div>
+        <button class="link small" data-bkview="quotes" style="margin:12px 0">${icon("back", "ic")} Volver a cotizaciones</button>
+        <div class="card">
+          <div class="between" style="align-items:flex-start">
+            <div><div class="row" style="gap:10px"><h2>${a.t}</h2><span class="pill" style="background:${CLASSES[a.cls].color}1a;color:${CLASSES[a.cls].color}">${CLASSES[a.cls].name}</span></div>
+              <p class="muted">${a.name}${a.per === 100 ? " · precio cada 100 " + t("vn", "VN") : ""}</p></div>
+            <div style="text-align:right"><div class="big-num num">${m2(last(tk))}</div><span class="chg ${v >= 0 ? "up" : "down"}">${pc2(v)} hoy</span></div>
+          </div>
+          <div class="between" style="margin:16px 0 6px">
+            <div class="tabs">${Object.keys(RANGES).map(x => `<button class="${r === x ? "on" : ""}" data-range="${x}">${x}</button>`).join("")}</div>
+            <div class="tabs"><button class="${style === "line" ? "on" : ""}" data-cstyle="line">Línea</button><button class="${style === "candle" ? "on" : ""}" data-cstyle="candle">Velas</button></div>
+          </div>
+          <div id="chart-asset"></div>
+          ${ex(r === "1D" ? "El gráfico de 1D muestra cómo se movió el precio durante el día, de 11 a 17 hs." : "Cada punto es el precio de cierre de un día. En velas, cada vela muestra la apertura, el cierre, el máximo y el mínimo del día.")}
+        </div>
+        <div class="grid" style="grid-template-columns:repeat(4,1fr);margin-top:14px">${[
+          ["Máximo del día", m2(dayHigh)], ["Mínimo del día", m2(dayLow)], [`Volumen ${q("volumen")}`, a.vMoney ? big(volumeToday(tk)) : "—"], ["Cierre anterior", m2(prevClose(tk))]
+        ].map(([l, val]) => `<div class="card kv-card"><span class="xs faint">${l}</span><b class="num">${val}</b></div>`).join("")}</div>
+        <div class="grid" style="grid-template-columns:1fr 1fr;margin-top:14px;align-items:start">
+          <div class="card"><span class="eyebrow">En simple</span><p style="margin-top:8px;font-size:16px">${a.simple}</p>${a.ccl ? `<p class="small muted" style="margin-top:8px">Cotiza en pesos y se mueve con la empresa y con el ${t("ccl", "dólar CCL")}.</p>` : ""}
+            ${h ? `<div class="callout" style="margin-top:12px;font-size:14px">Tenés <b>${qtyF(a, h.qty)} ${a.unit}</b> · valorizado ${m2(units(a, h.qty, last(tk)))}</div>` : ""}</div>
+          ${riskMeter(a)}
+        </div>
+      </div>
+      <div class="bk-ticket">${ticket(tk)}</div>
+    </div>`;
+}
+
+function newTicket(tk, side = "buy") {
+  const a = A[tk];
+  return { t: tk, side, type: "mkt", mode: a.cls === "fci" ? "monto" : "qty", qty: a.per === 100 ? 100 : 1, amount: a.cls === "fci" ? 50000 : 100000, limit: +last(tk).toFixed(2), plazo: "CI", step: "form" };
+}
+function ticket(tk) {
+  if (!V.tk || V.tk.t !== tk) V.tk = newTicket(tk);
+  const o = V.tk, a = A[tk], fci = a.cls === "fci", ses = session();
+  if (o.step === "done") {
+    const r = o.result, ok = r.status === "Ejecutada", pend = r.status === "Pendiente";
+    return `<div class="card ticket">
+      <div class="medal" style="width:64px;height:64px;${pend ? "background:linear-gradient(145deg,#FCE7A8,#E3A21A)" : ok ? "" : "background:#F3B4B4"}">${icon(pend ? "flame" : ok ? "check" : "alert")}</div>
+      <h2 style="text-align:center">${ok ? "Orden ejecutada" : pend ? "Orden pendiente" : "Orden rechazada"}</h2>
+      <p class="small muted" style="text-align:center">${ok ? `${o.side === "buy" ? (fci ? "Suscribiste" : "Compraste") : (fci ? "Rescataste" : "Vendiste")} ${qtyF(a, r.qty)} ${a.unit} de ${a.t} a ${m2(r.price)}.` : pend ? (ses.open ? "Se ejecuta si el precio llega a tu límite." : "El mercado está cerrado: se ejecuta en la próxima apertura (11 hs).") : r.why}</p>
+      <div class="sum">
+        <div><span>N.º de orden</span><b class="num">${r.id}</b></div>
+        <div><span>Estado</span><b><span class="pill ${ok ? "" : pend ? "amber" : "red"}">${r.status}</span></b></div>
+        <div><span>Fecha y hora</span><b>${fmtD(r.created.d)} · ${r.created.time} hs</b></div>
+        <div><span>Liquidación</span><b>${r.plazo === "CI" ? "Contado inmediato" : "24 hs"}</b></div>
+        ${ok ? `<div><span>Total ${o.side === "buy" ? "pagado" : "recibido"}</span><b class="num">${m2(r.total)}</b></div>` : ""}
+        <div><span>Saldo disponible</span><b class="num">${m2(S.bk.cash)}</b></div>
+      </div>
+      <div class="row"><button class="btn ghost" style="flex:1" data-bkview="port">Ver mi cartera</button><button class="btn" style="flex:1" data-bkact="newTicket">Nueva orden</button></div>
+    </div>`;
+  }
+  const c = calc(o);
+  if (o.step === "review") return `<div class="card ticket">
+    <span class="eyebrow">Revisá antes de confirmar</span>
+    <h2>${o.side === "buy" ? (fci ? "Suscribir" : "Comprar") : (fci ? "Rescatar" : "Vender")} ${a.t}</h2>
+    ${ex("Siempre revisá el total: incluye los costos de la operación.")}
+    ${summary(o, c)}
+    ${!ses.open ? `<div class="callout" style="font-size:13.5px;background:var(--amber-100)">El mercado está cerrado: la orden va a quedar <b>pendiente</b> hasta la próxima apertura.</div>` : ""}
+    <div class="row"><button class="btn ghost" style="flex:1" data-bkact="edit">Modificar</button><button class="btn ${o.side === "sell" ? "dark" : ""}" style="flex:1" data-bkact="confirm" ${c.err ? "disabled" : ""}>Confirmar</button></div>
+  </div>`;
+  return `<div class="card ticket">
+    <div class="seg2"><button class="${o.side === "buy" ? "on buy" : ""}" data-tkf="side" data-v="buy">${fci ? "Suscribir" : "Comprar"}</button><button class="${o.side === "sell" ? "on sell" : ""}" data-tkf="side" data-v="sell">${fci ? "Rescatar" : "Vender"}</button></div>
+    ${ex("Acá le decís al broker qué querés hacer: comprar o vender, cuánto y a qué precio.")}
+    ${fci ? "" : `<div class="field"><label>Tipo de orden <span class="faint xs">· a mercado ${q("mercado")} · limitada ${q("limitada")}</span></label><div class="tabs full"><button class="${o.type === "mkt" ? "on" : ""}" data-tkf="type" data-v="mkt">A mercado</button><button class="${o.type === "lim" ? "on" : ""}" data-tkf="type" data-v="lim">Limitada</button></div></div>`}
+    ${o.type === "lim" ? `<div class="field"><label for="tk-lim">Precio límite${a.per === 100 ? " (cada 100 VN)" : ""}</label><div class="money-in"><span>$</span><input class="input num" id="tk-lim" data-tkin="limit" value="${o.limit}" inputmode="decimal"></div></div>` : ""}
+    <div class="field"><label>Ingresar por</label><div class="tabs full"><button class="${o.mode === "qty" ? "on" : ""}" data-tkf="mode" data-v="qty">Cantidad${a.per === 100 ? " (VN)" : ""}</button><button class="${o.mode === "monto" ? "on" : ""}" data-tkf="mode" data-v="monto">Monto en $</button></div></div>
+    <div class="field">${o.mode === "qty" ? `<input class="input num" id="tk-qty" data-tkin="qty" value="${o.qty}" inputmode="decimal" aria-label="Cantidad">` : `<div class="money-in"><span>$</span><input class="input num" id="tk-amt" data-tkin="amount" value="${o.amount}" inputmode="numeric" aria-label="Monto"></div>`}
+      ${o.side === "sell" ? `<span class="xs faint">Tenés ${qtyF(a, S.bk.hold[tk]?.qty || 0)} ${a.unit}.</span>` : ""}</div>
+    ${fci ? `<p class="xs faint">Los FCI de liquidez se suscriben y rescatan en el día.</p>` : `<div class="field"><label>Plazo de liquidación <span class="faint xs">· CI ${q("ci")} · 24 hs ${q("h24")}</span></label><div class="tabs full"><button class="${o.plazo === "CI" ? "on" : ""}" data-tkf="plazo" data-v="CI">Contado inmediato</button><button class="${o.plazo === "24" ? "on" : ""}" data-tkf="plazo" data-v="24">24 hs</button></div></div>`}
+    <div id="tk-sum">${summary(o, c)}</div>
+    <button class="btn block ${o.side === "sell" ? "dark" : ""}" id="tk-review" data-bkact="review" ${c.err ? "disabled" : ""}>Revisar orden</button>
+  </div>`;
+}
+function summary(o, c) {
+  const a = A[o.t], fci = a.cls === "fci";
+  return `<div class="sum">
+    <div><span>Precio estimado${o.type === "lim" ? " (límite)" : ""}</span><b class="num">${m2(c.px)}</b></div>
+    <div><span>Cantidad</span><b class="num">${qtyF(a, c.qty)} ${a.unit}</b></div>
+    <div><span>Monto bruto</span><b class="num">${m2(c.gross)}</b></div>
+    ${fci ? `<div><span>Comisión</span><b>Sin comisión</b></div>` : `
+    <div><span>Comisión del broker (0,5%) ${q("comision")}</span><b class="num">${m2(c.com)}</b></div>
+    <div><span>Derechos de mercado (0,08%) ${q("derechos")}</span><b class="num">${m2(c.der)}</b></div>
+    <div><span>IVA sobre comisión ${q("ivacom")}</span><b class="num">${m2(c.iva)}</b></div>`}
+    <div class="tot"><span>${o.side === "buy" ? "Total a pagar" : "Total a recibir"}</span><b class="num">${m2(c.total)}</b></div>
+    <div><span>Saldo restante</span><b class="num">${m2(c.after)}</b></div>
+    ${c.err ? `<p class="small" style="color:var(--red);margin-top:6px">${c.err}</p>` : ""}
+  </div>`;
+}
+function placeOrder() {
+  const o = V.tk, c = calc(o), B = S.bk, ses = session();
+  if (c.err) return;
+  const rec = { id: B.nextId++, t: o.t, side: o.side, type: o.type, limit: o.type === "lim" ? +o.limit : null, qty: c.qty, plazo: o.plazo, created: { d: B.day, time: ses.time }, status: "Pendiente" };
+  if (o.side === "buy") { rec.reserved = c.total * (o.type === "lim" ? 1.002 : 1.01); B.cash -= rec.reserved; }
+  B.orders.unshift(rec);
+  if (ses.open) {
+    const cur = o.side === "buy" ? askPx(o.t) : bidPx(o.t);
+    if (o.type === "mkt") fill(rec, cur, B.day, ses.time);
+    else if (o.side === "buy" ? cur <= rec.limit : cur >= rec.limit) fill(rec, cur, B.day, ses.time);
+  }
+  save();
+  V.tk = { ...o, step: "done", result: rec };
+  render();
+}
+
+function donut(parts) {
+  const total = parts.reduce((s, p) => s + p.v, 0) || 1, R = 70, C = 2 * Math.PI * R;
+  let off = 0;
+  return `<svg width="180" height="180" viewBox="0 0 180 180" role="img" aria-label="Distribución de la cartera">${parts.map(p => {
+    const len = p.v / total * C, gap = parts.length > 1 ? 2 : 0;
+    const s = `<circle cx="90" cy="90" r="${R}" fill="none" stroke="${p.color}" stroke-width="26" stroke-dasharray="${Math.max(0, len - gap)} ${C}" stroke-dashoffset="${-off}" transform="rotate(-90 90 90)"><title>${p.name}: ${Math.round(p.v / total * 100)}%</title></circle>`;
+    off += len; return s;
+  }).join("")}<text x="90" y="86" text-anchor="middle" font-size="12" fill="#7A8C91">Valor total</text><text x="90" y="104" text-anchor="middle" font-size="14" font-weight="800" fill="#0F2229">${big(total)}</text></svg>`;
+}
+function portView() {
+  const B = S.bk, tot = totalValue(), dr = dayResult(), res = tot - BROKER_CFG.startCash, hv = holdValue();
+  const rows = Object.entries(B.hold).map(([tk, h]) => { const a = A[tk], val = units(a, h.qty, last(tk)); return { a, h, val, res: val - h.cost, ppc: h.cost / h.qty * a.per }; });
+  const byCls = {}; rows.forEach(r => byCls[r.a.cls] = (byCls[r.a.cls] || 0) + r.val);
+  const parts = Object.keys(CLASSES).filter(k => byCls[k]).map(k => ({ name: CLASSES[k].name, color: CLASSES[k].color, v: byCls[k] }))
+    .concat([{ name: "Pesos disponibles", color: "#CFDAD8", v: B.cash + reserved() }]);
+  const top = rows.sort((x, y) => y.val - x.val)[0];
+  const topShare = top && hv ? top.val / hv : 0;
+  return `
+    <div class="grid" style="grid-template-columns:repeat(4,1fr);margin-top:16px">${[
+      [t("saldo", "Saldo disponible"), m2(B.cash), ""], ["Valor total", m2(tot), ""],
+      ["Resultado del día", `${m2(dr)} (${pc2(dr / Math.max(1, tot - dr))})`, dr >= 0 ? "up" : "down"],
+      ["Resultado total", `${m2(res)} (${pc2(res / BROKER_CFG.startCash)})`, res >= 0 ? "up" : "down"]
+    ].map(([l, v, c]) => `<div class="card kv-card"><span class="xs faint">${l}</span><b class="num ${c}" style="font-size:19px">${v}</b></div>`).join("")}</div>
+    ${ex("El resultado del día compara con el cierre de ayer. El resultado total compara con el $1.000.000 virtual con el que empezaste.")}
+    <div class="grid" style="grid-template-columns:1fr 2fr;margin-top:14px;align-items:start">
+      <div class="card" style="text-align:center">
+        <span class="eyebrow">Por tipo de activo</span>
+        <div style="margin:12px auto 8px;width:180px">${donut(parts)}</div>
+        <div class="stack" style="gap:6px;text-align:left">${parts.map(p => `<div class="between small"><span class="row" style="gap:8px"><i style="width:10px;height:10px;border-radius:3px;background:${p.color};display:inline-block"></i>${p.name}</span><b class="num">${Math.round(p.v / (tot || 1) * 100)}%</b></div>`).join("")}</div>
+        ${topShare >= 0.5 && rows.length ? `<div class="callout" style="margin-top:14px;font-size:13.5px;background:var(--amber-100);text-align:left">${icon("alert", "ic")} Tenés el <b>${Math.round(topShare * 100)}%</b> de lo invertido en un solo activo (${top.a.t}). Probá ${t("diversificar", "diversificar")}.</div>` : ""}
+      </div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <table class="bk-table"><thead><tr><th>Activo</th><th class="r">Cantidad</th><th class="r">PPC ${q("ppc")}</th><th class="r">Precio actual</th><th class="r">Valorizado</th><th class="r">Resultado</th><th></th></tr></thead>
+          <tbody>${rows.length ? rows.map(r => `<tr class="click" data-sym="${r.a.t}">
+            <td><b class="tk">${r.a.t}</b><div class="xs faint">${CLASSES[r.a.cls].name}</div></td>
+            <td class="r num">${qtyF(r.a, r.h.qty)}</td><td class="r num">${m2(r.ppc)}</td><td class="r num">${m2(last(r.a.t))}</td><td class="r num">${m2(r.val)}</td>
+            <td class="r num ${r.res >= 0 ? "up" : "down"}"><b>${m2(r.res)}</b><div class="xs">${pc2(r.res / r.h.cost)}</div></td>
+            <td class="r"><button class="btn ghost sm" data-sell="${r.a.t}">${r.a.cls === "fci" ? "Rescatar" : "Vender"}</button></td></tr>`).join("")
+            : `<tr><td colspan="7" style="text-align:center;padding:36px" class="muted">Todavía no tenés inversiones. <button class="link" data-bkview="quotes">Ir a cotizaciones</button></td></tr>`}</tbody></table>
+      </div>
+    </div>`;
+}
+function histView() {
+  const os = S.bk.orders;
+  return `
+    ${ex("Acá queda registrada cada orden, igual que en un broker real. Las pendientes se pueden cancelar.")}
+    <div class="card" style="padding:0;overflow:hidden;margin-top:16px">
+      <table class="bk-table"><thead><tr><th>N.º</th><th>Fecha</th><th>Hora</th><th>Activo</th><th>Operación</th><th class="r">Cantidad</th><th class="r">Precio</th><th class="r">Comisión y gastos</th><th class="r">Total</th><th>Estado</th></tr></thead>
+        <tbody>${os.length ? os.map(o => {
+          const a = A[o.t], when = o.exec || o.created;
+          return `<tr><td class="num xs">${o.id}</td><td>${fmtD(when.d)}</td><td class="num">${when.time}</td><td><b class="tk">${o.t}</b></td>
+            <td><span class="${o.side === "buy" ? "up" : "down"}" style="font-weight:700">${o.side === "buy" ? (a.cls === "fci" ? "Suscripción" : "Compra") : (a.cls === "fci" ? "Rescate" : "Venta")}</span><div class="xs faint">${o.type === "mkt" ? "A mercado" : "Limitada " + m2(o.limit)} · ${o.plazo === "CI" ? "CI" : "24 hs"}</div></td>
+            <td class="r num">${qtyF(a, o.qty)}</td><td class="r num">${o.price ? m2(o.price) : "—"}</td><td class="r num">${o.fees != null ? m2(o.fees) : "—"}</td><td class="r num">${o.total != null ? m2(o.total) : "—"}</td>
+            <td><span class="pill ${o.status === "Ejecutada" ? "" : o.status === "Pendiente" ? "amber" : o.status === "Cancelada" ? "grey" : "red"}">${o.status}</span>${o.status === "Pendiente" ? ` <button class="link xs" data-cancel="${o.id}">Cancelar</button>` : ""}</td></tr>`;
+        }).join("") : `<tr><td colspan="10" style="text-align:center;padding:36px" class="muted">Todavía no hiciste operaciones.</td></tr>`}</tbody></table>
+    </div>`;
+}
+
+function mountAssetChart() {
+  const el = document.getElementById("chart-asset"); if (!el) return;
+  const tk = V.sym, r = V.range || "1M", style = V.cstyle || "line", B = S.bk, ses = session();
+  let labels, vals, bars;
+  if (r === "1D") {
+    const p = intraday(tk, B.day), n = ses.f > 0 ? Math.ceil(ses.f * STEPS) : 0;
+    const src = n > 0 ? p.slice(0, n + 1).concat() : intraday(tk, B.day - 1);
+    if (n > 0) src[src.length - 1] = last(tk);
+    labels = src.map((_, i) => { const mm = 11 * 60 + i * 15; return `${Math.floor(mm / 60)}:${String(mm % 60).padStart(2, "0")}`; });
+    vals = src;
+    bars = []; for (let i = 0; i + 4 <= src.length - 1; i += 4) { const seg = src.slice(i, i + 5); bars.push({ o: seg[0], c: seg[4], h: Math.max(...seg), l: Math.min(...seg), lab: labels[i] }); }
+  } else {
+    const n = RANGES[r], days = Array.from({ length: n + 1 }, (_, i) => B.day - n + i);
+    labels = days.map(d => simDate(d).toLocaleDateString("es-AR", { day: "2-digit", month: "2-digit" }));
+    vals = days.map((d, i) => i === n ? last(tk) : closeOf(tk, d));
+    bars = days.map((d, i) => { const k = ohlc(tk, d); if (i === n && ses.f < 1) { k.c = last(tk); } return { ...k, lab: labels[i] }; });
+  }
+  if (style === "candle") return candleChart(el, bars);
+  lineChart("chart-asset", { labels, series: [{ name: tk, color: vals[vals.length - 1] >= vals[0] ? "#1F9D63" : "#D64545", values: vals, area: true }], fmt: v => m2(v), height: 300 });
+}
+function candleChart(el, bars) {
+  const W = el.clientWidth || 640, H = 300, L = 74, R = 14, T = 12, Bm = 28;
+  const min = Math.min(...bars.map(b => b.l)), max = Math.max(...bars.map(b => b.h)), pad = (max - min) * 0.08 || 1;
+  const lo = min - pad, hi = max + pad, n = bars.length;
+  const x = i => L + (W - L - R) * ((i + 0.5) / n), y = v => T + (H - T - Bm) * (1 - (v - lo) / (hi - lo));
+  const bw = Math.max(2, Math.min(14, (W - L - R) / n * 0.6)), every = Math.ceil(n / 7);
+  el.innerHTML = `<div class="chart"><svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="Gráfico de velas">
+    ${[0, 1, 2, 3, 4].map(k => { const v = lo + (hi - lo) * k / 4; return `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="#E6EEEC"/><text x="${L - 8}" y="${y(v) + 4}" text-anchor="end" font-size="11" fill="#7A8C91">${m2(v)}</text>`; }).join("")}
+    ${bars.map((b, i) => { const up = b.c >= b.o, col = up ? "#1F9D63" : "#D64545"; return `<g><title>${b.lab} · Apertura ${m2(b.o)} · Máx ${m2(b.h)} · Mín ${m2(b.l)} · Cierre ${m2(b.c)}</title>
+      <line x1="${x(i)}" x2="${x(i)}" y1="${y(b.h)}" y2="${y(b.l)}" stroke="${col}" stroke-width="1.3"/>
+      <rect x="${x(i) - bw / 2}" y="${y(Math.max(b.o, b.c))}" width="${bw}" height="${Math.max(1.5, Math.abs(y(b.o) - y(b.c)))}" fill="${col}" rx="1.5"/>
+      ${i % every === 0 ? `<text x="${x(i)}" y="${H - 8}" text-anchor="middle" font-size="11" fill="#7A8C91">${b.lab}</text>` : ""}</g>`; }).join("")}
+  </svg></div><div class="legend" style="margin-top:8px"><span><i style="background:#1F9D63"></i>Sube en el período</span><span><i style="background:#D64545"></i>Baja en el período</span><span class="xs faint">Pasá el mouse por una vela para ver sus datos.</span></div>`;
+}
+
+function badDayModal(before) {
+  const rows = BROKER_CFG.assets.map(a => ({ a, ch: closeOf(a.t, S.bk.day) / closeOf(a.t, S.bk.day - 1) - 1 }));
+  const mine = before != null ? totalValue() - before : null;
+  modal(`<span class="pill red">Día malo de mercado (simulado)</span>
+    <h2 style="margin-top:10px">Esto es normal</h2>
+    <p class="muted" style="margin:6px 0 14px">Mirá cómo el Money Market casi no se movió y las acciones sí. Por eso conviene ${t("diversificar", "diversificar")}.</p>
+    <div class="stack" style="gap:6px;max-height:300px;overflow:auto">${rows.map(r => `<div class="between small"><span class="row" style="gap:8px"><i style="width:10px;height:10px;border-radius:3px;background:${CLASSES[r.a.cls].color};display:inline-block"></i><b class="tk">${r.a.t}</b><span class="faint">${CLASSES[r.a.cls].name}</span></span>
+      <span class="row" style="gap:10px"><span class="dd"><i style="width:${Math.min(100, Math.abs(r.ch) * 1000)}%;background:${r.ch >= 0 ? "#1F9D63" : "#D64545"}"></i></span><b class="num ${r.ch >= 0 ? "up" : "down"}" style="width:64px;text-align:right">${pc2(r.ch)}</b></span></div>`).join("")}</div>
+    ${mine != null ? `<div class="callout" style="margin-top:14px;font-size:14px">Tu cartera ese día: <b class="${mine >= 0 ? "up" : "down"}">${m2(mine)}</b>. Una baja así no es una pérdida si no vendés asustado.</div>` : ""}
+    <button class="btn block" style="margin-top:14px" data-act="closeModal">Entendido</button>`);
+}
+
+// Actualiza los precios en vivo mientras el mercado está abierto (cada 30 s, sin interrumpir lo que escribís).
+setInterval(() => {
+  if (V.page !== "sim" || !S.bk || !session().open) return;
+  if (/INPUT|TEXTAREA/.test(document.activeElement?.tagName || "") || document.getElementById("modal").innerHTML) return;
+  const m = document.querySelector(".main"), st = m?.scrollTop; render(); if (m) m.scrollTop = st;
+}, 30000);
 
 /* ---------- 9. Liga ---------- */
 function myScore() {
-  const types = OPTIONS.filter(o => S.sim.alloc[o.id] > 0).length;
+  const types = S.bk ? new Set(Object.keys(S.bk.hold).map(k => A[k].cls)).size : 0;
   const parts = { div: types * 100, days: S.streak * 30, lessons: S.done.length * 80, scams: S.scams * 60 };
   return { types, pts: 300 + parts.div + parts.days + parts.lessons + parts.scams };
 }
@@ -940,7 +1484,7 @@ function league() {
           <tbody>${rows.map((r, k) => `<tr class="${r.me ? "me-row" : ""}">
             <td style="padding-left:20px"><span class="rank ${k < 3 ? "r" + (k + 1) : ""}">${k + 1}</span></td>
             <td><div class="row" style="gap:10px"><div class="avatar" style="width:32px;height:32px;background:${r.me ? "var(--mint)" : "var(--petrol-600)"};color:${r.me ? "#062018" : "#fff"}">${esc(r.name[0])}</div><b style="white-space:nowrap">${esc(r.name)}</b></div></td>
-            <td class="c num">${r.div} de 4</td><td class="c num" style="white-space:nowrap">${r.days} ${r.days === 1 ? "día" : "días"}</td><td class="c num">${r.lessons} de 6</td><td class="c num">${r.scams}</td>
+            <td class="c num">${r.div} de 5</td><td class="c num" style="white-space:nowrap">${r.days} ${r.days === 1 ? "día" : "días"}</td><td class="c num">${r.lessons} de 6</td><td class="c num">${r.scams}</td>
             <td style="text-align:right;padding-right:20px"><b class="num">${r.pts.toLocaleString("es-AR")}</b></td></tr>`).join("")}</tbody></table>
         <p class="xs faint" style="padding:12px 20px;border-top:1px solid var(--line)">Nombres ficticios de ejemplo.</p>
       </div>
@@ -948,7 +1492,7 @@ function league() {
         <div class="card">
           <span class="eyebrow">Cómo se suman puntos</span>
           <div class="grid" style="margin-top:12px;gap:14px;grid-template-columns:repeat(4,1fr)">${[
-            ["sim", "Diversificar", "100 por cada tipo de opción en tu cartera"],
+            ["sim", "Diversificar", "100 por cada tipo de activo en tu cartera de práctica"],
             ["flame", "Constancia", "30 por cada día de racha"],
             ["learn", "Completar lecciones", "80 por nivel terminado"],
             ["shield", "Detectar estafas", "60 por cada oferta que revisás"]
@@ -1158,13 +1702,7 @@ document.addEventListener("mousemove", e => {
 
 const shortMoney = v => "$" + (v >= 1e6 ? (v / 1e6).toLocaleString("es-AR", { maximumFractionDigits: 1 }) + " M" : Math.round(v / 1000).toLocaleString("es-AR") + " mil");
 function mountCharts() {
-  if (document.getElementById("chart-sim")) {
-    const { total } = simSeries(), m = S.sim.month;
-    lineChart("chart-sim", { labels: Array.from({ length: 13 }, (_, k) => k === 0 ? "Hoy" : `Mes ${k}`),
-      series: [{ name: "Tu cartera (simulada)", color: "#2BB673", values: total.map((v, k) => k <= m ? v : null).filter(v => v != null), area: true },
-               { name: "Lo que pusiste: $100.000", color: "#7A8C91", dash: true, values: Array(13).fill(100000) }],
-      fmt: shortMoney, height: 270 });
-  }
+  mountAssetChart();
   if (document.getElementById("chart-wi")) {
     const amt = V.wiAmt ?? 20000, d = wiData(amt);
     lineChart("chart-wi", { labels: Array.from({ length: 13 }, (_, k) => k === 0 ? "Hoy" : `Mes ${k}`),
@@ -1225,6 +1763,9 @@ function confetti() {
    Eventos
    ================================================================= */
 document.addEventListener("click", e => {
+  const b = e.target.closest("[data-q],[data-bkact],[data-bkview],[data-bktab],[data-sym],[data-range],[data-cstyle],[data-tkf],[data-sell],[data-cancel]");
+  if (b && !b.disabled && V.page === "sim") { bkClick(b, e); return; }
+  if (b && b.dataset.q) { bkClick(b, e); return; }
   const el = e.target.closest("[data-go],[data-act],[data-diag],[data-lvl],[data-pick],[data-example],[data-sig],[data-league],[data-ask],[data-wi],[data-nsal],[data-scroll],[data-jump]");
   if (!el || el.disabled) return;
   const d = el.dataset;
@@ -1233,6 +1774,7 @@ document.addEventListener("click", e => {
   if (d.go) {
     if (d.go === "lesson") return go("lesson", { lvl: current(), step: 0 });
     if (d.go === "diag") return go("diag", { step: 0 });
+    if (d.go === "sim") { ensureBk(); return go("sim"); }
     return go(d.go);
   }
   if (d.diag) { S[DIAG[V.step || 0].key] = d.diag; save(); render(); return; }
@@ -1262,8 +1804,6 @@ document.addEventListener("click", e => {
       if (!txt) { toast("Escribí o pegá la oferta que te llegó."); return; }
       V.scamText = txt; V.scam = { ans: analyze(txt) }; S.scams++; save(); render(); break;
     }
-    case "simStep": S.simTouched = true; S.sim.month = Math.min(12, S.sim.month + 1); save(); render(); break;
-    case "simReset": S.sim.month = 0; save(); render(); break;
     case "invite": {
       const link = "sinmiedo.lbo.com.ar/liga/" + myName().toLowerCase().replace(/\W+/g, "") + "-5b";
       const msg = `Sumate a mi liga en Sin Miedo: practicamos inversiones con plata virtual y gana quien mejor administra. ${link}`;
@@ -1282,6 +1822,33 @@ document.addEventListener("click", e => {
     case "reset": try { localStorage.removeItem(KEY); } catch (err) {} S = fresh(); modal(""); go("landing"); break;
   }
 });
+
+function bkClick(b, e) {
+  const d = b.dataset, B = S.bk;
+  if (d.q) { e.stopPropagation(); const x = TERMS[d.q]; modal(`<span class="eyebrow">¿Qué es?</span><h2 style="margin-top:6px">${x[0]}</h2><p style="margin:10px 0;font-size:16px">${x[1]}</p><div class="callout" style="font-size:14px">Ejemplo: ${x[2]}</div><button class="btn block" style="margin-top:16px" data-act="closeModal">Entendido</button>`); return; }
+  if (d.bkview) { B.view = d.bkview; V.sym = null; save(); render(); return; }
+  if (d.bktab) { B.tab = d.bktab; save(); render(); return; }
+  if (d.sell) { V.sym = d.sell; V.tk = newTicket(d.sell, "sell"); render(); return; }
+  if (d.sym) { V.sym = d.sym; V.tk = null; V.range = V.range || "1M"; render(); const m = document.querySelector(".main"); if (m) m.scrollTop = 0; return; }
+  if (d.range) { V.range = d.range; render(); return; }
+  if (d.cstyle) { V.cstyle = d.cstyle; render(); return; }
+  if (d.cancel) { const o = B.orders.find(x => x.id === +d.cancel); if (o && o.status === "Pendiente") { B.cash += o.reserved || 0; o.reserved = 0; o.status = "Cancelada"; save(); render(); } return; }
+  if (d.tkf) {
+    V.tk[d.tkf] = d.v;
+    if (d.tkf === "side") { const keep = V.tk.t; V.tk = newTicket(keep, d.v); }
+    if (d.tkf === "type" && d.v === "lim") V.tk.limit = +last(V.tk.t).toFixed(2);
+    render(); return;
+  }
+  switch (d.bkact) {
+    case "adv": { const n = +d.n; advanceDays(n); toast(`Avanzaste ${n === 1 ? "1 día" : n === 5 ? "1 semana" : "1 mes"}: ${fmtD(B.day)}`); render(); break; }
+    case "bad": { const before = totalValue(); advanceDays(1, true); render(); badDayModal(before); break; }
+    case "force": B.forceOpen = !B.forceOpen; save(); render(); break;
+    case "newTicket": V.tk = newTicket(V.sym); render(); break;
+    case "review": if (!calc(V.tk).err) { V.tk.step = "review"; render(); } break;
+    case "edit": V.tk.step = "form"; render(); break;
+    case "confirm": placeOrder(); break;
+  }
+}
 
 function finishLevel() {
   const i = V.lvl;
@@ -1307,9 +1874,13 @@ document.addEventListener("submit", e => { if (e.target.id === "ask-form") { e.p
 document.addEventListener("input", e => {
   const el = e.target;
   if (el.dataset.bind) { S[el.dataset.bind] = el.value; save(); return; }
-  if (el.dataset.alloc) {
-    S.sim.alloc[el.dataset.alloc] = +el.value; S.simTouched = true; save();
-    const id = el.id; render(); document.getElementById(id)?.focus(); return;
+  if (el.dataset.bk === "explain") { S.bk.explain = el.checked; save(); render(); return; }
+  if (el.dataset.tkin && V.tk) {
+    const raw = el.value.trim(), v = parseFloat(raw.includes(",") ? raw.replace(/\./g, "").replace(",", ".") : raw.replace(/[^0-9.]/g, ""));
+    V.tk[el.dataset.tkin] = isNaN(v) ? 0 : v;
+    const c = calc(V.tk), sm = document.getElementById("tk-sum"), rv = document.getElementById("tk-review");
+    if (sm) sm.innerHTML = summary(V.tk, c); if (rv) rv.disabled = !!c.err;
+    return;
   }
   if (el.dataset.num) {
     const v = parseInt(el.value.replace(/\D/g, ""), 10) || 0;
