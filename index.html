@@ -1755,9 +1755,9 @@ function loadDemo() {
     const r = execute(o, px(sym));
     if (r.ok) S.broker.orders.unshift({ id: S.broker.nextId++, ...o, day: S.broker.day, status: "Ejecutada", price: r.price, qty: r.qty, fee: r.fee, total: r.total });
   };
-  buy("MM", 0, 25000); buy("KO", 1, 0); buy("SPY", 1, 0);
+  buy("MM", 0, 20000); buy("KO", 1, 0); buy("SPY", 1, 0);
   advance(25, { silent: true });
-  buy("GGAL", 2, 0);
+  buy("GGAL", 1, 0);
   advance(15, { silent: true });
   S.broker.orders.unshift({ id: S.broker.nextId++, sym: "YPFD", side: "buy", type: "lim", plazo: "CI", qty: 1, amount: 0,
     limit: +(px("YPFD") * 0.93).toFixed(2), day: S.broker.day, status: "Pendiente" });
