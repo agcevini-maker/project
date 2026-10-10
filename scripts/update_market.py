@@ -38,16 +38,20 @@ FUND_NAME_HINTS = ["Fima Premium", "Mercado Pago", "Balanz Money Market", "Galil
 notes = []
 
 
-def get_json(url, tries=3):
+def log(*a):
+    print(*a, flush=True)
+
+
+def get_json(url, tries=2):
     last = None
     for k in range(tries):
         try:
             req = urllib.request.Request(url, headers=UA)
-            with urllib.request.urlopen(req, timeout=30) as r:
+            with urllib.request.urlopen(req, timeout=20) as r:
                 return json.loads(r.read().decode("utf-8"))
         except Exception as e:  # noqa: BLE001
             last = e
-            time.sleep(2 * (k + 1))
+            time.sleep(2)
     raise RuntimeError(f"{url}: {last}")
 
 
@@ -65,9 +69,11 @@ def yahoo_closes(ticker):
                 day = dt.datetime.utcfromtimestamp(t).date().isoformat()
                 out[day] = round(float(c), 4)
             if out:
+                log(f"{ticker}: {len(out)} cierres")
                 return out
         except Exception as e:  # noqa: BLE001
             notes.append(f"{ticker} en {host}: {e}")
+            log(f"{ticker} en {host}: falló ({e})")
     return {}
 
 
@@ -96,6 +102,7 @@ def money_market(dates):
     """Valor de cuotaparte de un fondo money market, muestreado una vez por mes e interpolado por día."""
     samples = {}
     fund = None
+    fails = 0
     months = sorted({d[:7] for d in dates})
     for m in months + ["ultimo"]:
         if m == "ultimo":
@@ -105,10 +112,15 @@ def money_market(dates):
             first = next(d for d in dates if d.startswith(m))
             y, mo, da = first.split("-")
             url = f"https://api.argentinadatos.com/v1/finanzas/fci/mercadoDinero/{y}/{mo}/{da}"
+        if fails >= 4 and not samples:
+            notes.append("fondo: la fuente no responde, se omite")
+            break
         try:
-            rows = get_json(url, tries=2)
+            rows = get_json(url, tries=1)
         except Exception as e:  # noqa: BLE001
             notes.append(f"fondo {m}: {e}")
+            log(f"fondo {m}: falló ({e})")
+            fails += 1
             continue
         if fund is None:
             for hint in FUND_NAME_HINTS:
@@ -119,6 +131,7 @@ def money_market(dates):
         row = next((r for r in rows if r.get("fondo") == fund and r.get("vcp")), None)
         if row:
             samples[str(row.get("fecha", ""))[:10] or m] = float(row["vcp"])
+            log(f"fondo {m}: {fund} = {row['vcp']}")
     if not fund or len(samples) < 6:
         return None, None
     pts = sorted((d, v) for d, v in samples.items() if re.match(r"\d{4}-\d{2}-\d{2}", d))
@@ -156,6 +169,7 @@ def main():
         series[k] = [v if v is not None else first for v in vals]
 
     infl, infl_src = inflation()
+    log(f"inflación: {len(infl)} meses ({infl_src})")
     fund, mm = money_market(dates)
     if mm:
         first = next(v for v in mm if v is not None)
