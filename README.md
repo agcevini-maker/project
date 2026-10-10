@@ -9,7 +9,9 @@
 - **Preguntá sin vergüenza**: asistente para preguntas básicas. En la versión publicada responde Claude; en el archivo local usa respuestas guardadas y el diccionario.
 - **Salto con un adulto**: si sos menor, la app arma un mensaje para invitar a tu mamá, papá o tutor a habilitar la cuenta (pendiente confirmar con LBO cómo funciona).
 
-**Supuestos de ejemplo**: los valores de inflación y rendimientos de "Mi meta" y "¿Y si…?" están en el objeto `SUPUESTOS` de `index.html`. No son datos reales: hay que reemplazarlos por la inflación del INDEC y rendimientos históricos reales antes de mostrarlos como tales.
+**Precios reales**: `scripts/update_market.py` baja cierres diarios de BYMA (data912.com, con Yahoo Finance de respaldo), la inflación del INDEC y el valor de cuotaparte de un fondo money market (CAFCI vía argentinadatos.com). Corrige splits y datos raros, y guarda todo en `data/mercado.json` y dentro de `index.html`. Lo corre el workflow "Datos de mercado" de GitHub Actions. La actualización automática diaria funciona cuando el workflow está en la rama principal; mientras tanto se puede correr a mano desde Actions o con `python3 scripts/update_market.py`.
+
+El simulador es una **temporada**: todos arrancan el 1/10/2025 con $100.000 de mentira y avanzan por los cierres reales hasta el último día con datos.
 
 Prototipo de app para animarse a invertir: **aprender** con lecciones de 1 minuto, **entender** las palabras raras tocándolas, **practicar** con plata de mentira y **animarse** a dar el primer paso real.
 

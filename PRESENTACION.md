@@ -9,7 +9,7 @@ Duración sugerida: 5 a 7 minutos. Abrí `index.html` en Chrome y apretá `F11` 
 
 ## Recorrido
 1. **El problema (30 s).** Mucha gente no invierte por miedo: a perder plata, a no entender las palabras o a no saber por dónde empezar.
-2. **Lo honesto (30 s).** Ya existen apps de lecciones y simuladores. Lo distinto: practicar para una meta real y con amigos. Abrí "Sobre el proyecto" y leé la frase: *"El miedo no se va leyendo. Se va practicando, con amigos y para algo que te importa."*
+2. **La idea (30 s).** Leé la frase de la portada: *"El miedo no se va leyendo. Se va practicando, con amigos y para algo que te importa."*
 3. **Bienvenida (30 s).** Respondé las 5 preguntas (incluye la meta y si sos menor). La app arma tu perfil de inversor.
 3b. **Mi meta (1 min).** Mostrá en cuántos meses llegás al viaje de egresados guardando contra invirtiendo. Después "¿Y si…?" con lo que te regalaron en el cumpleaños.
 4. **Aprender (1 min).** Abrí el nivel 1. Tocá una palabra subrayada ("inflación") para mostrar la explicación con ejemplo. Respondé la pregunta.
@@ -25,14 +25,13 @@ Duración sugerida: 5 a 7 minutos. Abrí `index.html` en Chrome y apretá `F11` 
 7. **El salto (30 s).** Al terminar los 5 niveles: resumen de la práctica (días, operaciones, peor caída vivida) y el primer paso sugerido con un monto chico en LBO.
 
 ## Qué aclarar siempre
-- Es un **prototipo educativo**. Los precios, la comisión y la inflación son **inventados**.
+- Es un **prototipo educativo** con plata de mentira. Los precios y la inflación son **reales**; la comisión (0,6%) es de ejemplo.
 - Los activos son ejemplos. La lista real depende de los productos de LBO.
 - El botón "Hacerlo en LBO" todavía no está conectado.
-- La inflación y los rendimientos de "Mi meta" y "¿Y si…?" son supuestos de ejemplo, no datos reales.
+- Los precios son reales (cierres de BYMA), pero la plata es de mentira. Lo que pasó antes no garantiza lo que va a pasar.
 - En la liga de la versión local, los otros jugadores son de ejemplo.
 
 ## Preguntas que te pueden hacer en LBO
-- **¿Esto ya existe?** Hay apps de lecciones y simuladores. Lo nuevo es la meta real, la liga por curso y el salto con el adulto que habilita la cuenta (dos clientes en vez de uno).
 - **¿Cómo funciona la cuenta para menores?** Pendiente de confirmar con LBO.
 - **¿Qué productos mostraría?** Los que defina LBO; el prototipo usa ejemplos genéricos a propósito.
 - **¿Cómo se conectaría con la cuenta real?** El paso final llevaría al alta de cuenta con el monto sugerido.
