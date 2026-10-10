@@ -1073,7 +1073,7 @@ function sidePanel() {
         <div><span class="sym" style="font-size:20px">${sym}</span> <span class="xs muted">${t.short}</span><div class="small muted">${i.name}</div></div>
         ${riskPill(t.risk)}
       </div>
-      <div style="margin-top:10px"><span class="big num" data-px="${sym}">${money(px(sym))}</span></div>
+      <div style="margin-top:10px"><span class="big num" data-px="${sym}">${money(px(sym))}</span>${i.type === "bono" ? ` <span class="xs muted">cada 100 nominales</span>` : ""}</div>
       <div class="small"><span class="pill ${cls(v)} num" data-var="${sym}">${pct(v)}</span> <span class="muted">hoy ·</span> <span class="${cls(rv)} num">${pct(rv)}</span> <span class="muted">en ${range}</span></div>
       <div class="mstat">
         <div><div class="label">Cierre anterior</div><div class="num small">${money(prevClose(sym))}</div></div>
@@ -1175,7 +1175,7 @@ function ticketHtml() {
     </div>`}
     <div class="fields">
       <div class="field">
-        <label class="label" for="q">${fci ? "Monto en pesos" : "Cantidad"}</label>
+        <label class="label" for="q">${fci ? "Monto en pesos" : INS[sym].type === "bono" ? "Cantidad (de a 100 nominales)" : "Cantidad"}</label>
         <div class="stepper">
           <button data-act="step" data-d="-1" aria-label="Restar">−</button>
           <input id="q" inputmode="decimal" value="${fci ? o.amount : o.qty}" data-field="${fci ? "amount" : "qty"}">

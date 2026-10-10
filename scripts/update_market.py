@@ -208,6 +208,29 @@ def money_market(dates):
     return fund, out
 
 
+def clean(code, vals, dates):
+    """Corrige errores puntuales y ajusta splits o cambios de ratio de CEDEAR hacia atrás."""
+    v = list(vals)
+    # 1) Saltos que se revierten en pocos días: error de carga, se mantiene el precio anterior.
+    for i in range(1, len(v)):
+        r = v[i] / v[i - 1] - 1
+        if abs(r) > 0.4:
+            for j in range(i + 1, min(i + 4, len(v))):
+                if abs(v[j] / v[i - 1] - 1) < 0.15:
+                    for k in range(i, j):
+                        v[k] = v[i - 1]
+                    notes.append(f"{code}: dato raro corregido el {dates[i]}")
+                    break
+    # 2) Saltos de más del 50% que no se revierten: split o cambio de ratio; se ajusta la historia previa.
+    for i in range(1, len(v)):
+        f = v[i] / v[i - 1]
+        if f < 0.5 or f > 2:
+            for k in range(i):
+                v[k] = round(v[k] * f, 4)
+            notes.append(f"{code}: ajuste por split o cambio de ratio el {dates[i]} (x{f:.4f})")
+    return v
+
+
 def main():
     infl, infl_src = inflation()
     log(f"inflación: {len(infl)} meses ({infl_src})")
@@ -227,7 +250,7 @@ def main():
             last = c.get(d, last)
             vals.append(last)
         first = next(v for v in vals if v is not None)
-        series[k] = [v if v is not None else first for v in vals]
+        series[k] = clean(k, [v if v is not None else first for v in vals], dates)
 
     fund, mm = money_market(dates)
     if mm:
