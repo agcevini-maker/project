@@ -76,13 +76,19 @@ npm run dev
 
 ## Prototipo de diseño para escritorio (`prototipo/`)
 
-`prototipo/index.html` es un prototipo navegable para presentar en LBO, pensado para pantalla de escritorio (1440x900). Los precios del simulador son **reales** (cierres diarios de BYMA, ver "Datos de mercado"). El resto de los datos de ejemplo (liga, meta, amigos) son simulados y están marcados como tales.
+`prototipo/index.html` es un prototipo navegable para presentar en LBO, pensado para pantalla de escritorio (1440x900). Los precios del simulador son **reales** (cierres diarios de BYMA, ver "Datos de mercado"). Los ejemplos que no son datos de mercado están marcados como tales.
 
-Pantallas: registro/ingreso, landing, diagnóstico, inicio, ¿Y si…?, Aprender (camino de 6 niveles), lección, ¿Es estafa? (detector con semáforo), simulador, liga con amigos, Preguntá sin vergüenza, Empezar con poco y El salto. El botón "Mapa del prototipo" (o la tecla M) permite saltar a cualquier pantalla durante la presentación.
+Pantallas: landing, registro/ingreso (Google o email), diagnóstico, inicio, Aprender (camino de 6 niveles), lección, ¿Es estafa? (detector con semáforo), simulador, Preguntá sin vergüenza y El salto. El botón "Mapa del prototipo" (o la tecla M) permite saltar a cualquier pantalla durante la presentación.
 
-### Cuentas con email
+### Cuentas: Google o email
 
-Cada usuario se registra con nombre, email y contraseña, y tiene su propio progreso (niveles, XP, racha, cartera de práctica).
+Al comenzar, cada usuario entra con **"Continuar con Google"** (también desde la landing, "Empezar con Google") o con nombre, email y contraseña. Cada cuenta tiene su propio progreso (niveles, XP, racha, cartera de práctica).
+
+"Continuar con Google" funciona de tres maneras según `AUTH_CFG`:
+
+- **Sin configurar (por defecto):** modo prototipo. No abre Google: un aviso lo dice y se escribe el Gmail para simular el ingreso.
+- **`googleClientId`:** ingreso real con Google (Google Identity Services) y progreso guardado en el dispositivo. Requiere un ID de cliente OAuth creado en Google Cloud, con el dominio donde se publica en "Orígenes autorizados", y abrir el prototipo desde ese dominio (no como archivo suelto).
+- **Supabase:** activá Google como proveedor en Supabase (Authentication → Providers) y el progreso se guarda en la nube.
 
 - **Modo local (por defecto):** las cuentas se guardan en el navegador (`localStorage`), con la contraseña hasheada (SHA-256). Sirve para la demo, pero cada cuenta existe solo en ese dispositivo y navegador. No es un sistema de cuentas real.
 - **Modo nube (Supabase):** completá `AUTH_CFG` (`supabaseUrl` y `supabaseAnonKey`) en el archivo y creá esta tabla:

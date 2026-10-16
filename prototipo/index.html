@@ -214,6 +214,7 @@
   .lcard .kicker { display: flex; gap: 14px; align-items: center; }
   .callout { background: var(--mint-50); border-radius: 14px; padding: 16px 18px; font-size: 16px; }
   .callout.red { background: var(--red-100); }
+  .callout.amber { background: #FDF3DC; color: #6B4A06; }
   .q-opt { width: 100%; text-align: left; background: #fff; border: 2px solid var(--line); border-radius: 14px; padding: 16px 18px; font-weight: 600; display: flex; gap: 12px; align-items: center; transition: border-color .15s, background .15s; }
   .q-opt:hover:not(:disabled) { border-color: #a8d9bf; }
   .q-opt .k { width: 30px; height: 30px; border-radius: 8px; background: #EEF3F2; display: grid; place-items: center; font-weight: 800; flex: none; }
@@ -329,6 +330,11 @@
   .auth-side .ic { color: var(--mint); }
   .auth-main { display: grid; place-items: center; padding: 40px; }
   .auth-card { width: 100%; max-width: 440px; padding: 32px; display: flex; flex-direction: column; gap: 14px; }
+  .btn-google { display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%; padding: 13px 16px; border-radius: 12px; border: 1.5px solid var(--line); background: #fff; font: inherit; font-weight: 700; font-size: 15.5px; color: var(--ink); cursor: pointer; transition: border-color .15s, background .15s; }
+  .btn-google:hover { border-color: #B8C7C4; background: #F8FAF9; }
+  .btn-google.on-dark { border-color: transparent; }
+  .or-sep { display: flex; align-items: center; gap: 12px; color: var(--ink-3); font-size: 13px; }
+  .or-sep::before, .or-sep::after { content: ""; flex: 1; height: 1px; background: var(--line); }
 
   /* Drawer lateral de operación */
   .dr-bg { position: fixed; inset: 0; background: rgba(11,42,51,.42); z-index: 60; animation: fade .2s; }
@@ -538,13 +544,6 @@ const LEVELS = [
     why: "El registro en la CNV es lo primero. Seguidores y promesas no dicen nada sobre si es confiable." }
 ];
 
-const GOALS = {
-  viaje: { name: "Viaje de egresados", target: 900000, icon: "plane" },
-  recital: { name: "Entrada para un recital", target: 120000, icon: "music" },
-  zapas: { name: "Zapatillas", target: 220000, icon: "shoe" },
-  otra: { name: "Mi meta", target: 300000, icon: "target" }
-};
-
 const FRENOS = {
   miedo: { name: "Me da miedo, no entiendo nada", short: "Me da miedo", icon: "shield-q",
     quote: "Una vez quise averiguar, vi la palabra “CEDEAR” y cerré todo.",
@@ -554,7 +553,7 @@ const FRENOS = {
     solve: "Un detector de estafas con semáforo y un nivel entero para aprender a reconocerlas." },
   poca: { name: "Con lo poco que tengo no vale la pena", short: "Tengo poca plata", icon: "coins",
     quote: "Tengo 20 lucas, ¿qué voy a invertir con eso?",
-    solve: "Una calculadora que muestra cómo se puede empezar con poco y cuánto suma con constancia." }
+    solve: "Un simulador con $1.000.000 virtuales y precios reales: probás con montos chicos y ves qué pasa, sin arriesgar nada." }
 };
 
 const OPTIONS = [
@@ -568,19 +567,9 @@ const OPTIONS = [
     desc: "Sos dueño de un pedacito de una empresa. Puede subir o bajar mucho.", mu: 0.028, sd: 0.10 }
 ];
 
-const FRIENDS = [
-  { name: "Cami R.", pts: 1240, div: 4, days: 12, lessons: 5, scams: 3 },
-  { name: "Tomi G.", pts: 1105, div: 3, days: 9, lessons: 4, scams: 2 },
-  { name: "Juli P.", pts: 980, div: 3, days: 7, lessons: 4, scams: 1 },
-  { name: "Valen S.", pts: 760, div: 2, days: 5, lessons: 3, scams: 1 },
-  { name: "Nico F.", pts: 610, div: 1, days: 4, lessons: 2, scams: 0 },
-  { name: "Mati L.", pts: 455, div: 1, days: 2, lessons: 2, scams: 0 }
-];
-const COURSE = ["Abril M.", "Bauti C.", "Cami R.", "Delfi O.", "Fede A.", "Guada T.", "Juli P.", "Lauti B.", "Mati L.", "Nico F.", "Pili D.", "Santi V.", "Tomi G.", "Valen S."];
-
 const TIPS = [
   "Si alguien te garantiza una ganancia, es una señal de alerta. Ninguna inversión real puede hacerlo.",
-  "Repartir tu plata en distintas opciones (diversificar) suma puntos en la liga y baja tu riesgo.",
+  "Repartir tu plata en distintas opciones (diversificar) baja tu riesgo y sube tu puntaje de inversor.",
   "Antes de invertir, preguntate: ¿para cuándo voy a necesitar esta plata?"
 ];
 
@@ -627,9 +616,9 @@ const icon = (n, cls = "ic") => `<svg class="${cls}" viewBox="0 0 24 24" fill="n
    Estado
    ================================================================= */
 const fresh = () => ({
-  name: "", exp: null, freno: null, goal: null, started: false,
-  done: [0, 1], streak: 5, scams: 0, minor: false, saved: 0.18,
-  chat: null, league: "amigos", xp: 120, stars: { 0: 3, 1: 2 }, micro: {}, xpDay: null, chest: false
+  name: "", exp: null, freno: null, started: false,
+  done: [0, 1], streak: 5, scams: 0, minor: false,
+  chat: null, xp: 120, stars: { 0: 3, 1: 2 }, micro: {}, xpDay: null, chest: false
 });
 let S = fresh();
 const save = () => { if (!USER) return; lsSet(keyFor(USER.email), S); cloudSave(); };
@@ -638,7 +627,6 @@ let V = { page: "landing" };
 const money = n => "$" + Math.round(n).toLocaleString("es-AR");
 const pct = n => (n >= 0 ? "+" : "−") + Math.abs(n * 100).toLocaleString("es-AR", { maximumFractionDigits: 1 }) + "%";
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-const goal = () => GOALS[S.goal || "viaje"];
 const current = () => Math.min(S.done.length, LEVELS.length - 1);
 const allDone = () => S.done.length >= LEVELS.length;
 const myName = () => S.name.trim() || "Agus";
@@ -646,14 +634,16 @@ const myName = () => S.name.trim() || "Agus";
 /* =================================================================
    Cuentas: cada persona se registra con su email y tiene su propio progreso
    ================================================================= */
-// Para cuentas reales (en la nube) completá estos dos datos de un proyecto de Supabase.
-// Vacíos = modo prototipo: las cuentas y el progreso se guardan en este dispositivo.
-const AUTH_CFG = { supabaseUrl: "", supabaseAnonKey: "" };
+// Para cuentas reales (en la nube) completá los datos de un proyecto de Supabase (con Google activado como proveedor).
+// googleClientId: ID de cliente OAuth de Google, para "Continuar con Google" sin Supabase (cuentas en este dispositivo).
+// Vacíos = modo prototipo: las cuentas y el progreso se guardan en este dispositivo y Google se simula.
+const AUTH_CFG = { supabaseUrl: "", supabaseAnonKey: "", googleClientId: "" };
 const ACCOUNTS_KEY = "sinmiedo-cuentas.v1", SESSION_KEY = "sinmiedo-sesion.v1";
 const cloudOn = () => !!(AUTH_CFG.supabaseUrl && AUTH_CFG.supabaseAnonKey);
 const keyFor = email => "sinmiedo-progreso.v2:" + email.toLowerCase();
 const lsGet = (k, def) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : def; } catch (e) { return def; } };
 const lsSet = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
+const googleReady = () => cloudOn() || !!(AUTH_CFG.googleClientId && location.protocol.startsWith("http"));
 const validEmail = e => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e);
 let USER = null, SB = null, cloudTimer = null;
 
@@ -684,7 +674,7 @@ async function signup(name, email, pw) {
     startSession({ email, name, id: data.user.id }); return "";
   }
   const accs = lsGet(ACCOUNTS_KEY, {});
-  if (accs[email]) return "Ya hay una cuenta con ese email en este dispositivo. Ingresá con tu contraseña.";
+  if (accs[email]) return accs[email].pw ? "Ya hay una cuenta con ese email en este dispositivo. Ingresá con tu contraseña." : "Esa cuenta se creó con Google. Tocá “Continuar con Google”.";
   accs[email] = { name, pw: await hashPw(email, pw), created: new Date().toISOString() };
   lsSet(ACCOUNTS_KEY, accs);
   startSession({ email, name }, fresh()); S.name = name; save();
@@ -699,6 +689,7 @@ async function login(email, pw) {
     await cloudLoad(data.user); return "";
   }
   const acc = lsGet(ACCOUNTS_KEY, {})[email];
+  if (acc && !acc.pw) return "Esa cuenta se creó con Google. Tocá “Continuar con Google”.";
   if (!acc || acc.pw !== await hashPw(email, pw)) return "El email o la contraseña no coinciden.";
   startSession({ email, name: acc.name });
   return "";
@@ -711,7 +702,7 @@ async function logout() {
 }
 async function cloudLoad(user) {
   const { data } = await SB.from("progreso").select("data").eq("user_id", user.id).maybeSingle();
-  startSession({ email: user.email, name: user.user_metadata?.name || "", id: user.id }, data?.data || null);
+  startSession({ email: user.email, name: user.user_metadata?.name || (user.user_metadata?.full_name || "").split(" ")[0], id: user.id }, data?.data || null);
 }
 function cloudSave() {
   if (!cloudOn() || !SB || !USER?.id) return;
@@ -732,6 +723,65 @@ async function initAuth() {
   if (ses && lsGet(ACCOUNTS_KEY, {})[ses.email]) { startSession(ses); V = { page: S.started ? "home" : "diag", step: 0 }; }
 }
 
+/* ---------- Continuar con Google ---------- */
+async function googleAuth() {
+  if (cloudOn()) {
+    if (!SB) { authMsg("No se pudo conectar con el servidor de cuentas."); return; }
+    const { error } = await SB.auth.signInWithOAuth({ provider: "google", options: { redirectTo: location.href.split("#")[0] } });
+    if (error) authMsg(error.message);
+    return;
+  }
+  if (googleReady()) {
+    try {
+      if (!window.google?.accounts?.oauth2) await loadScript("https://accounts.google.com/gsi/client");
+      window.google.accounts.oauth2.initTokenClient({
+        client_id: AUTH_CFG.googleClientId, scope: "openid email profile",
+        callback: async r => {
+          if (r.error) { authMsg("No se pudo ingresar con Google."); return; }
+          try {
+            const u = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", { headers: { Authorization: "Bearer " + r.access_token } }).then(x => x.json());
+            if (!u.email) throw new Error("sin email");
+            googleSession(u.email, u.given_name || u.name || "");
+          } catch (e) { authMsg("No se pudo leer tu cuenta de Google."); }
+        }
+      }).requestAccessToken();
+    } catch (e) { authMsg("No se pudo cargar el ingreso con Google."); }
+    return;
+  }
+  V.gdemo = true; render();
+}
+function googleSession(email, name) {
+  email = email.trim().toLowerCase(); name = name.trim();
+  const accs = lsGet(ACCOUNTS_KEY, {}), isNew = !accs[email];
+  if (isNew) accs[email] = { name, google: true, created: new Date().toISOString() };
+  else accs[email].google = true;
+  lsSet(ACCOUNTS_KEY, accs);
+  startSession({ email, name: accs[email].name || name }, isNew ? Object.assign(fresh(), { name }) : undefined);
+  V.gdemo = false;
+  go(S.started ? "home" : "diag", { step: 0 });
+  toast(isNew ? `¡Bienvenido/a, ${S.name}!` : `Hola de nuevo, ${S.name}`);
+}
+function submitGoogleDemo() {
+  const name = document.getElementById("gd-name").value.trim(), email = document.getElementById("gd-email").value.trim().toLowerCase();
+  const known = lsGet(ACCOUNTS_KEY, {})[email];
+  if (!/^[^\s@]+@(gmail|googlemail)\.com$/.test(email)) { authMsg("Escribí tu Gmail (termina en @gmail.com)."); return; }
+  if (!name && !known) { authMsg("Contanos cómo te llamás."); return; }
+  googleSession(email, name || known.name);
+}
+const G_LOGO = `<svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>`;
+function googleDemoCard() {
+  return `<form class="card auth-card" id="gdemo-form" novalidate>
+    <div class="row" style="gap:10px">${G_LOGO}<b style="font-size:18px">Continuar con Google</b></div>
+    <div class="callout amber" style="font-size:13.5px">Modo prototipo: en la app real acá se abre la ventana de Google para elegir tu cuenta. Todavía no está conectada, así que escribí tu Gmail para simular el ingreso.</div>
+    <div class="field"><label for="gd-email">Tu Gmail</label><input class="input" id="gd-email" type="email" autocomplete="email" placeholder="tunombre@gmail.com"></div>
+    <div class="field"><label for="gd-name">¿Cómo te llamás?</label><input class="input" id="gd-name" autocomplete="given-name" maxlength="30" placeholder="Tu nombre o apodo"></div>
+    <div id="auth-msg" aria-live="polite"></div>
+    <button class="btn block lg" type="submit">Continuar ${icon("arrow")}</button>
+    <p class="xs faint" style="text-align:center">Al continuar aceptás los términos y la política de privacidad <span class="placeholder" style="padding:1px 6px">a completar</span></p>
+    <button type="button" class="link small" style="align-self:center" data-act="gdemoBack">Volver</button>
+  </form>`;
+}
+
 function authPage() {
   const signupMode = V.mode !== "login";
   return `<div class="auth">
@@ -739,11 +789,14 @@ function authPage() {
       ${logo()}
       <h1>${signupMode ? "Creá tu cuenta y arrancá sin miedo" : "¡Qué bueno verte de nuevo!"}</h1>
       <p>Tu progreso, tu racha, tu cartera de práctica y tu puntaje de inversor quedan guardados en tu cuenta.</p>
-      <div class="stack" style="gap:12px;margin-top:26px">${[["learn", "Aprendé a tu ritmo, con niveles y desafíos"], ["sim", "Practicá con $1.000.000 virtuales y precios reales"], ["league", "Competí con tus amigos: gana quien mejor administra"]].map(([ic, l]) => `<div class="row">${icon(ic)}<span>${l}</span></div>`).join("")}</div>
+      <div class="stack" style="gap:12px;margin-top:26px">${[["learn", "Aprendé a tu ritmo, con niveles y desafíos"], ["sim", "Practicá con $1.000.000 virtuales y precios reales"], ["shield", "Detectá estafas antes de caer en una"]].map(([ic, l]) => `<div class="row">${icon(ic)}<span>${l}</span></div>`).join("")}</div>
     </div>
     <div class="auth-main">
-      <form class="card auth-card" id="auth-form" novalidate>
-        <div class="tabs full" style="margin-bottom:20px"><button type="button" class="${signupMode ? "on" : ""}" data-auth="signup">Crear cuenta</button><button type="button" class="${signupMode ? "" : "on"}" data-auth="login">Ingresar</button></div>
+      ${V.gdemo ? googleDemoCard() : `<form class="card auth-card" id="auth-form" novalidate>
+        <div class="tabs full" style="margin-bottom:8px"><button type="button" class="${signupMode ? "on" : ""}" data-auth="signup">Crear cuenta</button><button type="button" class="${signupMode ? "" : "on"}" data-auth="login">Ingresar</button></div>
+        <button type="button" class="btn-google" data-auth="google">${G_LOGO}Continuar con Google</button>
+        <p class="xs faint" style="text-align:center;margin-top:-6px">Al continuar con Google aceptás los términos y la política de privacidad <span class="placeholder" style="padding:1px 6px">a completar</span></p>
+        <div class="or-sep"><span>o con tu email</span></div>
         ${signupMode ? `<div class="field"><label for="au-name">¿Cómo te llamás?</label><input class="input" id="au-name" autocomplete="given-name" maxlength="30" placeholder="Tu nombre o apodo"></div>` : ""}
         <div class="field"><label for="au-email">Email</label><input class="input" id="au-email" type="email" autocomplete="email" placeholder="tu@email.com" value="${esc(V.authEmail || "")}"></div>
         <div class="field"><label for="au-pw">Contraseña</label><input class="input" id="au-pw" type="password" autocomplete="${signupMode ? "new-password" : "current-password"}" placeholder="${signupMode ? "Al menos 8 caracteres" : "Tu contraseña"}"></div>
@@ -752,7 +805,7 @@ function authPage() {
         <button class="btn block lg" type="submit" id="auth-submit">${signupMode ? "Crear mi cuenta" : "Ingresar"} ${icon("arrow")}</button>
         <p class="xs faint" style="text-align:center">${cloudOn() ? "Tu cuenta y tu progreso se guardan de forma segura." : "Prototipo: las cuentas y el progreso se guardan en este dispositivo y navegador."}</p>
         <button type="button" class="link small" style="align-self:center" data-go="landing">Volver al inicio</button>
-      </form>
+      </form>`}
     </div>
   </div>`;
 }
@@ -875,10 +928,10 @@ function render() {
 }
 
 const NAV = [
-  ["home", "Inicio", "home"], ["learn", "Aprender", "learn"], ["sim", "Simulador", "sim"], ["league", "Liga", "league"],
-  ["scam", "¿Es estafa?", "shield"], ["ask", "Preguntá", "chat"], ["goal", "Mi meta", "target"]
+  ["home", "Inicio", "home"], ["learn", "Aprender", "learn"], ["sim", "Simulador", "sim"],
+  ["scam", "¿Es estafa?", "shield"], ["ask", "Preguntá", "chat"]
 ];
-const NAV_OF = { lesson: "learn", leap: "learn", whatif: "goal", small: "goal" };
+const NAV_OF = { lesson: "learn", leap: "learn" };
 
 function logo(light = true) {
   return `<div class="logo">
@@ -888,7 +941,7 @@ function logo(light = true) {
 
 function shell() {
   const active = NAV_OF[V.page] || V.page;
-  const pages = { home, learn, lesson, sim, league, scam, ask, goal: goalPage, whatif: goalPage, small: goalPage, leap };
+  const pages = { home, learn, lesson, sim, scam, ask, leap };
   const wide = V.page === "sim";
   return `<div class="shell ${wide ? "wide" : ""}">
     <aside class="side">
@@ -900,7 +953,7 @@ function shell() {
         <button class="nav-i" data-act="logout" style="padding:8px 12px;font-size:13.5px">${icon("back")}Cerrar sesión</button>
       </div>
     </aside>
-    <main class="main"><div class="main-in">${pages[V.page]()}</div></main>
+    <main class="main"><div class="main-in">${(pages[V.page] || home)()}</div></main>
     ${wide ? "" : rail()}
   </div>`;
 }
@@ -911,12 +964,11 @@ function ringSvg(frac, size = 84) {
 }
 
 function rail() {
-  const g = goal(), dn = S.done.length;
+  const dn = S.done.length;
   const todos = [
     { t: `Terminar el nivel ${current() + 1}`, done: allDone(), go: allDone() ? "learn" : "lesson" },
     { t: "Revisar una oferta en el detector", done: S.scams > 0, go: "scam" },
     { t: "Armar tu cartera de práctica", done: !!S.simTouched, go: "sim" },
-    { t: "Invitar a 2 amigos a la liga", done: !!S.invited, go: "league" },
     { t: "Dar el salto", done: false, go: allDone() ? "leap" : "learn" }
   ];
   return `<aside class="rail">
@@ -938,12 +990,6 @@ function rail() {
       <h4>Tu nivel de inversor</h4>
       <button class="todo" data-go="sim" style="align-items:center"><span class="big-num" style="font-size:24px">${p.days ? p.score : "—"}</span><span><b>${p.days ? p.tier : "Se calcula mañana"}</b><span class="xs faint" style="display:block">${p.days ? `${pc2(p.ret)} en ${p.days} días de mercado real` : "Se actualiza cada día hábil"}</span></span></button>
     </section>`; })() : ""}
-    <section>
-      <h4>Tu meta</h4>
-      <div class="between small"><b>${esc(g.name)}</b><span class="muted num">${Math.round(S.saved * 100)}%</span></div>
-      <div class="bar" style="margin-top:8px"><span style="width:${S.saved * 100}%"></span></div>
-      <p class="xs faint" style="margin-top:6px">${money(g.target * S.saved)} de ${money(g.target)} · ahorro de práctica</p>
-    </section>
   </aside>`;
 }
 
@@ -957,15 +1003,15 @@ function landing() {
           <div>
             <span class="pill petrol" style="background:rgba(43,182,115,.15);color:#7EE2AE">Para tu primera inversión</span>
             <h1 style="margin-top:18px">El miedo no se va leyendo. <em>Se va practicando.</em></h1>
-            <p class="lead">Con amigos y para algo que te importa. Aprendé en minutos, detectá estafas, practicá con plata virtual y, cuando estés listo, empezá con poco en LBO.</p>
-            <div class="row"><button class="btn lg" data-go="auth">Crear mi cuenta gratis ${icon("arrow")}</button><button class="btn lg ghost" style="color:#fff;border-color:rgba(255,255,255,.25)" data-scroll="frenos">Ver cómo funciona</button></div>
+            <p class="lead">Aprendé en minutos, detectá estafas, practicá con plata virtual y, cuando estés listo, empezá con poco en LBO.</p>
+            <div class="row"><button class="btn-google on-dark" style="width:auto;padding:14px 22px" data-auth="google">${G_LOGO}Empezar con Google</button><button class="btn lg" data-go="auth">Crear cuenta con email</button></div>
             <div class="trust"><span>${icon("shield")}Nunca te prometemos ganancias</span><span>${icon("sim")}Practicás con plata virtual</span><span>${icon("check")}Sin palabras raras</span></div>
           </div>
           <div class="preview" aria-hidden="true">
             <div class="card" style="left:0;top:0;width:340px">
-              <div class="between"><span class="eyebrow">Tu meta</span><span class="pill">18%</span></div>
-              <div class="row" style="margin:12px 0"><div class="icon-box">${icon("plane")}</div><div><b>Viaje de egresados</b><p class="xs faint">$162.000 de $900.000</p></div></div>
-              <div class="bar"><span style="width:18%"></span></div>
+              <div class="between"><span class="eyebrow">Tu nivel de inversor</span><span class="pill">ejemplo</span></div>
+              <div class="row" style="margin:12px 0"><div class="big-num" style="font-size:34px">64<span class="xs faint">/100</span></div><div><b>Prudente</b><p class="xs faint">Le ganaste a la inflación y diversificaste</p></div></div>
+              <div class="bar"><span style="width:64%"></span></div>
             </div>
             <div class="card" style="right:0;top:150px;width:300px">
               <span class="eyebrow">¿Es estafa?</span>
@@ -973,8 +1019,8 @@ function landing() {
               <p class="xs muted" style="margin-top:8px">“30% mensual garantizado por Instagram”: 3 señales de alerta.</p>
             </div>
             <div class="card" style="left:30px;top:300px;width:340px">
-              <div class="between"><span class="eyebrow">Liga de amigos</span><span class="xs faint">plata virtual</span></div>
-              ${["Cami R.", "Vos", "Tomi G."].map((n, k) => `<div class="between small" style="margin-top:10px"><span class="row" style="gap:10px"><span class="rank r${k + 1}" style="width:24px;height:24px;font-size:12px">${k + 1}</span>${n}</span><b class="num">${[1240, 1180, 1105][k]} pts</b></div>`).join("")}
+              <div class="between"><span class="eyebrow">Aprender</span><span class="xs faint">+50 XP por nivel</span></div>
+              ${["Por qué la plata guardada pierde valor", "Qué es invertir y qué no", "Inversión o estafa"].map((n, k) => `<div class="between small" style="margin-top:10px"><span class="row" style="gap:10px"><span class="rank r${k < 2 ? 1 : 3}" style="width:24px;height:24px;font-size:12px">${k + 1}</span>${n}</span><b style="color:#E3A21A">${k < 2 ? "★★★" : "▶"}</b></div>`).join("")}
             </div>
           </div>
         </div>
@@ -1003,7 +1049,7 @@ function landing() {
         <div class="steps">${[
           ["Aprendé", "6 niveles cortos, estilo juego. Cada palabra rara viene explicada."],
           ["Detectá estafas", "Pegá cualquier oferta que te llegue y mirá el semáforo."],
-          ["Practicá con amigos", "Una liga con plata virtual donde gana quien mejor administra."],
+          ["Practicá con precios reales", "Un broker de práctica con $1.000.000 virtuales: cada día ves qué tan buen inversor sos."],
           ["Dá el salto", "Tu primera inversión real en LBO, arrancando con poco."]
         ].map(([h, p], k) => `<div><div class="step-n">${k + 1}</div><h3>${h}</h3><p class="muted small" style="margin-top:6px">${p}</p></div>`).join("")}</div>
       </div>
@@ -1024,8 +1070,7 @@ function landing() {
 /* ---------- 2. Diagnóstico ---------- */
 const DIAG = [
   { key: "exp", q: "¿Alguna vez invertiste?", sub: "No hay respuestas incorrectas.", opts: [["nunca", "Nunca", "Arranco de cero", "sparkle"], ["poco", "Alguna vez, poquito", "Probé algo, pero no entendí mucho", "coins"], ["si", "Sí, a veces", "Quiero hacerlo mejor", "sim"]] },
-  { key: "freno", q: "¿Qué te frena más?", sub: "Elegí la que más te represente.", opts: [["miedo", "Me da miedo, no entiendo nada", "Las palabras técnicas me espantan", "shield-q"], ["estafa", "¿Es inversión o estafa?", "No sé en quién confiar", "alert"], ["poca", "Tengo poca plata", "Creo que no vale la pena", "coins"]] },
-  { key: "goal", q: "¿Para qué te gustaría juntar plata?", sub: "Invertir tiene más sentido con una meta.", opts: [["viaje", "Viaje de egresados", "", "plane"], ["recital", "Un recital", "", "music"], ["zapas", "Zapatillas", "", "shoe"], ["otra", "Otra cosa", "", "target"]] }
+  { key: "freno", q: "¿Qué te frena más?", sub: "Elegí la que más te represente.", opts: [["miedo", "Me da miedo, no entiendo nada", "Las palabras técnicas me espantan", "shield-q"], ["estafa", "¿Es inversión o estafa?", "No sé en quién confiar", "alert"], ["poca", "Tengo poca plata", "Creo que no vale la pena", "coins"]] }
 ];
 function diag() {
   const step = V.step || 0, d = DIAG[step], val = S[d.key];
@@ -1049,12 +1094,11 @@ function diag() {
 
 /* ---------- 3. Inicio ---------- */
 function home() {
-  const g = goal(), lv = LEVELS[current()];
-  const me = leagueRows("amigos").findIndex(r => r.me) + 1;
+  const lv = LEVELS[current()], perf = S.bk ? perfStats() : null;
   const focus = {
     miedo: ["Empezá por acá", "Las palabras raras, traducidas", "Pasá el mouse por cualquier palabra subrayada o preguntale al asistente sin vergüenza.", "ask", "Preguntá sin vergüenza"],
     estafa: ["Empezá por acá", "¿Te llegó una oferta rara?", "Pegala en el detector y mirá el semáforo. Además, el nivel 3 te enseña a reconocerlas.", "scam", "Abrir el detector"],
-    poca: ["Empezá por acá", "Con poco sí se puede", "Mirá cuánto podés juntar cambiando un par de salidas por mes.", "small", "Abrir la calculadora"]
+    poca: ["Empezá por acá", "Con poco sí se puede", "Probá en el simulador con montos chicos, con plata virtual y precios reales.", "sim", "Ir al simulador"]
   }[S.freno || "miedo"];
   return `
     <div class="page-h"><div><span class="eyebrow">Inicio</span><h1 style="margin-top:6px">Hola, ${esc(myName())}</h1>
@@ -1062,11 +1106,13 @@ function home() {
       <span class="sim-tag"><i></i>Modo práctica · plata virtual</span></div>
     <div class="grid dash">
       <div class="card goal-hero span-4">
-        <div class="between"><span class="eyebrow" style="color:#9FC3C6">Tu meta</span><button class="link" style="color:#7EE2AE" data-go="goal">Ver mi meta</button></div>
-        <div class="row" style="margin:16px 0 18px;gap:16px"><div class="icon-box" style="background:rgba(43,182,115,.18);color:#7EE2AE;width:56px;height:56px">${icon(g.icon)}</div>
-          <div><h2 style="color:#fff">${esc(g.name)}</h2><p class="muted">${money(g.target * S.saved)} de ${money(g.target)} · ahorro de práctica</p></div>
-          <div style="margin-left:auto;text-align:right"><div class="big-num">${Math.round(S.saved * 100)}%</div></div></div>
-        <div class="bar"><span style="width:${S.saved * 100}%"></span></div>
+        <div class="between"><span class="eyebrow" style="color:#9FC3C6">Tu broker de práctica</span><button class="link" style="color:#7EE2AE" data-go="sim">Ir al simulador</button></div>
+        ${perf ? `<div class="row" style="margin:16px 0 18px;gap:16px"><div class="icon-box" style="background:rgba(43,182,115,.18);color:#7EE2AE;width:56px;height:56px">${icon("sim")}</div>
+          <div><h2 style="color:#fff">${m2(totalValue())}</h2><p class="muted">Valor de tu cartera virtual · ${perf.days ? `${pc2(perf.ret)} en ${perf.days} ${perf.days === 1 ? "día" : "días"} de mercado real` : "se actualiza cada día hábil"}</p></div>
+          <div style="margin-left:auto;text-align:right"><div class="big-num">${perf.days ? perf.score : "—"}</div><span class="xs" style="color:#9FC3C6">${perf.days ? perf.tier : "Se calcula mañana"}</span></div></div>`
+        : `<div class="row" style="margin:16px 0 18px;gap:16px"><div class="icon-box" style="background:rgba(43,182,115,.18);color:#7EE2AE;width:56px;height:56px">${icon("sim")}</div>
+          <div><h2 style="color:#fff">$1.000.000 virtuales te esperan</h2><p class="muted">Comprá y vendé con precios reales de cierre y mirá qué tan buen inversor sos.</p></div></div>`}
+        <p class="xs" style="color:#9FC3C6">Plata virtual · precios reales de cierre de BYMA</p>
       </div>
       <div class="card span-2" style="display:flex;flex-direction:column;justify-content:space-between">
         <div class="between"><span class="eyebrow">Racha</span><span style="color:#F27B1A">${icon("flame")}</span></div>
@@ -1077,20 +1123,10 @@ function home() {
         <div class="row" style="margin:14px 0"><div class="icon-box">${icon(allDone() ? "star" : "play")}</div><div><b>${allDone() ? "¡Terminaste los 6 niveles!" : `Nivel ${current() + 1}: ${esc(lv.title)}`}</b><p class="small muted">${allDone() ? "Te espera el último paso." : `${lv.min} minutos · 3 tarjetas y 1 pregunta`}</p></div></div>
         <button class="btn" data-go="${allDone() ? "leap" : "lesson"}">${allDone() ? "Dar el salto" : "Seguir aprendiendo"} ${icon("arrow")}</button>
       </div>
-      <div class="card hover span-3">
-        <div class="between"><span class="eyebrow">Liga de amigos</span><span class="xs faint">plata virtual</span></div>
-        <div class="row" style="margin:14px 0"><div class="rank ${me <= 3 ? "r" + me : ""}" style="width:44px;height:44px;font-size:18px">${me}°</div><div><b>Estás ${me}° de ${FRIENDS.length + 1}</b><p class="small muted">Te faltan ${Math.max(0, leagueRows("amigos")[Math.max(0, me - 2)].pts - leagueRows("amigos")[me - 1].pts)} puntos para subir un puesto.</p></div></div>
-        <button class="btn ghost" data-go="league">Ver la liga</button>
-      </div>
       <div class="card hover span-3" style="border-color:#BFE6D1">
         <span class="eyebrow">${focus[0]} · porque elegiste “${FRENOS[S.freno || "miedo"].short}”</span>
         <h3 style="margin:10px 0 6px">${focus[1]}</h3><p class="small muted">${focus[2]}</p>
         <button class="btn" style="margin-top:14px" data-go="${focus[3]}">${focus[4]}</button>
-      </div>
-      <div class="card hover span-3">
-        <span class="eyebrow">¿Y si…?</span>
-        <h3 style="margin:10px 0 6px">¿Qué hubiera pasado con la plata de tu cumpleaños?</h3><p class="small muted">Compará “guardado en el cajón” contra “invertido” en 12 meses.</p>
-        <button class="btn ghost" style="margin-top:14px" data-go="whatif">Probar</button>
       </div>
       <div class="card span-6" style="background:var(--mint-50);border-color:#CDEBDB">
         <div class="row" style="gap:14px"><div class="icon-box" style="background:#fff">${icon("bulb")}</div><div><span class="eyebrow">Tip del día</span><p style="margin-top:2px">${TIPS[(new Date().getDate()) % TIPS.length]}</p></div></div>
@@ -1768,53 +1804,6 @@ function onNewData() {
   render();
 }
 
-/* ---------- 9. Liga ---------- */
-function myScore() {
-  const types = S.bk ? new Set(Object.keys(S.bk.hold).map(k => A(k).cls)).size : 0;
-  const parts = { div: types * 100, days: S.streak * 30, lessons: S.done.length * 80, scams: S.scams * 60 };
-  return { types, pts: 300 + parts.div + parts.days + parts.lessons + parts.scams };
-}
-function leagueRows(kind) {
-  const ms = myScore();
-  const me = { name: myName() + " (vos)", me: true, pts: ms.pts, div: ms.types, days: S.streak, lessons: S.done.length, scams: S.scams };
-  let rows = kind === "curso" ? COURSE.map((n, k) => {
-    const f = FRIENDS.find(x => x.name === n); if (f) return { ...f };
-    const r = rng(k + 7); return { name: n, pts: Math.round(300 + r() * 900), div: 1 + Math.floor(r() * 4), days: 1 + Math.floor(r() * 12), lessons: 1 + Math.floor(r() * 5), scams: Math.floor(r() * 3) };
-  }) : FRIENDS.map(f => ({ ...f }));
-  rows.push(me); rows.sort((x, y) => y.pts - x.pts);
-  return rows;
-}
-function league() {
-  const kind = S.league, rows = leagueRows(kind);
-  return `
-    <div class="page-h"><div><span class="eyebrow">Liga</span><h1 style="margin-top:6px">Liga con amigos</h1><p class="muted">Gana quien mejor administra, no quien más arriesga.</p></div>
-      <div class="row"><span class="sim-tag"><i></i>Plata virtual</span><button class="btn" data-act="invite">${icon("users")}Invitar amigos</button></div></div>
-    <div class="grid" style="grid-template-columns:1fr;align-items:start">
-      <div class="card" style="padding:0;overflow:hidden">
-        <div class="between" style="padding:18px 20px"><div class="tabs"><button class="${kind === "amigos" ? "on" : ""}" data-league="amigos">Mis amigos</button><button class="${kind === "curso" ? "on" : ""}" data-league="curso">Liga de mi curso · 5° B</button></div><span class="xs faint">Temporada de octubre</span></div>
-        <table><thead><tr><th style="padding-left:20px">#</th><th>Jugador</th><th class="c">Diversificación</th><th class="c">Racha</th><th class="c">Niveles</th><th class="c">Estafas</th><th style="text-align:right;padding-right:20px">Puntos</th></tr></thead>
-          <tbody>${rows.map((r, k) => `<tr class="${r.me ? "me-row" : ""}">
-            <td style="padding-left:20px"><span class="rank ${k < 3 ? "r" + (k + 1) : ""}">${k + 1}</span></td>
-            <td><div class="row" style="gap:10px"><div class="avatar" style="width:32px;height:32px;background:${r.me ? "var(--mint)" : "var(--petrol-600)"};color:${r.me ? "#062018" : "#fff"}">${esc(r.name[0])}</div><b style="white-space:nowrap">${esc(r.name)}</b></div></td>
-            <td class="c num">${r.div} de 5</td><td class="c num" style="white-space:nowrap">${r.days} ${r.days === 1 ? "día" : "días"}</td><td class="c num">${r.lessons} de 6</td><td class="c num">${r.scams}</td>
-            <td style="text-align:right;padding-right:20px"><b class="num">${r.pts.toLocaleString("es-AR")}</b></td></tr>`).join("")}</tbody></table>
-        <p class="xs faint" style="padding:12px 20px;border-top:1px solid var(--line)">Nombres ficticios de ejemplo.</p>
-      </div>
-      <div class="stack">
-        <div class="card">
-          <span class="eyebrow">Cómo se suman puntos</span>
-          <div class="grid" style="margin-top:12px;gap:14px;grid-template-columns:repeat(4,1fr)">${[
-            ["sim", "Diversificar", "100 por cada tipo de activo en tu cartera de práctica"],
-            ["flame", "Constancia", "30 por cada día de racha"],
-            ["learn", "Completar lecciones", "80 por nivel terminado"],
-            ["shield", "Detectar estafas", "60 por cada oferta que revisás"]
-          ].map(([ic, h, d]) => `<div class="row" style="align-items:flex-start"><div class="icon-box" style="width:36px;height:36px">${icon(ic)}</div><div><b>${h}</b><p class="small muted">${d}</p></div></div>`).join("")}</div>
-          <div class="callout red" style="margin-top:14px;font-size:14px"><b>Arriesgar más no suma.</b> Los puntos no dependen de cuánto ganás: así nadie gana apostando todo.</div>
-        </div>
-      </div>
-    </div>`;
-}
-
 /* ---------- 10. Preguntá ---------- */
 const ANSWERS = [
   { k: /acci[oó]n/i, a: `Una <b>acción</b> es un pedacito de una empresa. Si comprás una acción de una empresa, sos dueño de una parte muy chiquita de ella.<ul><li>Si a la empresa le va bien, tu pedacito puede valer más.</li><li>Si le va mal, puede valer menos.</li></ul><p style="margin-top:8px">Ejemplo: es como tener una porción de la pizzería del barrio. Las acciones son de <b>riesgo alto</b>, así que conviene empezar con poco y repartir.</p>` },
@@ -1846,110 +1835,22 @@ function answerFor(q) {
   return f ? f.a : `Buena pregunta. En este prototipo tengo respuestas para algunos temas: acciones, CEDEARs, fondos, estafas y cuánto hace falta para empezar. Probá con una de las preguntas sugeridas.`;
 }
 
-/* ---------- Mi meta (con ¿Y si…? y Empezar con poco) ---------- */
-function goalPage() {
-  const tab = V.page === "whatif" ? "whatif" : V.page === "small" ? "small" : "goal";
-  const tabs = `<div class="tabs" style="margin-bottom:20px"><button class="${tab === "goal" ? "on" : ""}" data-go="goal">Mi meta</button><button class="${tab === "whatif" ? "on" : ""}" data-go="whatif">¿Y si…?</button><button class="${tab === "small" ? "on" : ""}" data-go="small">Empezar con poco</button></div>`;
-  return (tab === "goal" ? goalMain(tabs) : tab === "whatif" ? whatif(tabs) : small(tabs));
-}
-function goalMain(tabs) {
-  const g = goal();
-  return `
-    <div class="page-h"><div><span class="eyebrow">Mi meta</span><h1 style="margin-top:6px">${esc(g.name)}</h1><p class="muted">Invertir tiene más sentido cuando es para algo que te importa.</p></div></div>
-    ${tabs}
-    <div class="card goal-hero">
-      <div class="row" style="gap:18px"><div class="icon-box" style="background:rgba(43,182,115,.18);color:#7EE2AE;width:64px;height:64px">${icon(g.icon)}</div>
-        <div><span class="eyebrow" style="color:#9FC3C6">Ahorro de práctica</span><div class="big-num">${money(g.target * S.saved)} <span style="font-size:18px;color:#B9D3D5">de ${money(g.target)}</span></div></div>
-        <div style="margin-left:auto" class="big-num">${Math.round(S.saved * 100)}%</div></div>
-      <div class="bar" style="margin-top:18px;height:14px"><span style="width:${S.saved * 100}%"></span></div>
-      <p class="small muted" style="margin-top:10px">Valores de ejemplo para el prototipo.</p>
-    </div>
-    <div class="grid" style="grid-template-columns:1fr 1fr;margin-top:18px">
-      <div class="card hover"><div class="icon-box">${icon("sparkle")}</div><h3 style="margin-top:12px">¿Y si…?</h3><p class="muted small" style="margin:6px 0 14px">¿Qué hubiera pasado si invertías la plata de tu cumpleaños?</p><button class="btn" data-go="whatif">Probar</button></div>
-      <div class="card hover"><div class="icon-box">${icon("calc")}</div><h3 style="margin-top:12px">Empezar con poco</h3><p class="muted small" style="margin:6px 0 14px">Mirá cuánto juntás para tu meta cambiando un par de salidas por mes.</p><button class="btn" data-go="small">Calcular</button></div>
-    </div>`;
-}
-
-const INFL_M = 0.022, INV_M = 0.026; // valores simulados para los ejemplos
-function whatif(tabs) {
-  const amt = V.wiAmt ?? 20000;
-  return `
-    <div class="page-h"><div><span class="eyebrow">Mi meta</span><h1 style="margin-top:6px">¿Y si…?</h1><p class="muted">Poné cuánto te regalaron en tu cumpleaños y compará en 12 meses.</p></div></div>
-    ${tabs}
-    <div class="grid" style="grid-template-columns:300px 1fr;align-items:start">
-      <div class="card">
-        <div class="field"><label for="wi">¿Cuánto te regalaron?</label><div class="money-in"><span>$</span><input class="input num" id="wi" inputmode="numeric" value="${amt.toLocaleString("es-AR")}" data-num="wiAmt"></div></div>
-        <div class="row" style="flex-wrap:wrap;gap:8px;margin-top:12px">${[10000, 20000, 50000].map(v => `<button class="chip" data-wi="${v}">${money(v)}</button>`).join("")}</div>
-        <div id="wi-res" style="margin-top:18px">${wiSummary(amt)}</div>
-      </div>
-      <div class="card">
-        <span class="eyebrow">Qué podés comprar con esa plata, mes a mes</span>
-        <div id="chart-wi" style="margin-top:14px"></div>
-        <div class="callout" style="margin-top:14px;font-size:13.5px"><b>Ejemplo ilustrativo con datos simulados.</b> Rendimientos pasados no garantizan resultados futuros.</div>
-      </div>
-    </div>`;
-}
-function wiData(amt) {
-  const r = rng(7), caj = [], inv = []; let v = amt;
-  for (let m = 0; m <= 12; m++) { if (m) v *= 1 + INV_M + 0.012 * gauss(r); caj.push(amt / (1 + INFL_M) ** m); inv.push(v / (1 + INFL_M) ** m); }
-  return { caj, inv };
-}
-function wiSummary(amt) {
-  const d = wiData(amt);
-  return `<div class="stack" style="gap:10px">
-    <div style="background:#F6F9F8;border-radius:12px;padding:12px"><span class="xs faint" style="font-weight:700">GUARDADO EN EL CAJÓN</span><div style="font-size:22px;font-weight:800" class="num">${money(d.caj[12])}</div><span class="small muted">de poder de compra en 12 meses</span></div>
-    <div style="background:var(--mint-50);border-radius:12px;padding:12px"><span class="xs faint" style="font-weight:700">INVERTIDO (SIMULADO)</span><div style="font-size:22px;font-weight:800;color:#13774a" class="num">${money(d.inv[12])}</div><span class="small muted">de poder de compra en 12 meses</span></div></div>`;
-}
-
-function small(tabs) {
-  const g = goal(), salida = V.salida ?? 10000, n = V.nSal ?? 2, monthly = salida * n;
-  const { aport, inv, tA, tI } = smallData(monthly, g.target);
-  return `
-    <div class="page-h"><div><span class="eyebrow">Mi meta</span><h1 style="margin-top:6px">Empezar con poco</h1><p class="muted">No hace falta mucha plata. Hace falta empezar.</p></div></div>
-    ${tabs}
-    <div class="grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:18px">${[
-      ["coins", "$5.000", "lo que sale una merienda con amigos"], ["music", "$10.000", "una salida un sábado"], ["calc", "$20.000", "dos salidas por mes"]
-    ].map(([ic, a, d]) => `<div class="card hover"><div class="row"><div class="icon-box">${icon(ic)}</div><div><b style="font-size:20px">${a}</b><p class="small muted">${d}</p></div></div></div>`).join("")}</div>
-    <div class="grid" style="grid-template-columns:320px 1fr;align-items:start">
-      <div class="card stack">
-        <div class="field"><label for="sal">¿Cuánto gastás en una salida?</label><div class="money-in"><span>$</span><input class="input num" id="sal" inputmode="numeric" value="${salida.toLocaleString("es-AR")}" data-num="salida"></div></div>
-        <div class="field"><label>¿Cuántas salidas por mes podrías cambiar?</label><div class="tabs">${[1, 2, 3, 4].map(k => `<button class="${n === k ? "on" : ""}" data-nsal="${k}">${k}</button>`).join("")}</div></div>
-        <div style="background:var(--mint-50);border-radius:12px;padding:14px"><span class="xs faint" style="font-weight:700">PONÉS POR MES</span><div style="font-size:26px;font-weight:800" class="num">${money(monthly)}</div>
-          <p class="small" style="margin-top:6px">Con lo que gastás en ${n} ${n === 1 ? "salida" : "salidas"} por mes podés empezar.</p></div>
-        <p class="small">Para “${esc(g.name)}” (${money(g.target)}): <b>${tA ? tA + " meses" : "más de 3 años"}</b> solo ahorrando, <b style="color:#13774a">${tI ? tI + " meses" : "más de 3 años"}</b> invirtiendo (simulado).</p>
-      </div>
-      <div class="card">
-        <span class="eyebrow">Cuánto sumás hacia tu meta</span>
-        <div id="chart-small" style="margin-top:14px"></div>
-        <p class="note" style="margin-top:10px">Datos simulados con fines educativos. Los montos mínimos dependen de cada producto. Rendimientos pasados no garantizan resultados futuros.</p>
-      </div>
-    </div>`;
-}
-function smallData(monthly, target) {
-  const aport = [0], inv = [0]; let tA = null, tI = null;
-  for (let m = 1; m <= 36; m++) {
-    aport.push(aport[m - 1] + monthly); inv.push(inv[m - 1] * (1 + INV_M) + monthly);
-    if (!tA && aport[m] >= target) tA = m; if (!tI && inv[m] >= target) tI = m;
-  }
-  return { aport, inv, tA, tI };
-}
-
 /* ---------- 12. El salto ---------- */
 function leap() {
-  const msg = `¡Hola! Estoy usando Sin Miedo, de LBO, para aprender a invertir. Ya terminé el camino y quiero hacer mi primera inversión real con un monto chico, para mi meta: ${goal().name}. Como soy menor, necesito que un adulto me habilite la cuenta. ¿Lo vemos juntos?`;
+  const msg = `¡Hola! Estoy usando Sin Miedo, de LBO, para aprender a invertir. Ya terminé el camino y quiero hacer mi primera inversión real con un monto chico. Como soy menor, necesito que un adulto me habilite la cuenta. ¿Lo vemos juntos?`;
   return `
     <div class="leap-hero">
       <div class="medal">${icon("rocket")}</div>
       <span class="pill" style="background:rgba(43,182,115,.18);color:#7EE2AE">Camino completo</span>
       <h1 style="font-size:42px;margin-top:14px">¡Ya podés dar el salto!</h1>
       <p style="color:#B9D3D5;font-size:18px;margin:10px auto 0;max-width:52ch">Aprendiste, detectaste estafas y practicaste sin arriesgar nada. Ahora podés hacer tu primera inversión real, arrancando con poco.</p>
-      <div class="stats4">${[["6/6", "niveles completos"], [S.scams, "ofertas revisadas"], [S.streak, "días de racha"], [leagueRows("amigos").findIndex(r => r.me) + 1 + "°", "en tu liga"]].map(([b, d]) => `<div><b>${b}</b><span class="small" style="color:#B9D3D5">${d}</span></div>`).join("")}</div>
+      <div class="stats4">${[["6/6", "niveles completos"], [S.scams, "ofertas revisadas"], [S.streak, "días de racha"], [S.xp || 0, "XP ganados"]].map(([b, d]) => `<div><b>${b}</b><span class="small" style="color:#B9D3D5">${d}</span></div>`).join("")}</div>
     </div>
     <div class="grid" style="grid-template-columns:1.3fr 1fr;margin-top:18px;align-items:start">
       <div class="card">
         <span class="eyebrow">Tu primera inversión real</span>
         <h2 style="margin-top:6px">Empezá con poco, en LBO</h2>
-        <p class="muted" style="margin-top:6px">Por ejemplo, con <b>$5.000</b> en una opción de riesgo bajo, para tu meta “${esc(goal().name)}”. Lo definís vos al abrir tu cuenta.</p>
+        <p class="muted" style="margin-top:6px">Por ejemplo, con <b>$5.000</b> en una opción de riesgo bajo. Lo definís vos al abrir tu cuenta.</p>
         <div class="row" style="margin-top:18px;flex-wrap:wrap"><button class="btn lg" data-act="openAccount">Abrir mi cuenta en LBO ${icon("arrow")}</button><button class="btn lg ghost" data-go="sim">Seguir practicando</button></div>
         <p class="note" style="margin-top:16px">Invertir tiene riesgos. Antes de invertir, leé las condiciones de cada producto.</p>
       </div>
@@ -2015,21 +1916,6 @@ document.addEventListener("mousemove", e => {
 const shortMoney = v => "$" + (v >= 1e6 ? (v / 1e6).toLocaleString("es-AR", { maximumFractionDigits: 1 }) + " M" : Math.round(v / 1000).toLocaleString("es-AR") + " mil");
 function mountCharts() {
   mountAssetChart();
-  if (document.getElementById("chart-wi")) {
-    const amt = V.wiAmt ?? 20000, d = wiData(amt);
-    lineChart("chart-wi", { labels: Array.from({ length: 13 }, (_, k) => k === 0 ? "Hoy" : `Mes ${k}`),
-      series: [{ name: "Invertido (simulado)", color: "#2BB673", values: d.inv, area: true }, { name: "Guardado en el cajón", color: "#D64545", values: d.caj, dash: true }],
-      fmt: v => money(v), height: 300 });
-  }
-  if (document.getElementById("chart-small")) {
-    const monthly = (V.salida ?? 10000) * (V.nSal ?? 2), g = goal(), d = smallData(monthly, g.target);
-    const horizon = Math.min(36, Math.max(12, (d.tA || 36) + 2));
-    lineChart("chart-small", { labels: Array.from({ length: horizon + 1 }, (_, k) => k === 0 ? "Hoy" : `${k} m`),
-      series: [{ name: "Invirtiendo (simulado)", color: "#2BB673", values: d.inv.slice(0, horizon + 1), area: true },
-               { name: "Solo ahorrando", color: "#2F6FB5", values: d.aport.slice(0, horizon + 1) },
-               { name: `Tu meta: ${money(g.target)}`, color: "#E3A21A", dash: true, values: Array(horizon + 1).fill(g.target) }],
-      fmt: shortMoney, height: 300 });
-  }
 }
 
 /* =================================================================
@@ -2075,12 +1961,12 @@ function confetti() {
    Eventos
    ================================================================= */
 document.addEventListener("click", e => {
-  const ga = e.target.closest("[data-auth],[data-micro],[data-mpick],[data-act=orb],[data-act=orbClose],[data-act=orbBack],[data-act=chest],[data-act=logout]");
+  const ga = e.target.closest("[data-auth],[data-act=gdemoBack],[data-micro],[data-mpick],[data-act=orb],[data-act=orbClose],[data-act=orbBack],[data-act=chest],[data-act=logout]");
   if (ga) { gameClick(ga); return; }
   const b = e.target.closest("[data-q],[data-bkact],[data-bkview],[data-bktab],[data-sym],[data-range],[data-cstyle],[data-tkf],[data-cancel],[data-trade],[data-drclose],[data-drgo]");
   if (b && !b.disabled && (V.page === "sim" || b.closest("#drawer") || b.dataset.trade)) { bkClick(b, e); return; }
   if (b && b.dataset.q) { bkClick(b, e); return; }
-  const el = e.target.closest("[data-go],[data-act],[data-diag],[data-lvl],[data-pick],[data-example],[data-sig],[data-league],[data-ask],[data-wi],[data-nsal],[data-scroll],[data-jump]");
+  const el = e.target.closest("[data-go],[data-act],[data-diag],[data-lvl],[data-pick],[data-example],[data-sig],[data-ask],[data-scroll],[data-jump]");
   if (!el || el.disabled) return;
   const d = el.dataset;
   if (d.scroll) { document.getElementById(d.scroll)?.scrollIntoView({ behavior: "smooth" }); return; }
@@ -2101,10 +1987,7 @@ document.addEventListener("click", e => {
   if (d.pick != null) { V.picked = +d.pick; V.tries = (V.tries || 0) + 1; render(); return; }
   if (d.example) { V.scamText = d.example; V.scam = { ans: analyze(d.example) }; S.scams++; save(); render(); return; }
   if (d.sig) { V.scam.ans[d.sig] = d.v; render(); return; }
-  if (d.league) { S.league = d.league; save(); render(); return; }
   if (d.ask) { sendAsk(d.ask); return; }
-  if (d.wi) { V.wiAmt = +d.wi; render(); return; }
-  if (d.nsal) { V.nSal = +d.nsal; render(); return; }
   switch (d.act) {
     case "diagBack": V.step--; render(); break;
     case "diagNext":
@@ -2119,19 +2002,8 @@ document.addEventListener("click", e => {
       if (!txt) { toast("Escribí o pegá la oferta que te llegó."); return; }
       V.scamText = txt; V.scam = { ans: analyze(txt) }; S.scams++; save(); render(); break;
     }
-    case "invite": {
-      const link = "sinmiedo.lbo.com.ar/liga/" + myName().toLowerCase().replace(/\W+/g, "") + "-5b";
-      const msg = `Sumate a mi liga en Sin Miedo: practicamos inversiones con plata virtual y gana quien mejor administra. ${link}`;
-      modal(`<h2>Invitá a tus amigos</h2><p class="muted" style="margin:6px 0 16px">Cada amigo que se suma juega con su propia plata virtual.</p>
-        <div class="field"><label>Tu link de invitación</label><div class="row"><input class="input" value="${link}" readonly id="inv-link"><button class="btn ghost" data-act="copyInvite">Copiar</button></div><span class="xs faint">Link de ejemplo del prototipo.</span></div>
-        <a class="btn wa block" style="margin-top:14px" href="https://wa.me/?text=${encodeURIComponent(msg)}" target="_blank" rel="noopener" data-act="invited">${icon("wa")}Compartir por WhatsApp</a>
-        <button class="btn ghost block" style="margin-top:10px" data-act="closeModal">Cerrar</button>`);
-      break;
-    }
-    case "copyInvite": { const i = document.getElementById("inv-link"); try { navigator.clipboard.writeText(i.value).then(() => toast("Link copiado"), () => { i.select(); }); } catch (err) { i.select(); } S.invited = true; save(); break; }
-    case "invited": S.invited = true; save(); break;
     case "closeModal": if (e.target === el || el.tagName === "BUTTON") modal(""); break;
-    case "openAccount": modal(`<div class="medal" style="width:72px;height:72px">${icon("rocket")}</div><h2 style="text-align:center">Acá empieza tu cuenta en LBO</h2><p class="muted" style="text-align:center;margin:8px 0 18px">En el producto real, este botón lleva al alta de cuenta en LBO con tu meta y el monto que elegiste. En el prototipo termina acá.</p><button class="btn block" data-act="closeModal">Entendido</button>`); break;
+    case "openAccount": modal(`<div class="medal" style="width:72px;height:72px">${icon("rocket")}</div><h2 style="text-align:center">Acá empieza tu cuenta en LBO</h2><p class="muted" style="text-align:center;margin:8px 0 18px">En el producto real, este botón lleva al alta de cuenta en LBO con el monto que elegiste. En el prototipo termina acá.</p><button class="btn block" data-act="closeModal">Entendido</button>`); break;
     case "minor": S.minor = el.checked; save(); render(); break;
     case "map": showMap(); break;
     case "reset": { const nm = S.name; S = fresh(); S.name = nm; save(); modal(""); go("diag", { step: 0 }); break; }
@@ -2146,6 +2018,8 @@ function closeDrawer() {
 }
 function gameClick(el) {
   const d = el.dataset;
+  if (d.auth === "google") { if (V.page !== "auth") go("auth", { mode: "signup" }); googleAuth(); return; }
+  if (d.act === "gdemoBack") { V.gdemo = false; render(); return; }
   if (d.auth) { V.mode = d.auth; V.authEmail = document.getElementById("au-email")?.value || ""; render(); return; }
   if (d.micro) { V.orb = true; V.micro = d.micro; V.microPick = null; renderOrb(); return; }
   if (d.mpick != null) {
@@ -2200,7 +2074,7 @@ function finishLevel() {
   if (first) addXP(50 + (stars === 3 ? 20 : 0), stars === 3 ? "¡a la primera!" : "nivel completo");
   if (allDone() && first) { setTimeout(() => go("leap"), 700); return; }
   modal(`<div class="medal" style="width:76px;height:76px">${icon("star")}</div><h2 style="text-align:center">¡Nivel ${i + 1} completo!</h2><div class="stars big" style="text-align:center">${[1, 2, 3].map(k => `<span class="${k <= stars ? "on" : ""}">★</span>`).join("")}</div>
-    <p class="muted" style="text-align:center;margin:8px 0 18px">${first ? `+${50 + (stars === 3 ? 20 : 0)} XP y +80 puntos en la liga.` : "Buen repaso."} ${allDone() ? "" : `Se desbloqueó el nivel ${current() + 1}: ${LEVELS[current()].title}.`}</p>
+    <p class="muted" style="text-align:center;margin:8px 0 18px">${first ? `+${50 + (stars === 3 ? 20 : 0)} XP.` : "Buen repaso."} ${allDone() ? "" : `Se desbloqueó el nivel ${current() + 1}: ${LEVELS[current()].title}.`}</p>
     <div class="row"><button class="btn ghost" style="flex:1" data-go="learn" data-act="closeModal">Ver el camino</button>${allDone() ? `<button class="btn" style="flex:1" data-go="leap">Dar el salto</button>` : `<button class="btn" style="flex:1" data-go="lesson">Siguiente nivel</button>`}</div>`);
 }
 document.getElementById("modal").addEventListener("click", e => { if (e.target.closest("[data-go]")) modal(""); });
@@ -2212,7 +2086,7 @@ function sendAsk(q) {
 }
 function scrollChat() { const l = document.getElementById("chat-log"); if (l) l.scrollTop = l.scrollHeight; }
 
-document.addEventListener("submit", e => { if (e.target.id === "auth-form") { e.preventDefault(); submitAuth(); return; } if (e.target.id === "ask-form") { e.preventDefault(); const i = document.getElementById("ask-in"); sendAsk(i.value); } });
+document.addEventListener("submit", e => { if (e.target.id === "auth-form") { e.preventDefault(); submitAuth(); return; } if (e.target.id === "gdemo-form") { e.preventDefault(); submitGoogleDemo(); return; } if (e.target.id === "ask-form") { e.preventDefault(); const i = document.getElementById("ask-in"); sendAsk(i.value); } });
 
 document.addEventListener("input", e => {
   const el = e.target;
@@ -2241,8 +2115,8 @@ window.addEventListener("resize", () => mountCharts());
 
 /* ---------- Mapa del prototipo (para presentar) ---------- */
 const SCREENS = [
-  ["landing", "Landing"], ["auth", "Registro con email"], ["diag", "Diagnóstico"], ["home", "Inicio"], ["whatif", "¿Y si…?"], ["learn", "Aprender"], ["lesson3", "Lección nivel 3"],
-  ["scam", "¿Es estafa?"], ["sim", "Simulador"], ["league", "Liga con amigos"], ["ask", "Preguntá sin vergüenza"], ["small", "Empezar con poco"], ["leap", "El salto"]
+  ["landing", "Landing"], ["auth", "Registro (Google o email)"], ["diag", "Diagnóstico"], ["home", "Inicio"], ["learn", "Aprender"], ["lesson3", "Lección nivel 3"],
+  ["scam", "¿Es estafa?"], ["sim", "Simulador"], ["ask", "Preguntá sin vergüenza"], ["leap", "El salto"]
 ];
 function showMap() {
   modal(`<h2>Mapa del prototipo</h2><p class="muted small" style="margin-top:4px">Saltá a cualquier pantalla. Atajo: tecla M.</p>
@@ -2265,7 +2139,7 @@ function demoPortfolio() {
 function jump(id) {
   if (!USER) startSession({ email: "demo@sinmiedo.app", name: "Agus" }, Object.assign(fresh(), { name: "Agus" }));
   if (id === "auth") { logout(); return go("auth", { mode: "signup" }); }
-  if (!S.started && !["landing", "diag"].includes(id)) { S.started = true; S.freno = S.freno || "miedo"; S.goal = S.goal || "viaje"; S.exp = S.exp || "nunca"; save(); }
+  if (!S.started && !["landing", "diag"].includes(id)) { S.started = true; S.freno = S.freno || "miedo"; S.exp = S.exp || "nunca"; save(); }
   if (id === "lesson3") return go("lesson", { lvl: 2, step: 0 });
   if (id === "leap") { if (!allDone()) { S.done = [0, 1, 2, 3, 4, 5]; save(); } go("leap"); confetti(); return; }
   if (id === "diag") return go("diag", { step: 0 });
