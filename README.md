@@ -105,6 +105,11 @@ create policy "cada uno actualiza lo suyo" on progreso for update using (auth.ui
 
 Antes de usarlo con usuarios reales (y menores de edad) hace falta que LBO revise la política de privacidad y el tratamiento de datos personales (Ley 25.326). El texto de los términos está marcado "a completar".
 
+### Asistente con IA y progreso guardado
+
+- **Preguntá** responde cualquier pregunta con IA (Claude) cuando el prototipo se abre publicado en claude.ai (capacidad `sample`). Las instrucciones están en `AI_RULES`: voseo, respuestas cortas, nunca promete ganancias ni recomienda qué comprar, avisa que no tiene datos en vivo y no inventa datos de LBO. Como archivo suelto o app de escritorio usa las respuestas guardadas (`ANSWERS`).
+- **Progreso:** siempre se guarda en el navegador. En claude.ai además se guarda en la base privada de cada persona (capacidad `db`, `data/users/<id>`), así vuelve aunque se borre el navegador o se entre desde otro dispositivo. La barra lateral muestra dónde quedó guardado.
+
 ### Aprender (más lúdico)
 
 XP por nivel (+50, +20 si respondés bien al primer intento), estrellas, meta diaria, niveles de jugador, insignias y un cofre. La **esfera flotante** ("¿Qué querés aprender hoy?") abre micro-lecciones de 1 minuto con una pregunta y XP.

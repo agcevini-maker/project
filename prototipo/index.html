@@ -125,6 +125,42 @@
   .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-top: 32px; }
   .step-n { width: 34px; height: 34px; border-radius: 50%; background: var(--petrol-800); color: #fff; display: grid; place-items: center; font-weight: 800; margin-bottom: 14px; }
   .l-cta { background: var(--petrol-800); color: #fff; border-radius: 24px; padding: 44px; display: flex; justify-content: space-between; align-items: center; gap: 24px; }
+  .ticker { display: flex; align-items: center; background: var(--petrol-900); border-top: 1px solid rgba(255,255,255,.08); color: #DCEBEC; font-size: 13.5px; }
+  .tk-lab { flex: none; padding: 12px 18px 12px 40px; font-weight: 800; color: #7EE2AE; white-space: nowrap; background: var(--petrol-900); position: relative; z-index: 1; }
+  .tk-run { overflow: hidden; flex: 1; -webkit-mask-image: linear-gradient(90deg, transparent, #000 40px, #000 calc(100% - 40px), transparent); mask-image: linear-gradient(90deg, transparent, #000 40px, #000 calc(100% - 40px), transparent); }
+  .tk-track { display: flex; width: max-content; animation: tick 60s linear infinite; }
+  .ticker:hover .tk-track { animation-play-state: paused; }
+  .tk-i { display: inline-flex; gap: 8px; align-items: baseline; padding: 12px 22px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .tk-i b { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; color: #fff; }
+  .tk-i em { font-style: normal; font-weight: 700; } .tk-i em.up { color: #7EE2AE; } .tk-i em.down { color: #FF9C9C; }
+  @keyframes tick { to { transform: translateX(-50%); } }
+  @media (prefers-reduced-motion: reduce) { .tk-track { animation: none; } }
+  .feat { display: grid; grid-template-columns: 1fr 1.1fr; gap: 56px; align-items: center; margin-top: 56px; }
+  .feat.rev .feat-t { order: 2; }
+  .feat-t h3 { font-size: 26px; letter-spacing: -.02em; margin: 14px 0 10px; }
+  .feat-t p { font-size: 16.5px; max-width: 44ch; }
+  .feat-n { display: inline-grid; place-items: center; min-width: 48px; height: 48px; padding: 0 10px; border-radius: 14px; background: var(--petrol-800); color: var(--mint); font-weight: 800; font-size: 18px; }
+  .feat-v { background: linear-gradient(145deg, #E5F3EE, #F4F8F7); border-radius: 24px; padding: 34px; border: 1px solid var(--line); }
+  .mock-chat { display: flex; flex-direction: column; gap: 12px; }
+  .mock-chat .msg { max-width: 86%; }
+  .mock-chat .msg.bot { background: #fff; box-shadow: var(--shadow); }
+  .mock-bk { box-shadow: var(--shadow-lg); }
+  .mock-game { background: linear-gradient(135deg, var(--petrol-800), var(--petrol-700)); border-radius: 20px; padding: 22px; box-shadow: var(--shadow-lg); }
+  .orb-mini { width: 46px; height: 46px; margin-left: auto; border-radius: 50%; background: radial-gradient(circle at 32% 28%, #ffffff 0, #C9F5DD 12%, #2BB673 45%, #0E6A55 78%, #003845 100%); box-shadow: 0 8px 20px rgba(43,182,115,.45); animation: float 3.4s ease-in-out infinite; }
+  @media (prefers-reduced-motion: reduce) { .orb-mini { animation: none; } }
+  .l-fam { background: linear-gradient(180deg, var(--petrol-900), var(--petrol-800)); }
+  .fam { display: grid; grid-template-columns: 1fr 1.3fr; gap: 48px; align-items: center; }
+  .fam-g { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .fam-i { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.08); border-radius: 16px; padding: 18px; display: flex; flex-direction: column; gap: 6px; color: #B9D3D5; font-size: 14px; }
+  .fam-i b { color: #fff; font-size: 16px; } .fam-i .ic { color: var(--mint); width: 24px; height: 24px; margin-bottom: 4px; }
+  .faq-wrap { max-width: 860px; }
+  .faq { margin-top: 24px; display: flex; flex-direction: column; gap: 10px; }
+  .faq-i { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 4px 20px; }
+  .faq-i summary { cursor: pointer; font-weight: 700; font-size: 16.5px; padding: 14px 0; list-style: none; display: flex; justify-content: space-between; gap: 12px; }
+  .faq-i summary::-webkit-details-marker { display: none; }
+  .faq-i summary::after { content: "+"; color: var(--mint-600); font-size: 22px; line-height: 1; transition: transform .2s; }
+  .faq-i[open] summary::after { transform: rotate(45deg); }
+  .faq-i p { padding-bottom: 16px; max-width: 64ch; }
   .l-foot { padding-block: 28px 40px; color: var(--ink-3); font-size: 12.5px; display: flex; justify-content: space-between; gap: 20px; }
 
   /* ---------- Diagnóstico ---------- */
@@ -1041,7 +1077,7 @@ function landing() {
   return `<div class="landing">
     <section class="l-hero">
       <div class="l-wrap">
-        <nav class="l-nav">${logo()}<div class="row"><button class="navlink" data-scroll="frenos">Cómo funciona</button><button class="navlink" data-scroll="confianza">Seguridad</button><button class="navlink" data-go="auth" data-mode="login">Ingresar</button><button class="btn" data-go="auth">Crear cuenta</button></div></nav>
+        <nav class="l-nav">${logo()}<div class="row"><button class="navlink" data-scroll="producto">Producto</button><button class="navlink" data-scroll="familias">Familias</button><button class="navlink" data-scroll="faq">Preguntas</button><button class="navlink" data-go="auth" data-mode="login">Ingresar</button><button class="btn" data-go="auth">Crear cuenta</button></div></nav>
         <div class="l-hero-in">
           <div>
             <span class="pill petrol" style="background:rgba(43,182,115,.15);color:#7EE2AE">Para tu primera inversión</span>
@@ -1070,6 +1106,8 @@ function landing() {
       </div>
     </section>
 
+    ${tickerStrip()}
+
     <section class="l-section" id="frenos">
       <div class="l-wrap">
         <h2>Sabemos por qué todavía no invertiste</h2>
@@ -1096,6 +1134,58 @@ function landing() {
       </div>
     </section>
 
+    <section class="l-section" id="producto">
+      <div class="l-wrap">
+        <h2>Todo lo que necesitás para animarte, en un solo lugar</h2>
+        <div class="feat">
+          <div class="feat-t"><span class="feat-n">IA</span><h3>Preguntá lo que sea, sin vergüenza</h3><p class="muted">Una IA que te responde al toque, en criollo y sin palabras raras. De qué es un CEDEAR a si te conviene un plazo fijo. Te explica las opciones y los riesgos; nunca te dice qué comprar.</p></div>
+          <div class="feat-v" aria-hidden="true"><div class="mock-chat">
+            <div class="msg me">¿Qué es el dólar MEP?</div>
+            <div class="msg bot">Es comprar dólares de forma legal a través de bonos: comprás un bono en pesos y lo vendés en dólares. Es como cambiar plata, pero por la bolsa. Tiene un pequeño riesgo de precio mientras hacés la operación.</div>
+          </div></div>
+        </div>
+        <div class="feat rev">
+          <div class="feat-t"><span class="feat-n">$</span><h3>Un broker de práctica con precios de verdad</h3><p class="muted">$1.000.000 virtuales para comprar acciones, bonos, CEDEARs y fondos con los precios reales de cierre de cada día. Volvés mañana y ves cómo te fue, con un puntaje que premia invertir con cabeza, no arriesgar de más.</p></div>
+          <div class="feat-v" aria-hidden="true">${sparkCard()}</div>
+        </div>
+        <div class="feat">
+          <div class="feat-t"><span class="feat-n">XP</span><h3>Aprender se siente como un juego</h3><p class="muted">Niveles de 3 minutos, estrellas, racha diaria, insignias y un cofre. Y una esfera que te propone algo nuevo cada día: una pregunta, un minuto, 10 XP.</p></div>
+          <div class="feat-v" aria-hidden="true"><div class="mock-game">
+            <div class="row" style="gap:14px"><div class="gh-avatar">${icon("rocket")}<span>3</span></div><div style="flex:1"><b style="color:#fff">Aprendiz</b><div class="xpbar"><span style="width:62%"></span></div><span class="xs" style="color:#B9D3D5">310 XP · faltan 140 para el próximo nivel</span></div></div>
+            <div class="row" style="gap:8px;margin-top:16px">${["star", "shield", "flame", "bulb"].map((ic, k) => `<div class="badge-i ${k < 3 ? "on" : ""}">${icon(ic, "ic")}</div>`).join("")}<div class="orb-mini"></div></div>
+          </div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="l-section l-fam" id="familias">
+      <div class="l-wrap">
+        <div class="fam">
+          <div><h2 style="color:#fff">Pensado para que mamás y papás estén tranquilos</h2><p style="color:#B9D3D5;margin-top:10px;max-width:46ch">Sin Miedo enseña a decidir. No pide tarjeta, no mueve plata real y nunca promete ganancias.</p></div>
+          <div class="fam-g">${[
+            ["sim", "Plata virtual", "Todo lo que se practica es con plata de mentira y precios reales."],
+            ["shield", "Detector de estafas", "Aprenden a reconocer las promesas que suenan demasiado bien."],
+            ["users", "Con un adulto", "Para invertir de verdad, un menor necesita que un adulto lo acompañe."],
+            ["check", "De LBO", "Detrás hay un agente registrado en la CNV, no una app anónima."]
+          ].map(([ic, h, p]) => `<div class="fam-i">${icon(ic)}<b>${h}</b><span>${p}</span></div>`).join("")}</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="l-section" id="faq">
+      <div class="l-wrap faq-wrap">
+        <h2>Preguntas frecuentes</h2>
+        <div class="faq">${[
+          ["¿Cuánto cuesta?", "Aprender, practicar y preguntarle a la IA no cuesta nada. Si después querés invertir de verdad, lo hacés en LBO con las condiciones de cada producto."],
+          ["¿Necesito tener plata para usarlo?", "No. Practicás con $1.000.000 virtuales. Cuando te sientas listo, podés empezar con montos chicos."],
+          ["Tengo menos de 18, ¿puedo usarlo?", "Sí, para aprender y practicar. Para abrir una cuenta real vas a necesitar que un adulto responsable te acompañe."],
+          ["¿La IA me dice en qué invertir?", "No. Te explica cómo funciona cada opción y qué riesgos tiene, para que decidas vos. No es una recomendación de inversión."],
+          ["¿Los precios del simulador son reales?", "Sí: son los precios de cierre de BYMA de cada día hábil. No son cotizaciones en vivo y las puntas de compra y venta son estimadas."],
+          ["¿Se guarda lo que hago?", "Sí. Tu progreso, tu racha y tu cartera de práctica quedan guardados en tu cuenta."]
+        ].map(([q, a]) => `<details class="faq-i"><summary>${q}</summary><p class="muted">${a}</p></details>`).join("")}</div>
+      </div>
+    </section>
+
     <section class="l-section" id="confianza">
       <div class="l-wrap">
         <div class="l-cta">
@@ -1105,6 +1195,25 @@ function landing() {
         <div class="l-foot"><span>Sin Miedo · by LBO · Prototipo de diseño</span><span>Las inversiones tienen riesgo. Rendimientos pasados no garantizan resultados futuros.</span></div>
       </div>
     </section>
+  </div>`;
+}
+
+function tickerStrip() {
+  if (!MD.real) return "";
+  const items = assets().filter(a => a.cls !== "fci").map(a => { const v = dayVar(a.t); return `<span class="tk-i"><b>${a.t === "LECAP" && MD.lecap ? MD.lecap : a.t}</b>${m2(last(a.t))}<em class="${v >= 0 ? "up" : "down"}">${pc2(v)}</em></span>`; }).join("");
+  return `<div class="ticker" aria-label="Precios de cierre reales de BYMA del ${fmtDateLong(MD.asOf)}"><div class="tk-lab">Cierre real BYMA · ${fmtDate(MD.asOf)}</div><div class="tk-run"><div class="tk-track">${items}${items}</div></div></div>`;
+}
+function sparkCard() {
+  const tk = MD.close.SPY ? "SPY" : assets()[0]?.t;
+  const vals = (MD.close[tk] || []).slice(-60).filter(v => v != null);
+  if (vals.length < 2) return "";
+  const w = 420, h = 120, mn = Math.min(...vals), mx = Math.max(...vals);
+  const pts = vals.map((v, i) => `${(i / (vals.length - 1) * w).toFixed(1)},${(h - 8 - (v - mn) / (mx - mn || 1) * (h - 16)).toFixed(1)}`).join(" ");
+  const ch = vals[vals.length - 1] / vals[0] - 1;
+  return `<div class="mock-bk card">
+    <div class="between"><div><b class="tk">${tk}</b> <span class="muted small">${A(tk).name}</span></div><span class="chg ${ch >= 0 ? "up" : "down"}">${pc2(ch)}</span></div>
+    <svg viewBox="0 0 ${w} ${h}" style="width:100%;height:auto;margin:12px 0 6px;display:block"><polyline points="0,${h} ${pts} ${w},${h}" fill="rgba(43,182,115,.12)" stroke="none"/><polyline points="${pts}" fill="none" stroke="#2BB673" stroke-width="2.5" stroke-linejoin="round"/></svg>
+    <div class="between small"><span class="faint">Últimas ${vals.length} ruedas · cierres reales</span><span class="pill">Tu puntaje: Prudente · 64</span></div>
   </div>`;
 }
 
