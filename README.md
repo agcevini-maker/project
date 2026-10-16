@@ -76,8 +76,40 @@ npm run dev
 
 ## Prototipo de diseño para escritorio (`prototipo/`)
 
-`prototipo/index.html` es un prototipo navegable para presentar en LBO, pensado para pantalla de escritorio (1440x900). Es independiente de la app principal: todos sus datos son simulados y están marcados como tales.
+`prototipo/index.html` es un prototipo navegable para presentar en LBO, pensado para pantalla de escritorio (1440x900). Los precios del simulador son **reales** (cierres diarios de BYMA, ver "Datos de mercado"). El resto de los datos de ejemplo (liga, meta, amigos) son simulados y están marcados como tales.
 
-Pantallas: landing, diagnóstico, inicio, ¿Y si…?, Aprender (camino de 6 niveles), lección, ¿Es estafa? (detector con semáforo), simulador, liga con amigos, Preguntá sin vergüenza, Empezar con poco y El salto. El botón "Mapa del prototipo" (o la tecla M) permite saltar a cualquier pantalla durante la presentación.
+Pantallas: registro/ingreso, landing, diagnóstico, inicio, ¿Y si…?, Aprender (camino de 6 niveles), lección, ¿Es estafa? (detector con semáforo), simulador, liga con amigos, Preguntá sin vergüenza, Empezar con poco y El salto. El botón "Mapa del prototipo" (o la tecla M) permite saltar a cualquier pantalla durante la presentación.
 
-El **simulador** funciona como un broker en modo práctica: $1.000.000 virtuales, pizarra con puntas y volumen, ficha con gráfico de línea o velas (1D a 1A) y medidor de riesgo, órdenes a mercado o limitadas (por cantidad o monto, CI o 24 hs) con comisión 0,5%, derechos 0,08% e IVA, cartera con torta y aviso de diversificación, historial, avance de días, "día malo" y modo explicado. El horario de mercado es el real de BYMA (11 a 17 hs); fuera de horario las órdenes quedan pendientes (para demos hay un botón "Abrir mercado (demo)"). Los precios salen de un paseo aleatorio geométrico con semilla fija; las volatilidades, precios de referencia y costos están en el objeto `BROKER_CFG`.
+### Cuentas con email
+
+Cada usuario se registra con nombre, email y contraseña, y tiene su propio progreso (niveles, XP, racha, cartera de práctica).
+
+- **Modo local (por defecto):** las cuentas se guardan en el navegador (`localStorage`), con la contraseña hasheada (SHA-256). Sirve para la demo, pero cada cuenta existe solo en ese dispositivo y navegador. No es un sistema de cuentas real.
+- **Modo nube (Supabase):** completá `AUTH_CFG` (`supabaseUrl` y `supabaseAnonKey`) en el archivo y creá esta tabla:
+
+```sql
+create table progreso (
+  user_id uuid primary key references auth.users on delete cascade,
+  data jsonb not null,
+  updated_at timestamptz default now()
+);
+alter table progreso enable row level security;
+create policy "cada uno ve lo suyo" on progreso for select using (auth.uid() = user_id);
+create policy "cada uno guarda lo suyo" on progreso for insert with check (auth.uid() = user_id);
+create policy "cada uno actualiza lo suyo" on progreso for update using (auth.uid() = user_id);
+```
+
+Antes de usarlo con usuarios reales (y menores de edad) hace falta que LBO revise la política de privacidad y el tratamiento de datos personales (Ley 25.326). El texto de los términos está marcado "a completar".
+
+### Aprender (más lúdico)
+
+XP por nivel (+50, +20 si respondés bien al primer intento), estrellas, meta diaria, niveles de jugador, insignias y un cofre. La **esfera flotante** ("¿Qué querés aprender hoy?") abre micro-lecciones de 1 minuto con una pregunta y XP.
+
+### Simulador día a día con datos reales
+
+- Plata de mentira ($1.000.000), precios **reales** de cierre. No se adelanta el tiempo: cada día hábil, después del cierre, entran los precios nuevos y la cartera cambia sola. Las órdenes limitadas pendientes se ejecutan si el cierre del día las alcanza.
+- Las órdenes a mercado se ejecutan al último cierre real. Las puntas compradora/vendedora son **estimadas** a partir del cierre (no son cotizaciones en vivo).
+- Comprar y vender se hace desde un **drawer lateral** con el ticket completo (tipo de orden, cantidad o monto, plazo, comisión 0,5%, derechos 0,08%, IVA).
+- "¿Qué tan buen inversor sos?": un puntaje de 0 a 100 que premia ganarle a la inflación, diversificar e invertir, y resta las caídas fuertes. Se empieza a calcular después del primer día de mercado.
+- Para que los datos nuevos lleguen solos, el prototipo tiene que estar publicado (por ejemplo, GitHub Pages): al abrirse busca `data/mercado.json`, que el workflow "Datos de mercado" actualiza cada día. Si se abre como archivo suelto usa los datos que tenía al descargarse.
+- Los activos y parámetros de respaldo están en `BROKER_CFG`. La Lecap se elige automáticamente entre las vigentes (`LECAP_CANDIDATES` en `scripts/update_market.py`).

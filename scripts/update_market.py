@@ -37,6 +37,10 @@ YEARS = 3
 FUND_NAME_HINTS = ["Fima Premium", "Mercado Pago", "Balanz Money Market", "Galileo Ahorro", "Santander Super Ahorro"]
 
 notes = []
+RAW = {}          # código -> {fecha: [apertura, máximo, mínimo, cierre, volumen]} cuando la fuente lo trae
+LECAP_CANDIDATES = ["S31O6", "S28N6", "S30N6", "S12D6", "S15E7", "S27F7", "S31M7", "S16A7", "S30A7", "S29Y7"]
+OHLC_DAYS = 260
+HTML_FILES = ["index.html", os.path.join("prototipo", "index.html")]
 
 
 def log(*a):
@@ -56,8 +60,8 @@ def get_json(url, tries=2):
     raise RuntimeError(f"{url}: {last}")
 
 
-def parse_rows(rows):
-    """Lista de dicts con fecha y cierre, en el formato que venga."""
+def parse_rows(rows, code=None):
+    """Lista de dicts con fecha y cierre, en el formato que venga. Si trae apertura, máximo, mínimo y volumen, los guarda."""
     out = {}
     for r in rows if isinstance(rows, list) else []:
         if not isinstance(r, dict):
@@ -70,6 +74,13 @@ def parse_rows(rows):
             continue
         if d and math.isfinite(c) and c > 0:
             out[str(d)[:10]] = round(c, 4)
+            if code:
+                try:
+                    o, h, l = (float(r.get(k)) for k in ("o", "h", "l"))
+                    v = float(r.get("v") or 0)
+                    RAW.setdefault(code, {})[str(d)[:10]] = [o, h, l, c, v]
+                except (TypeError, ValueError):
+                    pass
     return out
 
 
@@ -78,7 +89,7 @@ def data912_closes(code):
     url = f"https://data912.com/historical/{kind}/{code}"
     try:
         rows = get_json(url)
-        out = parse_rows(rows)
+        out = parse_rows(rows, code)
         if not out:
             log(f"{code} data912: sin datos reconocibles; ejemplo: {str(rows)[:200]}")
         cut = (dt.date.today() - dt.timedelta(days=365 * YEARS)).isoformat()
@@ -231,6 +242,24 @@ def clean(code, vals, dates):
     return v
 
 
+def lecap():
+    """La Lecap disponible con datos más recientes (las Lecaps vencen y se reemplazan)."""
+    best = None
+    for tk in LECAP_CANDIDATES:
+        try:
+            rows = get_json(f"https://data912.com/historical/bonds/{tk}", tries=1)
+        except Exception as e:  # noqa: BLE001
+            notes.append(f"lecap {tk}: {e}")
+            continue
+        out = parse_rows(rows, "LECAP:" + tk)
+        if len(out) >= 15 and (best is None or max(out) > max(best[1]) or (max(out) == max(best[1]) and len(out) > len(best[1]))):
+            best = (tk, out)
+    if best:
+        log(f"lecap: {best[0]} con {len(best[1])} cierres")
+        RAW["LECAP"] = RAW.pop("LECAP:" + best[0], {})
+    return best
+
+
 def main():
     infl, infl_src = inflation()
     log(f"inflación: {len(infl)} meses ({infl_src})")
@@ -252,6 +281,33 @@ def main():
         first = next(v for v in vals if v is not None)
         series[k] = clean(k, [v if v is not None else first for v in vals], dates)
 
+    lc = lecap()
+    lecap_ticker = None
+    if lc:
+        lecap_ticker, c = lc
+        vals, last = [], None
+        for d in dates:
+            last = c.get(d, last)
+            vals.append(last)
+        series["LECAP"] = vals   # null antes de que se emitiera
+
+    # Velas (apertura, máximo, mínimo, cierre, volumen) de los últimos días, ajustadas por splits como los cierres
+    ohlc = {}
+    for k, vals in series.items():
+        raw = RAW.get(k)
+        if not raw:
+            continue
+        rows = []
+        for d, cl in zip(dates[-OHLC_DAYS:], vals[-OHLC_DAYS:]):
+            r = raw.get(d)
+            if r and cl and r[3]:
+                f = cl / r[3]
+                rows.append([round(r[0] * f, 4), round(r[1] * f, 4), round(r[2] * f, 4), cl, round(r[4])])
+            else:
+                rows.append(None)
+        if sum(1 for x in rows if x) > OHLC_DAYS * 0.5:
+            ohlc[k] = rows
+
     fund, mm = money_market(dates)
     if mm:
         first = next(v for v in mm if v is not None)
@@ -264,6 +320,8 @@ def main():
         "series": series,
         "inflation": dict(sorted(infl.items())[-48:]),
         "fund": fund,
+        "lecap": lecap_ticker,
+        "ohlc": ohlc,
         "sources": {
             "precios": "BYMA, precios de cierre diarios en pesos (vía data912.com / Yahoo Finance)",
             "inflacion": infl_src,
@@ -275,14 +333,17 @@ def main():
     with open(os.path.join(ROOT, "data", "mercado.json"), "w", encoding="utf-8") as f:
         json.dump(payload, f, ensure_ascii=False, separators=(",", ":"))
 
-    html_path = os.path.join(ROOT, "index.html")
-    html = open(html_path, encoding="utf-8").read()
     block = "/*MARKET_DATA_START*/const MARKET_DATA = " + json.dumps(payload, ensure_ascii=False, separators=(",", ":")) + ";/*MARKET_DATA_END*/"
-    new_html, n = re.subn(r"/\*MARKET_DATA_START\*/.*?/\*MARKET_DATA_END\*/", lambda _: block, html, flags=re.S)
-    if n != 1:
-        print("No encontré el bloque MARKET_DATA en index.html", file=sys.stderr)
-        return 1
-    open(html_path, "w", encoding="utf-8").write(new_html)
+    for rel in HTML_FILES:
+        html_path = os.path.join(ROOT, rel)
+        if not os.path.exists(html_path):
+            continue
+        html = open(html_path, encoding="utf-8").read()
+        new_html, n = re.subn(r"/\*MARKET_DATA_START\*/.*?/\*MARKET_DATA_END\*/", lambda _: block, html, flags=re.S)
+        if n != 1:
+            print(f"No encontré el bloque MARKET_DATA en {rel}", file=sys.stderr)
+            return 1
+        open(html_path, "w", encoding="utf-8").write(new_html)
     print(f"Datos al {payload['asOf']}: {len(dates)} días, activos {sorted(series)}, inflación {len(infl)} meses, fondo {fund}")
     for n_ in notes:
         print("nota:", n_)

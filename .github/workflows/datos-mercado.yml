@@ -36,7 +36,7 @@ jobs:
           if git diff --quiet; then echo "Sin cambios"; exit 0; fi
           git config user.name "github-actions[bot]"
           git config user.email "41898333+github-actions[bot]@users.noreply.github.com"
-          git add index.html data/mercado.json
+          git add index.html prototipo/index.html data/mercado.json
           git commit -m "Actualizar precios reales de mercado"
           git pull --no-rebase --no-edit origin "${GITHUB_REF_NAME}" || true
           git push origin "HEAD:${GITHUB_REF_NAME}"
