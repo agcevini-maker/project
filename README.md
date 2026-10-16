@@ -74,7 +74,7 @@ npm run dev
 
 ## Prototipo de diseño para escritorio (`prototipo/`)
 
-`prototipo/index.html` es un prototipo navegable para presentar en LBO, pensado para pantalla de escritorio (1440x900). Los precios del simulador son **reales** (cierres diarios de BYMA, ver "Datos de mercado"). Los ejemplos que no son datos de mercado están marcados como tales.
+`prototipo/index.html` es un prototipo navegable para presentar en LBO. Está pensado para pantalla de escritorio (1440x900) y también se adapta al celular en vertical: barra de pestañas abajo, barra superior con la cuenta y el mapa, y todo en una columna. Los precios del simulador son **reales** (cierres diarios de BYMA, ver "Datos de mercado"). Los ejemplos que no son datos de mercado están marcados como tales.
 
 Pantallas: landing, registro/ingreso (Google o email), diagnóstico, inicio, Aprender (camino de 6 niveles), lección, ¿Es estafa? (detector con semáforo), simulador, Preguntá sin vergüenza y El salto. El botón "Mapa del prototipo" (o la tecla M) permite saltar a cualquier pantalla durante la presentación.
 

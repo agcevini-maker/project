@@ -2,7 +2,11 @@
 <html lang="es-AR">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0B2A33">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Sin Miedo">
 <title>Sin Miedo · prototipo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -458,6 +462,131 @@
 
   @media (max-width: 1240px) { .shell { grid-template-columns: 232px minmax(0, 1fr); } .rail { display: none; } }
   @media (max-width: 1000px) { .l-hero-in, .frenos, .steps { grid-template-columns: 1fr; } .preview { display: none; } .opt4, .opts { grid-template-columns: 1fr; } }
+  /* ---------- Celular (vertical): barra de pestañas abajo, barra superior y todo en una columna ---------- */
+  .m-top { display: none; }
+  @media (max-width: 760px) {
+    body { font-size: 15px; }
+    h1 { font-size: 26px; } h2 { font-size: 20px; }
+    .card { padding: 18px; }
+    .grid { gap: 14px; }
+    /* Estructura */
+    .shell, .shell.wide { display: block; height: auto; min-height: 100%; }
+    .m-top { display: flex; position: sticky; top: env(safe-area-inset-top, 0px); z-index: 40; align-items: center; justify-content: space-between; gap: 12px; height: 58px;
+      padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); background: var(--petrol-900); color: #fff; }
+    .m-top .logo { padding: 0; } .m-top .logo svg { width: 32px; height: 32px; } .m-top .logo b { font-size: 17px; }
+    .m-me { border: 0; background: none; padding: 0; display: flex; align-items: center; gap: 8px; color: #CFE3E4; font-weight: 700; font-size: 13px; }
+    .m-me .avatar { width: 34px; height: 34px; }
+    .side { position: fixed; left: 0; right: 0; bottom: 0; z-index: 45; flex-direction: row; gap: 2px; overflow: visible;
+      padding: 6px max(6px, env(safe-area-inset-right, 0px)) calc(6px + env(safe-area-inset-bottom, 0px)) max(6px, env(safe-area-inset-left, 0px));
+      box-shadow: 0 -6px 24px rgba(11,42,51,.18); }
+    .side > .logo, .side-foot { display: none; }
+    .nav-i { flex: 1; flex-direction: column; gap: 3px; padding: 7px 2px; font-size: 11px; text-align: center; justify-content: center; position: relative; min-width: 0; }
+    .nav-i .ic { width: 22px; height: 22px; }
+    .nav-i.on { box-shadow: inset 0 3px 0 var(--mint); }
+    .nav-i .badge { position: absolute; top: 2px; right: calc(50% - 26px); margin: 0; font-size: 9.5px; padding: 0 5px; }
+    .main { overflow: visible; }
+    .main-in, .shell.wide .main-in { padding: 18px max(16px, env(safe-area-inset-right, 0px)) calc(150px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); max-width: none; }
+    .shell.wide .main-in { padding-top: 0; }
+    .rail { display: none; }
+    .page-h { flex-direction: column; align-items: stretch; gap: 12px; margin-bottom: 18px; }
+    .page-h > div[style*="min-width"] { min-width: 0 !important; }
+    .main-in .grid[style*="grid-template-columns"] { grid-template-columns: minmax(0, 1fr) !important; }
+    /* Inicio */
+    .dash { grid-template-columns: minmax(0, 1fr); }
+    .dash > * { grid-column: auto; min-width: 0; }
+    .goal-hero .row { flex-wrap: wrap; }
+    .big-num { font-size: 28px; }
+    /* Aprender */
+    .game-head { grid-template-columns: 1fr 1fr; padding: 16px; gap: 10px; }
+    .game-head > .gh-player, .game-head > .gh-badges { grid-column: 1 / -1; }
+    .gh-badges { justify-content: flex-start; }
+    .path { gap: 18px; }
+    .lvl, .lvl:nth-child(4n+2), .lvl:nth-child(4n+3), .lvl:nth-child(4n+4), .chest-row { padding-left: 0 !important; gap: 14px; align-items: flex-start; }
+    .lvl:nth-child(4n+3) { padding-left: 18px !important; }
+    .node { width: 60px; height: 60px; } .node .ic { width: 24px; height: 24px; } .node.chest { width: 56px; height: 56px; }
+    .lvl-info { min-width: 0; flex: 1; }
+    .main-in > .card[style*="padding:34px"] { padding: 20px 16px !important; }
+    /* Lección */
+    .lcard { padding: 22px 18px; min-height: 0; }
+    .lcard h2 { font-size: 22px; } .lcard p { font-size: 16px; }
+    .lesson-top { gap: 10px; }
+    /* Detector */
+    .light { flex-direction: row; width: auto; border-radius: 22px; padding: 10px 16px; justify-content: center; }
+    .light i { width: 40px; height: 40px; }
+    .chk-row { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+    /* Preguntá */
+    .chat-box { height: calc(100vh - 290px); min-height: 380px; }
+    .chat-log { padding: 16px; } .msg { max-width: 88%; }
+    .chat-in { padding: 12px; }
+    /* Simulador */
+    .practice-strip { top: calc(58px + env(safe-area-inset-top, 0px)); margin: 0 -16px 14px; padding: 8px 16px; font-size: 12px; }
+    .bk-head { flex-direction: column; align-items: stretch; gap: 10px; }
+    .bk-controls { flex-wrap: wrap; gap: 10px; }
+    .mkt { width: 100%; }
+    .bk-bar { flex-direction: column; align-items: stretch; }
+    .bk-kpis { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .bk-kpis b { font-size: 15px; }
+    .tabs { max-width: 100%; overflow-x: auto; scrollbar-width: none; }
+    .tabs button { white-space: nowrap; flex: none; }
+    .tabs.full button { flex: 1; }
+    table.bk-table, .main-in table { display: block; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
+    .bk-asset { grid-template-columns: minmax(0, 1fr); }
+    .asset-top { flex-wrap: wrap; }
+    .asset-top > * { min-width: 0; }
+    .asset-top > div:last-child { width: 100%; justify-content: space-between; }
+    .asset-top > div:last-child > div:first-child { text-align: left !important; }
+    .orb-bubble { display: none; }
+    .bk-ticket { position: static; margin-top: 0; }
+    .perf { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+    .perf-left { border-right: 0; padding-right: 0; border-bottom: 1px solid var(--line); padding-bottom: 16px; }
+    .perf-score b { font-size: 46px; }
+    .drawer { width: 100vw; }
+    .dr-head { padding: calc(16px + env(safe-area-inset-top, 0px)) 16px 14px; }
+    .dr-body { padding: 16px 16px calc(28px + env(safe-area-inset-bottom, 0px)); }
+    /* El salto */
+    .leap-hero { padding: 30px 18px; border-radius: 20px; }
+    .leap-hero h1 { font-size: 30px !important; }
+    .stats4 { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .stats4 b { font-size: 22px; }
+    /* Landing */
+    .l-wrap { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+    .l-nav { height: 64px; } .l-nav .row { gap: 10px; }
+    .l-nav .navlink[data-scroll] { display: none; }
+    .l-nav .btn { padding: 9px 14px; font-size: 14px; }
+    .l-hero-in { padding-block: 18px 44px; gap: 24px; }
+    .l-hero h1 { font-size: 38px; }
+    .l-hero .lead { font-size: 16.5px; margin: 14px 0 22px; }
+    .l-hero-in .row { flex-direction: column; align-items: stretch; }
+    .l-hero-in .row .btn-google { width: 100% !important; }
+    .trust { gap: 10px 16px; margin-top: 22px; }
+    .l-section { padding-block: 44px; }
+    .l-section h2 { font-size: 26px; }
+    .l-cta { flex-direction: column; align-items: stretch; padding: 26px 20px; border-radius: 20px; }
+    .l-cta h2 { font-size: 24px !important; }
+    .l-foot { flex-direction: column; gap: 8px; }
+    /* Diagnóstico */
+    .diag .l-wrap { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+    .diag-card { padding: 22px 18px !important; }
+    /* Registro */
+    .auth { grid-template-columns: minmax(0, 1fr); min-height: 0; }
+    .auth-side { padding: 22px max(16px, env(safe-area-inset-left, 0px)) 26px; }
+    .auth-side .logo { padding-bottom: 16px; }
+    .auth-side h1 { font-size: 28px; }
+    .auth-side p { font-size: 15px; }
+    .auth-side .stack { display: none !important; }
+    .auth-main { padding: 18px max(16px, env(safe-area-inset-right, 0px)) 40px max(16px, env(safe-area-inset-left, 0px)); place-items: start center; }
+    .auth-card { padding: 22px 18px; }
+    /* Esfera, avisos y ventanas */
+    .orb-wrap { right: max(14px, env(safe-area-inset-right, 0px)); bottom: calc(80px + env(safe-area-inset-bottom, 0px)); }
+    .orb { width: 58px; height: 58px; }
+    .orb-bubble { bottom: 72px; font-size: 13.5px; padding: 8px 12px; }
+    .orb-panel { width: calc(100vw - 28px); max-height: 64vh; }
+    #toast { bottom: calc(86px + env(safe-area-inset-bottom, 0px)); width: max-content; max-width: calc(100vw - 32px); text-align: center; }
+    #modal .bg { padding: 14px; align-items: end; }
+    #modal .box { padding: 22px 18px; max-height: 88vh; overflow-y: auto; }
+    #tip { max-width: calc(100vw - 24px); }
+  }
+
 </style>
 </head>
 <body>
@@ -626,6 +755,7 @@ let V = { page: "landing" };
 
 const money = n => "$" + Math.round(n).toLocaleString("es-AR");
 const pct = n => (n >= 0 ? "+" : "−") + Math.abs(n * 100).toLocaleString("es-AR", { maximumFractionDigits: 1 }) + "%";
+const pointWord = () => { try { return matchMedia("(hover: none)").matches ? "Tocá" : "Pasá el mouse por"; } catch (e) { return "Pasá el mouse por"; } };
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const current = () => Math.min(S.done.length, LEVELS.length - 1);
 const allDone = () => S.done.length >= LEVELS.length;
@@ -696,7 +826,7 @@ async function login(email, pw) {
 }
 async function logout() {
   if (cloudOn() && SB) await SB.auth.signOut();
-  USER = null; S = fresh();
+  USER = null; S = fresh(); modal("");
   try { localStorage.removeItem(SESSION_KEY); } catch (e) {}
   go("landing");
 }
@@ -944,6 +1074,7 @@ function shell() {
   const pages = { home, learn, lesson, sim, scam, ask, leap };
   const wide = V.page === "sim";
   return `<div class="shell ${wide ? "wide" : ""}">
+    <header class="m-top">${logo()}<button class="m-me" data-act="mmenu" aria-label="Tu cuenta y opciones">${esc(myName())}<span class="avatar" style="background:var(--mint);color:#062018">${esc(myName()[0].toUpperCase())}</span></button></header>
     <aside class="side">
       ${logo()}
       ${NAV.map(([id, l, ic]) => `<button class="nav-i ${active === id ? "on" : ""}" data-go="${id}">${icon(ic)}${l}${id === "learn" && !allDone() ? `<span class="badge">${current() + 1}/6</span>` : ""}</button>`).join("")}
@@ -1096,7 +1227,7 @@ function diag() {
 function home() {
   const lv = LEVELS[current()], perf = S.bk ? perfStats() : null;
   const focus = {
-    miedo: ["Empezá por acá", "Las palabras raras, traducidas", "Pasá el mouse por cualquier palabra subrayada o preguntale al asistente sin vergüenza.", "ask", "Preguntá sin vergüenza"],
+    miedo: ["Empezá por acá", "Las palabras raras, traducidas", `${pointWord()} cualquier palabra subrayada o preguntale al asistente sin vergüenza.`, "ask", "Preguntá sin vergüenza"],
     estafa: ["Empezá por acá", "¿Te llegó una oferta rara?", "Pegala en el detector y mirá el semáforo. Además, el nivel 3 te enseña a reconocerlas.", "scam", "Abrir el detector"],
     poca: ["Empezá por acá", "Con poco sí se puede", "Probá en el simulador con montos chicos, con plata virtual y precios reales.", "sim", "Ir al simulador"]
   }[S.freno || "miedo"];
@@ -1171,7 +1302,7 @@ function lesson() {
       <div class="kicker"><div class="icon-box">${icon(i === 2 ? "shield" : "learn")}</div><span class="eyebrow">${esc(l.title)} · Tarjeta ${step + 1} de ${l.cards.length}</span></div>
       <h2>${c.h}</h2><p>${c.p}</p>
       ${c.callout ? `<div class="callout ${c.red ? "red" : ""}">${c.callout}</div>` : ""}
-      <p class="small faint" style="margin-top:auto">Pasá el mouse por las palabras subrayadas para ver qué significan.</p>
+      <p class="small faint" style="margin-top:auto">${pointWord()} las palabras subrayadas para ver qué significan.</p>
     </div>
     <div class="between" style="margin-top:18px">
       ${step > 0 ? `<button class="btn ghost" data-act="lstep" data-d="-1">${icon("back")}Anterior</button>` : "<span></span>"}
@@ -1559,7 +1690,7 @@ function assetView(tk) {
   return `
     <button class="link small" data-bkview="quotes" style="margin:12px 0">${icon("back", "ic")} Volver a cotizaciones</button>
     <div class="card">
-      <div class="between" style="align-items:flex-start">
+      <div class="between asset-top" style="align-items:flex-start">
         <div><div class="row" style="gap:10px"><h2>${a.t === "LECAP" && MD.lecap ? MD.lecap : a.t}</h2><span class="pill" style="background:${CLASSES[a.cls].color}1a;color:${CLASSES[a.cls].color}">${CLASSES[a.cls].name}</span></div>
           <p class="muted">${a.name}${a.per === 100 ? " · precio cada 100 " + t("vn", "VN") : ""}</p></div>
         <div class="row" style="gap:18px;align-items:center">
@@ -1774,7 +1905,7 @@ function candleChart(el, bars) {
   const min = Math.min(...bars.map(b => b.l)), max = Math.max(...bars.map(b => b.h)), pad = (max - min) * 0.08 || 1;
   const lo = min - pad, hi = max + pad, n = bars.length;
   const x = i => L + (W - L - R) * ((i + 0.5) / n), y = v => T + (H - T - Bm) * (1 - (v - lo) / (hi - lo));
-  const bw = Math.max(2, Math.min(14, (W - L - R) / n * 0.6)), every = Math.ceil(n / 7);
+  const bw = Math.max(2, Math.min(14, (W - L - R) / n * 0.6)), every = Math.ceil(n / Math.max(3, Math.min(7, Math.floor((W - L - R) / 72))));
   el.innerHTML = `<div class="chart"><svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="Gráfico de velas">
     ${[0, 1, 2, 3, 4].map(k => { const v = lo + (hi - lo) * k / 4; return `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="#E6EEEC"/><text x="${L - 8}" y="${y(v) + 4}" text-anchor="end" font-size="11" fill="#7A8C91">${m2(v)}</text>`; }).join("")}
     ${bars.map((b, i) => { const up = b.c >= b.o, col = up ? "#1F9D63" : "#D64545"; return `<g><title>${b.lab} · Apertura ${m2(b.o)} · Máx ${m2(b.h)} · Mín ${m2(b.l)} · Cierre ${m2(b.c)}</title>
@@ -1882,10 +2013,10 @@ function lineChart(id, { labels, series, fmt = money, height = 280, yLabel = "" 
   const n = labels.length - 1;
   const x = i => L + (W - L - R) * (n ? i / n : 0), y = v => T + (H - T - B) * (1 - (v - min) / (max - min));
   const ticks = 4, grid = Array.from({ length: ticks + 1 }, (_, k) => min + (max - min) * k / ticks);
-  const xEvery = Math.ceil(labels.length / 7);
+  const xEvery = Math.ceil(labels.length / Math.max(3, Math.min(7, Math.floor((W - L - R) / 72))));
   el.innerHTML = `<div class="chart"><svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="${series.map(s => s.name).join(" y ")}">
     ${grid.map(v => `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="#E6EEEC"/><text x="${L - 10}" y="${y(v) + 4}" text-anchor="end" font-size="11" fill="#7A8C91">${fmt(v)}</text>`).join("")}
-    ${labels.map((l, i) => i % xEvery === 0 || i === n ? `<text x="${x(i)}" y="${H - 8}" text-anchor="middle" font-size="11" fill="#7A8C91">${l}</text>` : "").join("")}
+    ${labels.map((l, i) => (i % xEvery === 0 && n - i >= xEvery * 0.6) || i === n ? `<text x="${x(i)}" y="${H - 8}" text-anchor="middle" font-size="11" fill="#7A8C91">${l}</text>` : "").join("")}
     ${series.map(s => s.area ? `<path d="M${x(0)},${y(min)} ${s.values.map((v, i) => `L${x(i)},${y(v)}`).join(" ")} L${x(s.values.length - 1)},${y(min)}Z" fill="${s.color}" fill-opacity=".10"/>` : "").join("")}
     ${series.map(s => `<polyline points="${s.values.map((v, i) => `${x(i)},${y(v)}`).join(" ")}" fill="none" stroke="${s.color}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" ${s.dash ? 'stroke-dasharray="6 5"' : ""}/>`).join("")}
     ${series.map(s => { const i = s.values.length - 1; return `<circle cx="${x(i)}" cy="${y(s.values[i])}" r="5" fill="${s.color}" stroke="#fff" stroke-width="2"/>`; }).join("")}
@@ -1937,6 +2068,7 @@ function showTip(el) {
 }
 function hideTip() { tipEl.classList.remove("on"); }
 document.addEventListener("mouseover", e => { const el = e.target.closest?.(".term"); if (el) showTip(el); });
+document.addEventListener("touchstart", e => { const el = e.target.closest?.(".term"); if (el) showTip(el); else hideTip(); }, { passive: true });
 document.addEventListener("mouseout", e => { if (e.target.closest?.(".term")) hideTip(); });
 document.addEventListener("focusin", e => { if (e.target.classList?.contains("term")) showTip(e.target); });
 document.addEventListener("focusout", e => { if (e.target.classList?.contains("term")) hideTip(); });
@@ -2009,6 +2141,8 @@ document.addEventListener("click", e => {
     case "openAccount": modal(`<div class="medal" style="width:72px;height:72px">${icon("rocket")}</div><h2 style="text-align:center">Acá empieza tu cuenta en LBO</h2><p class="muted" style="text-align:center;margin:8px 0 18px">En el producto real, este botón lleva al alta de cuenta en LBO con el monto que elegiste. En el prototipo termina acá.</p><button class="btn block" data-act="closeModal">Entendido</button>`); break;
     case "minor": S.minor = el.checked; save(); render(); break;
     case "map": showMap(); break;
+    case "mmenu": modal(`<div class="row" style="gap:12px"><div class="avatar" style="background:var(--mint);color:#062018;width:44px;height:44px;font-size:16px">${esc(myName()[0].toUpperCase())}</div><div style="min-width:0"><b>${esc(myName())}</b><div class="small muted" style="overflow:hidden;text-overflow:ellipsis">${esc(USER?.email || "")}</div></div></div>
+      <div class="stack" style="gap:8px;margin-top:18px"><button class="btn ghost block" data-act="map">${icon("map")}Mapa del prototipo</button><button class="btn ghost block" data-act="logout">${icon("back")}Cerrar sesión</button><button class="btn block" data-act="closeModal">Cerrar</button></div>`); break;
     case "reset": { const nm = S.name; S = fresh(); S.name = nm; save(); modal(""); go("diag", { step: 0 }); break; }
     case "demoPort": demoPortfolio(); modal(""); go("sim"); break;
   }
