@@ -6,7 +6,7 @@
 <title>Sin Miedo · prototipo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700;800&display=swap">
 <style>
   /* Prototipo de escritorio (1440x900). Estructura en verde petróleo (barra lateral, hero),
      contenido sobre superficie clara para lectura cómoda, acento verde menta. */
@@ -34,7 +34,7 @@
     --radius: 16px;
     --shadow: 0 1px 2px rgba(11,42,51,.05), 0 8px 24px rgba(11,42,51,.06);
     --shadow-lg: 0 18px 50px rgba(11,42,51,.16);
-    --font: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --font: "Source Sans 3", "Segoe UI", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     color-scheme: light;
   }
   * { box-sizing: border-box; }
@@ -135,32 +135,6 @@
   .tk-i em { font-style: normal; font-weight: 700; } .tk-i em.up { color: #7EE2AE; } .tk-i em.down { color: #FF9C9C; }
   @keyframes tick { to { transform: translateX(-50%); } }
   @media (prefers-reduced-motion: reduce) { .tk-track { animation: none; } }
-  .feat { display: grid; grid-template-columns: 1fr 1.1fr; gap: 56px; align-items: center; margin-top: 56px; }
-  .feat.rev .feat-t { order: 2; }
-  .feat-t h3 { font-size: 26px; letter-spacing: -.02em; margin: 14px 0 10px; }
-  .feat-t p { font-size: 16.5px; max-width: 44ch; }
-  .feat-n { display: inline-grid; place-items: center; min-width: 48px; height: 48px; padding: 0 10px; border-radius: 14px; background: var(--petrol-800); color: var(--mint); font-weight: 800; font-size: 18px; }
-  .feat-v { background: linear-gradient(145deg, #E5F3EE, #F4F8F7); border-radius: 24px; padding: 34px; border: 1px solid var(--line); }
-  .mock-chat { display: flex; flex-direction: column; gap: 12px; }
-  .mock-chat .msg { max-width: 86%; }
-  .mock-chat .msg.bot { background: #fff; box-shadow: var(--shadow); }
-  .mock-bk { box-shadow: var(--shadow-lg); }
-  .mock-game { background: linear-gradient(135deg, var(--petrol-800), var(--petrol-700)); border-radius: 20px; padding: 22px; box-shadow: var(--shadow-lg); }
-  .orb-mini { width: 46px; height: 46px; margin-left: auto; border-radius: 50%; background: radial-gradient(circle at 32% 28%, #ffffff 0, #C9F5DD 12%, #2BB673 45%, #0E6A55 78%, #003845 100%); box-shadow: 0 8px 20px rgba(43,182,115,.45); animation: float 3.4s ease-in-out infinite; }
-  @media (prefers-reduced-motion: reduce) { .orb-mini { animation: none; } }
-  .l-fam { background: linear-gradient(180deg, var(--petrol-900), var(--petrol-800)); }
-  .fam { display: grid; grid-template-columns: 1fr 1.3fr; gap: 48px; align-items: center; }
-  .fam-g { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-  .fam-i { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.08); border-radius: 16px; padding: 18px; display: flex; flex-direction: column; gap: 6px; color: #B9D3D5; font-size: 14px; }
-  .fam-i b { color: #fff; font-size: 16px; } .fam-i .ic { color: var(--mint); width: 24px; height: 24px; margin-bottom: 4px; }
-  .faq-wrap { max-width: 860px; }
-  .faq { margin-top: 24px; display: flex; flex-direction: column; gap: 10px; }
-  .faq-i { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 4px 20px; }
-  .faq-i summary { cursor: pointer; font-weight: 700; font-size: 16.5px; padding: 14px 0; list-style: none; display: flex; justify-content: space-between; gap: 12px; }
-  .faq-i summary::-webkit-details-marker { display: none; }
-  .faq-i summary::after { content: "+"; color: var(--mint-600); font-size: 22px; line-height: 1; transition: transform .2s; }
-  .faq-i[open] summary::after { transform: rotate(45deg); }
-  .faq-i p { padding-bottom: 16px; max-width: 64ch; }
   .l-foot { padding-block: 28px 40px; color: var(--ink-3); font-size: 12.5px; display: flex; justify-content: space-between; gap: 20px; }
 
   /* ---------- Diagnóstico ---------- */
@@ -498,6 +472,111 @@
 
   @media (max-width: 1240px) { .shell { grid-template-columns: 232px minmax(0, 1fr); } .rail { display: none; } }
   @media (max-width: 1000px) { .l-hero-in, .frenos, .steps { grid-template-columns: 1fr; } .preview { display: none; } .opt4, .opts { grid-template-columns: 1fr; } }
+
+  /* =================================================================
+     Estilo de plataforma profesional: barra superior oscura, resumen de cuenta siempre visible,
+     paneles cuadrados con bordes finos, tablas densas y colores de operación (comprar azul, vender rojo).
+     ================================================================= */
+  :root { --bg: #F1F3F5; --line: #D8DEE3; --ink: #14212A; --ink-2: #4B5963; --ink-3: #75828B; --radius: 4px;
+    --shadow: none; --shadow-lg: 0 10px 30px rgba(10,30,40,.14); --buy: #1660C7; --sell: #C62828; --link: #1660C7; }
+  body { font-size: 14px; line-height: 1.5; }
+  h1 { font-size: 24px; font-weight: 700; letter-spacing: -.01em; }
+  h2 { font-size: 18px; font-weight: 700; letter-spacing: -.005em; }
+  h3 { font-size: 15.5px; font-weight: 700; letter-spacing: 0; }
+  .card { border-radius: 4px; box-shadow: none; padding: 18px; }
+  .card.hover:hover { transform: none; box-shadow: 0 2px 10px rgba(10,30,40,.08); border-color: #C3CCD3; }
+  .btn { border-radius: 4px; padding: 9px 16px; font-weight: 600; background: var(--petrol-800); color: #fff; }
+  .btn:hover { background: var(--petrol-700); box-shadow: none; transform: none; }
+  .btn.lg { padding: 12px 22px; font-size: 15px; border-radius: 4px; }
+  .btn.sm { padding: 6px 12px; font-size: 13px; border-radius: 3px; }
+  .btn.ghost { background: #fff; border: 1px solid #C3CCD3; color: var(--ink); }
+  .btn.ghost:hover { background: #F5F7F9; border-color: #9FAEB8; }
+  .btn.dark { background: var(--petrol-900); }
+  .btn[data-side="buy"], .seg2 button.on.buy { background: var(--buy); color: #fff; }
+  .btn[data-side="buy"]:hover { background: #124FA6; }
+  .btn[data-side="sell"]:not(.ghost), .seg2 button.on.sell { background: var(--sell); color: #fff; }
+  .btn.ghost[data-side="sell"] { color: var(--sell); border-color: #E3B4B4; }
+  .link { color: var(--link); }
+  .pill { border-radius: 3px; padding: 3px 8px; font-weight: 600; }
+  .sim-tag { border-radius: 3px; }
+  .icon-box { border-radius: 4px; width: 40px; height: 40px; }
+  .input { border-radius: 4px; border: 1px solid #C3CCD3; padding: 9px 12px; }
+  .input:focus { box-shadow: 0 0 0 3px rgba(22,96,199,.15); border-color: var(--buy); }
+  .up { color: #0E7A45; } .down { color: var(--sell); }
+  .chg { border-radius: 3px; font-weight: 600; }
+  .chg.up { background: #E4F3EA; } .chg.down { background: #FBE8E8; }
+  .tabs { background: none; border-radius: 0; padding: 0; gap: 0; border-bottom: 1px solid var(--line); display: flex; }
+  .tabs button { border-radius: 0; padding: 10px 16px; font-weight: 600; color: var(--ink-2); border-bottom: 2px solid transparent; margin-bottom: -1px; }
+  .tabs button:hover { color: var(--ink); }
+  .tabs button.on { background: none; box-shadow: none; color: var(--ink); border-bottom-color: var(--mint-600); }
+  .seg2 { border-radius: 4px; } .seg2 button { border-radius: 3px; }
+  th { font-size: 11px; letter-spacing: .05em; background: #F6F8F9; color: var(--ink-3); padding: 8px 12px; border-bottom: 1px solid var(--line); }
+  td { padding: 9px 12px; border-bottom: 1px solid #E6EAED; }
+  .bk-table td { padding: 8px 12px; font-size: 13.5px; }
+  .bk-table tbody tr.click:hover, tbody tr:hover td { background: #F3F7FA; }
+  .explain { border-radius: 4px; }
+  .callout { border-radius: 4px; }
+  #modal .box { border-radius: 6px; }
+  #toast { border-radius: 4px; }
+  .q-opt, .opt { border-radius: 4px; border-width: 1px; }
+  .opt.sel, .q-opt.right, .q-opt.wrong { border-width: 2px; }
+  .lvl-info { border-radius: 4px; box-shadow: none; }
+  .lcard { padding: 32px 36px; }
+  .goal-hero { border-radius: 4px; }
+  .game-head { border-radius: 4px; }
+  .gh-stat, .badge-i { border-radius: 4px; }
+  .freno, .l-cta { border-radius: 6px; }
+  .chip { border-radius: 3px; }
+  .msg { border-radius: 6px; }
+  .mkt { border-radius: 4px; }
+  .practice-strip { margin: 0 -28px 16px; padding: 7px 28px; font-size: 13px; }
+  .drawer { box-shadow: -10px 0 40px rgba(10,30,40,.2); }
+  .dr-x { border-radius: 4px; }
+  .seg-progress span { border-radius: 2px; }
+  .tri { border-radius: 4px; } .tri button { border-radius: 3px; }
+
+  .l-hero .btn, .l-cta .btn, .l-nav .btn { background: var(--mint); color: #062018; }
+  .l-hero .btn:hover, .l-cta .btn:hover, .l-nav .btn:hover { background: #33c47f; }
+  /* Estructura de la aplicación */
+  .shell, .shell.wide { display: flex; flex-direction: column; height: 100vh; }
+  .topbar { flex: none; background: var(--petrol-900); color: #fff; border-bottom: 1px solid #06181E; }
+  .tb-in { display: flex; align-items: center; gap: 28px; height: 54px; padding: 0 20px; }
+  .topbar .logo { padding: 0; } .topbar .logo svg { width: 30px; height: 30px; } .topbar .logo b { font-size: 16px; } .topbar .logo small { font-size: 11px; }
+  .tnav { display: flex; align-self: stretch; }
+  .tnav .nav-i { width: auto; height: 100%; border-radius: 0; padding: 0 14px; gap: 8px; font-size: 14px; font-weight: 600; color: #B7CCCF; box-shadow: none; }
+  .tnav .nav-i .ic { width: 16px; height: 16px; }
+  .tnav .nav-i:hover { background: rgba(255,255,255,.05); color: #fff; }
+  .tnav .nav-i.on { background: rgba(255,255,255,.06); color: #fff; box-shadow: inset 0 -3px 0 var(--mint); }
+  .tnav .nav-i .badge { margin-left: 2px; border-radius: 3px; }
+  .tb-r { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .topbar .saved { color: #9FC3C6; padding: 0 6px 0 0; }
+  .tb-user { display: flex; align-items: center; gap: 10px; padding-left: 12px; border-left: 1px solid rgba(255,255,255,.12); }
+  .tb-user .avatar { width: 30px; height: 30px; background: var(--mint); color: #062018; font-size: 12px; }
+  .tb-user b { display: block; font-size: 13.5px; line-height: 1.2; } .tb-user span { font-size: 11.5px; color: #9FC3C6; }
+  .tb-icon { width: 34px; height: 34px; display: grid; place-items: center; border: 1px solid rgba(255,255,255,.14); border-radius: 4px; background: none; color: #CFE3E4; }
+  .tb-icon:hover { background: rgba(255,255,255,.08); color: #fff; }
+  .tb-icon .ic { width: 17px; height: 17px; }
+  .acct-bar { flex: none; background: #fff; border-bottom: 1px solid var(--line); }
+  .ab-in { display: flex; align-items: stretch; min-height: 56px; padding: 0 20px; }
+  .ab-acct { display: flex; flex-direction: column; justify-content: center; padding-right: 20px; }
+  .ab-acct b { font-size: 13.5px; } .ab-acct span { font-size: 12px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+  .ab-cell { display: flex; flex-direction: column; justify-content: center; padding: 6px 20px; border-left: 1px solid var(--line); }
+  .ab-cell > span { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-3); font-weight: 600; }
+  .ab-cell > b { font-size: 15.5px; font-weight: 700; white-space: nowrap; }
+  .ab-wide > span { text-transform: none; letter-spacing: 0; font-size: 14px; color: var(--ink-2); font-weight: 500; }
+  .ab-data { margin-left: auto; align-self: center; display: flex; gap: 10px; align-items: center; font-size: 12px; color: var(--ink-3); }
+  .ab-data em { font-style: normal; font-weight: 700; font-size: 11px; letter-spacing: .06em; color: #7a5000; background: var(--amber-100); border: 1px solid #f1d58e; border-radius: 3px; padding: 2px 6px; }
+  .body { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 300px; }
+  .shell.wide .body { grid-template-columns: minmax(0, 1fr); }
+  .main { overflow-y: auto; }
+  .main-in, .shell.wide .main-in { padding: 24px 28px 120px; max-width: 1100px; }
+  .shell.wide .main-in { max-width: 1280px; padding-top: 0; }
+  .rail { padding: 20px 18px; gap: 18px; background: #fff; }
+  .rail section { border: 1px solid var(--line); border-radius: 4px; padding: 14px; }
+  .rail h4 { font-size: 11px; margin: -14px -14px 12px; padding: 8px 14px; background: #F6F8F9; border-bottom: 1px solid var(--line); border-radius: 4px 4px 0 0; }
+  .todo { border-radius: 4px; padding: 8px 10px; }
+  .orb-wrap { right: 324px; }
+  @media (max-width: 1240px) { .body { grid-template-columns: minmax(0, 1fr); } .ab-cell { padding: 6px 14px; } .tb-user div { display: none; } }
 </style>
 </head>
 <body>
@@ -1022,19 +1101,37 @@ function shell() {
   const pages = { home, learn, lesson, sim, scam, ask, leap };
   const wide = V.page === "sim";
   return `<div class="shell ${wide ? "wide" : ""}">
-    <aside class="side">
+    <header class="topbar"><div class="tb-in">
       ${logo()}
-      ${NAV.map(([id, l, ic]) => `<button class="nav-i ${active === id ? "on" : ""}" data-go="${id}">${icon(ic)}${l}${id === "learn" && !allDone() ? `<span class="badge">${current() + 1}/6</span>` : ""}</button>`).join("")}
-      <div class="side-foot">
+      <nav class="tnav" aria-label="Secciones">${NAV.map(([id, l, ic]) => `<button class="nav-i ${active === id ? "on" : ""}" data-go="${id}">${icon(ic)}${l}${id === "learn" && !allDone() ? `<span class="badge">${current() + 1}/6</span>` : ""}</button>`).join("")}</nav>
+      <div class="tb-r">
         <div class="saved" id="saved">${savedLabel()}</div>
-        <button class="nav-i" data-act="map">${icon("map")}Mapa del prototipo</button>
-        <div class="me"><div class="avatar" style="background:var(--mint);color:#062018">${esc(myName()[0].toUpperCase())}</div><div style="min-width:0"><b style="color:#fff">${esc(myName())}</b><div class="xs" style="color:var(--petrol-200);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(USER?.email || "")}</div></div></div>
-        <button class="nav-i" data-act="logout" style="padding:8px 12px;font-size:13.5px">${icon("back")}Cerrar sesión</button>
+        <div class="tb-user"><span class="avatar">${esc(myName()[0].toUpperCase())}</span><div><b>${esc(myName())}</b><span>${esc(USER?.email || "")}</span></div></div>
+        <button class="tb-icon" data-act="map" title="Mapa del prototipo" aria-label="Mapa del prototipo">${icon("map")}</button>
+        <button class="tb-icon" data-act="logout" title="Cerrar sesión" aria-label="Cerrar sesión">${icon("back")}</button>
       </div>
-    </aside>
-    <main class="main"><div class="main-in">${(pages[V.page] || home)()}</div></main>
-    ${wide ? "" : rail()}
+    </div></header>
+    ${acctBar()}
+    <div class="body">
+      <main class="main"><div class="main-in">${pages[V.page]()}</div></main>
+      ${wide ? "" : rail()}
+    </div>
   </div>`;
+}
+const acctId = () => { let h = 0; for (const c of (USER?.email || "demo")) h = (h * 31 + c.charCodeAt(0)) >>> 0; return "SM" + String(h % 9000000 + 1000000); };
+function acctBar() {
+  const data = `<span class="ab-data">${MD.real ? `Cierre BYMA ${fmtDate(MD.asOf)}` : "Precios simulados"}<em>PRÁCTICA</em></span>`;
+  if (!S.bk) return `<div class="acct-bar"><div class="ab-in"><div class="ab-acct"><b>Cuenta de práctica</b><span>${acctId()}</span></div><div class="ab-cell ab-wide"><span>Todavía no abriste tu cuenta de práctica.</span></div><div class="ab-cell"><button class="btn sm" data-go="sim">Abrir con $1.000.000 virtuales</button></div>${data}</div></div>`;
+  const tot = totalValue(), dr = dayResult(), res = tot - BROKER_CFG.startCash, p = perfStats();
+  const cell = (l, v, cls = "") => `<div class="ab-cell"><span>${l}</span><b class="num ${cls}">${v}</b></div>`;
+  return `<div class="acct-bar"><div class="ab-in">
+    <div class="ab-acct"><b>Cuenta de práctica</b><span>${acctId()}</span></div>
+    ${cell("Valor de la cuenta", m2(tot))}${cell("Disponible", m2(S.bk.cash))}
+    ${cell("Resultado del día", `${m2(dr)} (${pc2(dr / Math.max(1, tot - dr))})`, dr >= 0 ? "up" : "down")}
+    ${cell("Resultado total", `${m2(res)} (${pc2(res / BROKER_CFG.startCash)})`, res >= 0 ? "up" : "down")}
+    ${cell("Nivel de inversor", p.days ? `${p.score}/100 · ${p.tier}` : "Se calcula mañana")}
+    ${data}
+  </div></div>`;
 }
 
 function ringSvg(frac, size = 84) {
@@ -1077,7 +1174,7 @@ function landing() {
   return `<div class="landing">
     <section class="l-hero">
       <div class="l-wrap">
-        <nav class="l-nav">${logo()}<div class="row"><button class="navlink" data-scroll="producto">Producto</button><button class="navlink" data-scroll="familias">Familias</button><button class="navlink" data-scroll="faq">Preguntas</button><button class="navlink" data-go="auth" data-mode="login">Ingresar</button><button class="btn" data-go="auth">Crear cuenta</button></div></nav>
+        <nav class="l-nav">${logo()}<div class="row"><button class="navlink" data-scroll="frenos">Cómo funciona</button><button class="navlink" data-scroll="confianza">Seguridad</button><button class="navlink" data-go="auth" data-mode="login">Ingresar</button><button class="btn" data-go="auth">Crear cuenta</button></div></nav>
         <div class="l-hero-in">
           <div>
             <span class="pill petrol" style="background:rgba(43,182,115,.15);color:#7EE2AE">Para tu primera inversión</span>
@@ -1134,58 +1231,6 @@ function landing() {
       </div>
     </section>
 
-    <section class="l-section" id="producto">
-      <div class="l-wrap">
-        <h2>Todo lo que necesitás para animarte, en un solo lugar</h2>
-        <div class="feat">
-          <div class="feat-t"><span class="feat-n">IA</span><h3>Preguntá lo que sea, sin vergüenza</h3><p class="muted">Una IA que te responde al toque, en criollo y sin palabras raras. De qué es un CEDEAR a si te conviene un plazo fijo. Te explica las opciones y los riesgos; nunca te dice qué comprar.</p></div>
-          <div class="feat-v" aria-hidden="true"><div class="mock-chat">
-            <div class="msg me">¿Qué es el dólar MEP?</div>
-            <div class="msg bot">Es comprar dólares de forma legal a través de bonos: comprás un bono en pesos y lo vendés en dólares. Es como cambiar plata, pero por la bolsa. Tiene un pequeño riesgo de precio mientras hacés la operación.</div>
-          </div></div>
-        </div>
-        <div class="feat rev">
-          <div class="feat-t"><span class="feat-n">$</span><h3>Un broker de práctica con precios de verdad</h3><p class="muted">$1.000.000 virtuales para comprar acciones, bonos, CEDEARs y fondos con los precios reales de cierre de cada día. Volvés mañana y ves cómo te fue, con un puntaje que premia invertir con cabeza, no arriesgar de más.</p></div>
-          <div class="feat-v" aria-hidden="true">${sparkCard()}</div>
-        </div>
-        <div class="feat">
-          <div class="feat-t"><span class="feat-n">XP</span><h3>Aprender se siente como un juego</h3><p class="muted">Niveles de 3 minutos, estrellas, racha diaria, insignias y un cofre. Y una esfera que te propone algo nuevo cada día: una pregunta, un minuto, 10 XP.</p></div>
-          <div class="feat-v" aria-hidden="true"><div class="mock-game">
-            <div class="row" style="gap:14px"><div class="gh-avatar">${icon("rocket")}<span>3</span></div><div style="flex:1"><b style="color:#fff">Aprendiz</b><div class="xpbar"><span style="width:62%"></span></div><span class="xs" style="color:#B9D3D5">310 XP · faltan 140 para el próximo nivel</span></div></div>
-            <div class="row" style="gap:8px;margin-top:16px">${["star", "shield", "flame", "bulb"].map((ic, k) => `<div class="badge-i ${k < 3 ? "on" : ""}">${icon(ic, "ic")}</div>`).join("")}<div class="orb-mini"></div></div>
-          </div></div>
-        </div>
-      </div>
-    </section>
-
-    <section class="l-section l-fam" id="familias">
-      <div class="l-wrap">
-        <div class="fam">
-          <div><h2 style="color:#fff">Pensado para que mamás y papás estén tranquilos</h2><p style="color:#B9D3D5;margin-top:10px;max-width:46ch">Sin Miedo enseña a decidir. No pide tarjeta, no mueve plata real y nunca promete ganancias.</p></div>
-          <div class="fam-g">${[
-            ["sim", "Plata virtual", "Todo lo que se practica es con plata de mentira y precios reales."],
-            ["shield", "Detector de estafas", "Aprenden a reconocer las promesas que suenan demasiado bien."],
-            ["users", "Con un adulto", "Para invertir de verdad, un menor necesita que un adulto lo acompañe."],
-            ["check", "De LBO", "Detrás hay un agente registrado en la CNV, no una app anónima."]
-          ].map(([ic, h, p]) => `<div class="fam-i">${icon(ic)}<b>${h}</b><span>${p}</span></div>`).join("")}</div>
-        </div>
-      </div>
-    </section>
-
-    <section class="l-section" id="faq">
-      <div class="l-wrap faq-wrap">
-        <h2>Preguntas frecuentes</h2>
-        <div class="faq">${[
-          ["¿Cuánto cuesta?", "Aprender, practicar y preguntarle a la IA no cuesta nada. Si después querés invertir de verdad, lo hacés en LBO con las condiciones de cada producto."],
-          ["¿Necesito tener plata para usarlo?", "No. Practicás con $1.000.000 virtuales. Cuando te sientas listo, podés empezar con montos chicos."],
-          ["Tengo menos de 18, ¿puedo usarlo?", "Sí, para aprender y practicar. Para abrir una cuenta real vas a necesitar que un adulto responsable te acompañe."],
-          ["¿La IA me dice en qué invertir?", "No. Te explica cómo funciona cada opción y qué riesgos tiene, para que decidas vos. No es una recomendación de inversión."],
-          ["¿Los precios del simulador son reales?", "Sí: son los precios de cierre de BYMA de cada día hábil. No son cotizaciones en vivo y las puntas de compra y venta son estimadas."],
-          ["¿Se guarda lo que hago?", "Sí. Tu progreso, tu racha y tu cartera de práctica quedan guardados en tu cuenta."]
-        ].map(([q, a]) => `<details class="faq-i"><summary>${q}</summary><p class="muted">${a}</p></details>`).join("")}</div>
-      </div>
-    </section>
-
     <section class="l-section" id="confianza">
       <div class="l-wrap">
         <div class="l-cta">
@@ -1203,20 +1248,6 @@ function tickerStrip() {
   const items = assets().filter(a => a.cls !== "fci").map(a => { const v = dayVar(a.t); return `<span class="tk-i"><b>${a.t === "LECAP" && MD.lecap ? MD.lecap : a.t}</b>${m2(last(a.t))}<em class="${v >= 0 ? "up" : "down"}">${pc2(v)}</em></span>`; }).join("");
   return `<div class="ticker" aria-label="Precios de cierre reales de BYMA del ${fmtDateLong(MD.asOf)}"><div class="tk-lab">Cierre real BYMA · ${fmtDate(MD.asOf)}</div><div class="tk-run"><div class="tk-track">${items}${items}</div></div></div>`;
 }
-function sparkCard() {
-  const tk = MD.close.SPY ? "SPY" : assets()[0]?.t;
-  const vals = (MD.close[tk] || []).slice(-60).filter(v => v != null);
-  if (vals.length < 2) return "";
-  const w = 420, h = 120, mn = Math.min(...vals), mx = Math.max(...vals);
-  const pts = vals.map((v, i) => `${(i / (vals.length - 1) * w).toFixed(1)},${(h - 8 - (v - mn) / (mx - mn || 1) * (h - 16)).toFixed(1)}`).join(" ");
-  const ch = vals[vals.length - 1] / vals[0] - 1;
-  return `<div class="mock-bk card">
-    <div class="between"><div><b class="tk">${tk}</b> <span class="muted small">${A(tk).name}</span></div><span class="chg ${ch >= 0 ? "up" : "down"}">${pc2(ch)}</span></div>
-    <svg viewBox="0 0 ${w} ${h}" style="width:100%;height:auto;margin:12px 0 6px;display:block"><polyline points="0,${h} ${pts} ${w},${h}" fill="rgba(43,182,115,.12)" stroke="none"/><polyline points="${pts}" fill="none" stroke="#2BB673" stroke-width="2.5" stroke-linejoin="round"/></svg>
-    <div class="between small"><span class="faint">Últimas ${vals.length} ruedas · cierres reales</span><span class="pill">Tu puntaje: Prudente · 64</span></div>
-  </div>`;
-}
-
 /* ---------- 2. Diagnóstico ---------- */
 const DIAG = [
   { key: "exp", q: "¿Alguna vez invertiste?", sub: "No hay respuestas incorrectas.", opts: [["nunca", "Nunca", "Arranco de cero", "sparkle"], ["poco", "Alguna vez, poquito", "Probé algo, pero no entendí mucho", "coins"], ["si", "Sí, a veces", "Quiero hacerlo mejor", "sim"]] },
@@ -1635,20 +1666,11 @@ function sim() {
   return `
     <div class="practice-strip">${icon("alert", "ic")}<b>MODO PRÁCTICA</b> · Plata virtual · ${MD.real ? `Precios reales de cierre del ${fmtDateLong(MD.asOf)}, no son cotizaciones en vivo` : "Precios simulados, no son cotizaciones en vivo"}</div>
     <div class="bk-head">
-      <div><h1>Tu broker de práctica</h1></div>
+      <div><h1>Tu broker de práctica</h1><p class="small muted" style="margin-top:4px">Cuenta abierta el ${fmtDateLong(B.start)} · ${perf.days} ${perf.days === 1 ? "día" : "días"} de mercado</p></div>
       <div class="bk-controls">
         <div class="mkt ${ms.open ? "open" : ""}"><i></i><div><b>Mercado ${ms.label}</b><span class="xs faint">Hoy ${ms.time} hs · Precios al cierre del ${fmtDate(MD.asOf)} · se actualizan cada día hábil</span></div></div>
         <label class="toggle small"><input type="checkbox" data-bk="explain" ${B.explain ? "checked" : ""}><span class="sw"></span>Modo explicado</label>
       </div>
-    </div>
-    <div class="bk-bar">
-      <div class="bk-kpis">
-        <div><span class="xs faint">${t("saldo", "Saldo disponible")}</span><b class="num">${m2(B.cash)}</b></div>
-        <div><span class="xs faint">Valor total</span><b class="num">${m2(tot)}</b></div>
-        <div><span class="xs faint">Resultado total</span><b class="num ${res >= 0 ? "up" : "down"}">${m2(res)} (${pc2(res / BROKER_CFG.startCash)})</b></div>
-        <div><span class="xs faint">Empezaste el</span><b>${fmtDateLong(B.start)} · ${perf.days} ${perf.days === 1 ? "día" : "días"}</b></div>
-      </div>
-      <button class="score-chip" data-bkview="port"><span class="xs">Tu nivel de inversor</span><b>${perf.days ? `${perf.tier} · ${perf.score}/100` : "Se calcula mañana"}</b></button>
     </div>
     ${ex("Acá no se adelanta el tiempo: cada día hábil, después del cierre, entran los precios reales y tu cartera cambia sola. Volvé mañana para ver cómo te fue.")}
     <div class="tabs bk-tabs">${[["quotes", "Cotizaciones"], ["port", "Mi cartera"], ["hist", "Historial"]].map(([k, l]) => `<button class="${B.view === k ? "on" : ""}" data-bkview="${k}">${l}</button>`).join("")}</div>
@@ -1860,11 +1882,6 @@ function portView(perf) {
   const top = rows.slice().sort((x, y) => y.val - x.val)[0], topShare = top && hv ? top.val / hv : 0;
   return `
     <div style="margin-top:16px">${perfCard(perf)}</div>
-    <div class="grid" style="grid-template-columns:repeat(4,1fr);margin-top:14px">${[
-      [t("saldo", "Saldo disponible"), m2(B.cash), ""], ["Valor total", m2(tot), ""],
-      ["Resultado del día", `${m2(dr)} (${pc2(dr / Math.max(1, tot - dr))})`, dr >= 0 ? "up" : "down"],
-      ["Resultado total", `${m2(res)} (${pc2(res / BROKER_CFG.startCash)})`, res >= 0 ? "up" : "down"]
-    ].map(([l, v, c]) => `<div class="card kv-card"><span class="xs faint">${l}</span><b class="num ${c}" style="font-size:19px">${v}</b></div>`).join("")}</div>
     ${perf.days > 0 ? `<div class="card" style="margin-top:14px"><span class="eyebrow">Tu cartera desde el ${fmtDateLong(B.start)}</span><div id="chart-equity" style="margin-top:10px"></div></div>` : ""}
     <div class="grid" style="grid-template-columns:1fr 2fr;margin-top:14px;align-items:start">
       <div class="card" style="text-align:center">
