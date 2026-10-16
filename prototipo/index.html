@@ -6,7 +6,7 @@
 <title>Sin Miedo · prototipo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
 <style>
   /* Prototipo de escritorio (1440x900). Estructura en verde petróleo (barra lateral, hero),
      contenido sobre superficie clara para lectura cómoda, acento verde menta. */
@@ -34,7 +34,7 @@
     --radius: 16px;
     --shadow: 0 1px 2px rgba(11,42,51,.05), 0 8px 24px rgba(11,42,51,.06);
     --shadow-lg: 0 18px 50px rgba(11,42,51,.16);
-    --font: "Source Sans 3", "Segoe UI", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --font: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     color-scheme: light;
   }
   * { box-sizing: border-box; }
@@ -125,16 +125,6 @@
   .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-top: 32px; }
   .step-n { width: 34px; height: 34px; border-radius: 50%; background: var(--petrol-800); color: #fff; display: grid; place-items: center; font-weight: 800; margin-bottom: 14px; }
   .l-cta { background: var(--petrol-800); color: #fff; border-radius: 24px; padding: 44px; display: flex; justify-content: space-between; align-items: center; gap: 24px; }
-  .ticker { display: flex; align-items: center; background: var(--petrol-900); border-top: 1px solid rgba(255,255,255,.08); color: #DCEBEC; font-size: 13.5px; }
-  .tk-lab { flex: none; padding: 12px 18px 12px 40px; font-weight: 800; color: #7EE2AE; white-space: nowrap; background: var(--petrol-900); position: relative; z-index: 1; }
-  .tk-run { overflow: hidden; flex: 1; -webkit-mask-image: linear-gradient(90deg, transparent, #000 40px, #000 calc(100% - 40px), transparent); mask-image: linear-gradient(90deg, transparent, #000 40px, #000 calc(100% - 40px), transparent); }
-  .tk-track { display: flex; width: max-content; animation: tick 60s linear infinite; }
-  .ticker:hover .tk-track { animation-play-state: paused; }
-  .tk-i { display: inline-flex; gap: 8px; align-items: baseline; padding: 12px 22px; white-space: nowrap; font-variant-numeric: tabular-nums; }
-  .tk-i b { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; color: #fff; }
-  .tk-i em { font-style: normal; font-weight: 700; } .tk-i em.up { color: #7EE2AE; } .tk-i em.down { color: #FF9C9C; }
-  @keyframes tick { to { transform: translateX(-50%); } }
-  @media (prefers-reduced-motion: reduce) { .tk-track { animation: none; } }
   .l-foot { padding-block: 28px 40px; color: var(--ink-3); font-size: 12.5px; display: flex; justify-content: space-between; gap: 20px; }
 
   /* ---------- Diagnóstico ---------- */
@@ -287,6 +277,13 @@
   .shell.wide .main-in { max-width: 1240px; padding-top: 0; }
   .practice-strip { position: sticky; top: 0; z-index: 15; margin: 0 -36px 18px; padding: 10px 36px; background: #FCF1D8; color: #6b4600; border-bottom: 1px solid #f1d58e; font-size: 13.5px; display: flex; gap: 8px; align-items: center; }
   .practice-strip .ic { width: 16px; height: 16px; }
+  .practice-strip.live { background: #E3F5EC; color: #0f5a37; border-bottom-color: #b5e2c9; }
+  .live-dot { width: 9px; height: 9px; border-radius: 50%; background: #1FA463; box-shadow: 0 0 0 0 rgba(31,164,99,.6); animation: livep 1.6s infinite; flex: none; }
+  @keyframes livep { 70% { box-shadow: 0 0 0 7px rgba(31,164,99,0); } 100% { box-shadow: 0 0 0 0 rgba(31,164,99,0); } }
+  .fl-up { animation: flup 1.2s ease-out; } .fl-dn { animation: fldn 1.2s ease-out; }
+  @keyframes flup { 0% { background: #BFEBD3; } 100% { background: transparent; } }
+  @keyframes fldn { 0% { background: #F8CACA; } 100% { background: transparent; } }
+  @media (prefers-reduced-motion: reduce) { .live-dot, .fl-up, .fl-dn { animation: none; } }
   .bk-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; }
   .bk-controls { display: flex; gap: 18px; align-items: center; }
   .mkt { display: flex; gap: 10px; align-items: center; background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 8px 14px; }
@@ -472,111 +469,6 @@
 
   @media (max-width: 1240px) { .shell { grid-template-columns: 232px minmax(0, 1fr); } .rail { display: none; } }
   @media (max-width: 1000px) { .l-hero-in, .frenos, .steps { grid-template-columns: 1fr; } .preview { display: none; } .opt4, .opts { grid-template-columns: 1fr; } }
-
-  /* =================================================================
-     Estilo de plataforma profesional: barra superior oscura, resumen de cuenta siempre visible,
-     paneles cuadrados con bordes finos, tablas densas y colores de operación (comprar azul, vender rojo).
-     ================================================================= */
-  :root { --bg: #F1F3F5; --line: #D8DEE3; --ink: #14212A; --ink-2: #4B5963; --ink-3: #75828B; --radius: 4px;
-    --shadow: none; --shadow-lg: 0 10px 30px rgba(10,30,40,.14); --buy: #1660C7; --sell: #C62828; --link: #1660C7; }
-  body { font-size: 14px; line-height: 1.5; }
-  h1 { font-size: 24px; font-weight: 700; letter-spacing: -.01em; }
-  h2 { font-size: 18px; font-weight: 700; letter-spacing: -.005em; }
-  h3 { font-size: 15.5px; font-weight: 700; letter-spacing: 0; }
-  .card { border-radius: 4px; box-shadow: none; padding: 18px; }
-  .card.hover:hover { transform: none; box-shadow: 0 2px 10px rgba(10,30,40,.08); border-color: #C3CCD3; }
-  .btn { border-radius: 4px; padding: 9px 16px; font-weight: 600; background: var(--petrol-800); color: #fff; }
-  .btn:hover { background: var(--petrol-700); box-shadow: none; transform: none; }
-  .btn.lg { padding: 12px 22px; font-size: 15px; border-radius: 4px; }
-  .btn.sm { padding: 6px 12px; font-size: 13px; border-radius: 3px; }
-  .btn.ghost { background: #fff; border: 1px solid #C3CCD3; color: var(--ink); }
-  .btn.ghost:hover { background: #F5F7F9; border-color: #9FAEB8; }
-  .btn.dark { background: var(--petrol-900); }
-  .btn[data-side="buy"], .seg2 button.on.buy { background: var(--buy); color: #fff; }
-  .btn[data-side="buy"]:hover { background: #124FA6; }
-  .btn[data-side="sell"]:not(.ghost), .seg2 button.on.sell { background: var(--sell); color: #fff; }
-  .btn.ghost[data-side="sell"] { color: var(--sell); border-color: #E3B4B4; }
-  .link { color: var(--link); }
-  .pill { border-radius: 3px; padding: 3px 8px; font-weight: 600; }
-  .sim-tag { border-radius: 3px; }
-  .icon-box { border-radius: 4px; width: 40px; height: 40px; }
-  .input { border-radius: 4px; border: 1px solid #C3CCD3; padding: 9px 12px; }
-  .input:focus { box-shadow: 0 0 0 3px rgba(22,96,199,.15); border-color: var(--buy); }
-  .up { color: #0E7A45; } .down { color: var(--sell); }
-  .chg { border-radius: 3px; font-weight: 600; }
-  .chg.up { background: #E4F3EA; } .chg.down { background: #FBE8E8; }
-  .tabs { background: none; border-radius: 0; padding: 0; gap: 0; border-bottom: 1px solid var(--line); display: flex; }
-  .tabs button { border-radius: 0; padding: 10px 16px; font-weight: 600; color: var(--ink-2); border-bottom: 2px solid transparent; margin-bottom: -1px; }
-  .tabs button:hover { color: var(--ink); }
-  .tabs button.on { background: none; box-shadow: none; color: var(--ink); border-bottom-color: var(--mint-600); }
-  .seg2 { border-radius: 4px; } .seg2 button { border-radius: 3px; }
-  th { font-size: 11px; letter-spacing: .05em; background: #F6F8F9; color: var(--ink-3); padding: 8px 12px; border-bottom: 1px solid var(--line); }
-  td { padding: 9px 12px; border-bottom: 1px solid #E6EAED; }
-  .bk-table td { padding: 8px 12px; font-size: 13.5px; }
-  .bk-table tbody tr.click:hover, tbody tr:hover td { background: #F3F7FA; }
-  .explain { border-radius: 4px; }
-  .callout { border-radius: 4px; }
-  #modal .box { border-radius: 6px; }
-  #toast { border-radius: 4px; }
-  .q-opt, .opt { border-radius: 4px; border-width: 1px; }
-  .opt.sel, .q-opt.right, .q-opt.wrong { border-width: 2px; }
-  .lvl-info { border-radius: 4px; box-shadow: none; }
-  .lcard { padding: 32px 36px; }
-  .goal-hero { border-radius: 4px; }
-  .game-head { border-radius: 4px; }
-  .gh-stat, .badge-i { border-radius: 4px; }
-  .freno, .l-cta { border-radius: 6px; }
-  .chip { border-radius: 3px; }
-  .msg { border-radius: 6px; }
-  .mkt { border-radius: 4px; }
-  .practice-strip { margin: 0 -28px 16px; padding: 7px 28px; font-size: 13px; }
-  .drawer { box-shadow: -10px 0 40px rgba(10,30,40,.2); }
-  .dr-x { border-radius: 4px; }
-  .seg-progress span { border-radius: 2px; }
-  .tri { border-radius: 4px; } .tri button { border-radius: 3px; }
-
-  .l-hero .btn, .l-cta .btn, .l-nav .btn { background: var(--mint); color: #062018; }
-  .l-hero .btn:hover, .l-cta .btn:hover, .l-nav .btn:hover { background: #33c47f; }
-  /* Estructura de la aplicación */
-  .shell, .shell.wide { display: flex; flex-direction: column; height: 100vh; }
-  .topbar { flex: none; background: var(--petrol-900); color: #fff; border-bottom: 1px solid #06181E; }
-  .tb-in { display: flex; align-items: center; gap: 28px; height: 54px; padding: 0 20px; }
-  .topbar .logo { padding: 0; } .topbar .logo svg { width: 30px; height: 30px; } .topbar .logo b { font-size: 16px; } .topbar .logo small { font-size: 11px; }
-  .tnav { display: flex; align-self: stretch; }
-  .tnav .nav-i { width: auto; height: 100%; border-radius: 0; padding: 0 14px; gap: 8px; font-size: 14px; font-weight: 600; color: #B7CCCF; box-shadow: none; }
-  .tnav .nav-i .ic { width: 16px; height: 16px; }
-  .tnav .nav-i:hover { background: rgba(255,255,255,.05); color: #fff; }
-  .tnav .nav-i.on { background: rgba(255,255,255,.06); color: #fff; box-shadow: inset 0 -3px 0 var(--mint); }
-  .tnav .nav-i .badge { margin-left: 2px; border-radius: 3px; }
-  .tb-r { margin-left: auto; display: flex; align-items: center; gap: 12px; }
-  .topbar .saved { color: #9FC3C6; padding: 0 6px 0 0; }
-  .tb-user { display: flex; align-items: center; gap: 10px; padding-left: 12px; border-left: 1px solid rgba(255,255,255,.12); }
-  .tb-user .avatar { width: 30px; height: 30px; background: var(--mint); color: #062018; font-size: 12px; }
-  .tb-user b { display: block; font-size: 13.5px; line-height: 1.2; } .tb-user span { font-size: 11.5px; color: #9FC3C6; }
-  .tb-icon { width: 34px; height: 34px; display: grid; place-items: center; border: 1px solid rgba(255,255,255,.14); border-radius: 4px; background: none; color: #CFE3E4; }
-  .tb-icon:hover { background: rgba(255,255,255,.08); color: #fff; }
-  .tb-icon .ic { width: 17px; height: 17px; }
-  .acct-bar { flex: none; background: #fff; border-bottom: 1px solid var(--line); }
-  .ab-in { display: flex; align-items: stretch; min-height: 56px; padding: 0 20px; }
-  .ab-acct { display: flex; flex-direction: column; justify-content: center; padding-right: 20px; }
-  .ab-acct b { font-size: 13.5px; } .ab-acct span { font-size: 12px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
-  .ab-cell { display: flex; flex-direction: column; justify-content: center; padding: 6px 20px; border-left: 1px solid var(--line); }
-  .ab-cell > span { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-3); font-weight: 600; }
-  .ab-cell > b { font-size: 15.5px; font-weight: 700; white-space: nowrap; }
-  .ab-wide > span { text-transform: none; letter-spacing: 0; font-size: 14px; color: var(--ink-2); font-weight: 500; }
-  .ab-data { margin-left: auto; align-self: center; display: flex; gap: 10px; align-items: center; font-size: 12px; color: var(--ink-3); }
-  .ab-data em { font-style: normal; font-weight: 700; font-size: 11px; letter-spacing: .06em; color: #7a5000; background: var(--amber-100); border: 1px solid #f1d58e; border-radius: 3px; padding: 2px 6px; }
-  .body { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 300px; }
-  .shell.wide .body { grid-template-columns: minmax(0, 1fr); }
-  .main { overflow-y: auto; }
-  .main-in, .shell.wide .main-in { padding: 24px 28px 120px; max-width: 1100px; }
-  .shell.wide .main-in { max-width: 1280px; padding-top: 0; }
-  .rail { padding: 20px 18px; gap: 18px; background: #fff; }
-  .rail section { border: 1px solid var(--line); border-radius: 4px; padding: 14px; }
-  .rail h4 { font-size: 11px; margin: -14px -14px 12px; padding: 8px 14px; background: #F6F8F9; border-bottom: 1px solid var(--line); border-radius: 4px 4px 0 0; }
-  .todo { border-radius: 4px; padding: 8px 10px; }
-  .orb-wrap { right: 324px; }
-  @media (max-width: 1240px) { .body { grid-template-columns: minmax(0, 1fr); } .ab-cell { padding: 6px 14px; } .tb-user div { display: none; } }
 </style>
 </head>
 <body>
@@ -1101,37 +993,19 @@ function shell() {
   const pages = { home, learn, lesson, sim, scam, ask, leap };
   const wide = V.page === "sim";
   return `<div class="shell ${wide ? "wide" : ""}">
-    <header class="topbar"><div class="tb-in">
+    <aside class="side">
       ${logo()}
-      <nav class="tnav" aria-label="Secciones">${NAV.map(([id, l, ic]) => `<button class="nav-i ${active === id ? "on" : ""}" data-go="${id}">${icon(ic)}${l}${id === "learn" && !allDone() ? `<span class="badge">${current() + 1}/6</span>` : ""}</button>`).join("")}</nav>
-      <div class="tb-r">
+      ${NAV.map(([id, l, ic]) => `<button class="nav-i ${active === id ? "on" : ""}" data-go="${id}">${icon(ic)}${l}${id === "learn" && !allDone() ? `<span class="badge">${current() + 1}/6</span>` : ""}</button>`).join("")}
+      <div class="side-foot">
         <div class="saved" id="saved">${savedLabel()}</div>
-        <div class="tb-user"><span class="avatar">${esc(myName()[0].toUpperCase())}</span><div><b>${esc(myName())}</b><span>${esc(USER?.email || "")}</span></div></div>
-        <button class="tb-icon" data-act="map" title="Mapa del prototipo" aria-label="Mapa del prototipo">${icon("map")}</button>
-        <button class="tb-icon" data-act="logout" title="Cerrar sesión" aria-label="Cerrar sesión">${icon("back")}</button>
+        <button class="nav-i" data-act="map">${icon("map")}Mapa del prototipo</button>
+        <div class="me"><div class="avatar" style="background:var(--mint);color:#062018">${esc(myName()[0].toUpperCase())}</div><div style="min-width:0"><b style="color:#fff">${esc(myName())}</b><div class="xs" style="color:var(--petrol-200);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(USER?.email || "")}</div></div></div>
+        <button class="nav-i" data-act="logout" style="padding:8px 12px;font-size:13.5px">${icon("back")}Cerrar sesión</button>
       </div>
-    </div></header>
-    ${acctBar()}
-    <div class="body">
-      <main class="main"><div class="main-in">${pages[V.page]()}</div></main>
-      ${wide ? "" : rail()}
-    </div>
+    </aside>
+    <main class="main"><div class="main-in">${(pages[V.page] || home)()}</div></main>
+    ${wide ? "" : rail()}
   </div>`;
-}
-const acctId = () => { let h = 0; for (const c of (USER?.email || "demo")) h = (h * 31 + c.charCodeAt(0)) >>> 0; return "SM" + String(h % 9000000 + 1000000); };
-function acctBar() {
-  const data = `<span class="ab-data">${MD.real ? `Cierre BYMA ${fmtDate(MD.asOf)}` : "Precios simulados"}<em>PRÁCTICA</em></span>`;
-  if (!S.bk) return `<div class="acct-bar"><div class="ab-in"><div class="ab-acct"><b>Cuenta de práctica</b><span>${acctId()}</span></div><div class="ab-cell ab-wide"><span>Todavía no abriste tu cuenta de práctica.</span></div><div class="ab-cell"><button class="btn sm" data-go="sim">Abrir con $1.000.000 virtuales</button></div>${data}</div></div>`;
-  const tot = totalValue(), dr = dayResult(), res = tot - BROKER_CFG.startCash, p = perfStats();
-  const cell = (l, v, cls = "") => `<div class="ab-cell"><span>${l}</span><b class="num ${cls}">${v}</b></div>`;
-  return `<div class="acct-bar"><div class="ab-in">
-    <div class="ab-acct"><b>Cuenta de práctica</b><span>${acctId()}</span></div>
-    ${cell("Valor de la cuenta", m2(tot))}${cell("Disponible", m2(S.bk.cash))}
-    ${cell("Resultado del día", `${m2(dr)} (${pc2(dr / Math.max(1, tot - dr))})`, dr >= 0 ? "up" : "down")}
-    ${cell("Resultado total", `${m2(res)} (${pc2(res / BROKER_CFG.startCash)})`, res >= 0 ? "up" : "down")}
-    ${cell("Nivel de inversor", p.days ? `${p.score}/100 · ${p.tier}` : "Se calcula mañana")}
-    ${data}
-  </div></div>`;
 }
 
 function ringSvg(frac, size = 84) {
@@ -1203,8 +1077,6 @@ function landing() {
       </div>
     </section>
 
-    ${tickerStrip()}
-
     <section class="l-section" id="frenos">
       <div class="l-wrap">
         <h2>Sabemos por qué todavía no invertiste</h2>
@@ -1243,11 +1115,6 @@ function landing() {
   </div>`;
 }
 
-function tickerStrip() {
-  if (!MD.real) return "";
-  const items = assets().filter(a => a.cls !== "fci").map(a => { const v = dayVar(a.t); return `<span class="tk-i"><b>${a.t === "LECAP" && MD.lecap ? MD.lecap : a.t}</b>${m2(last(a.t))}<em class="${v >= 0 ? "up" : "down"}">${pc2(v)}</em></span>`; }).join("");
-  return `<div class="ticker" aria-label="Precios de cierre reales de BYMA del ${fmtDateLong(MD.asOf)}"><div class="tk-lab">Cierre real BYMA · ${fmtDate(MD.asOf)}</div><div class="tk-run"><div class="tk-track">${items}${items}</div></div></div>`;
-}
 /* ---------- 2. Diagnóstico ---------- */
 const DIAG = [
   { key: "exp", q: "¿Alguna vez invertiste?", sub: "No hay respuestas incorrectas.", opts: [["nunca", "Nunca", "Arranco de cero", "sparkle"], ["poco", "Alguna vez, poquito", "Probé algo, pero no entendí mucho", "coins"], ["si", "Sí, a veces", "Quiero hacerlo mejor", "sim"]] },
@@ -1283,11 +1150,11 @@ function home() {
   }[S.freno || "miedo"];
   return `
     <div class="page-h"><div><h1>Hola, ${esc(myName())}</h1>
-      <p class="muted">${{ nunca: "Arrancás de cero, y está perfecto: vamos paso a paso.", poco: "Ya probaste algo. Ahora vamos a entenderlo bien.", si: "Ya invertiste: acá vas a hacerlo con más confianza." }[S.exp || "nunca"]}</p></div>
+</div>
       <span class="sim-tag"><i></i>Modo práctica · plata virtual</span></div>
     <div class="grid dash">
       <div class="card goal-hero span-4">
-        <div class="between"><span class="eyebrow" style="color:#9FC3C6">Tu broker de práctica</span><button class="link" style="color:#7EE2AE" data-go="sim">Ir al simulador</button></div>
+        <div class="between"><span></span><button class="link" style="color:#7EE2AE" data-go="sim">Ir al simulador</button></div>
         ${perf ? `<div class="row" style="margin:16px 0 18px;gap:16px"><div class="icon-box" style="background:rgba(43,182,115,.18);color:#7EE2AE;width:56px;height:56px">${icon("sim")}</div>
           <div><h2 style="color:#fff">${m2(totalValue())}</h2><p class="muted">Valor de tu cartera virtual · ${perf.days ? `${pc2(perf.ret)} en ${perf.days} ${perf.days === 1 ? "día" : "días"} de mercado real` : "se actualiza cada día hábil"}</p></div>
           <div style="margin-left:auto;text-align:right"><div class="big-num">${perf.days ? perf.score : "—"}</div><span class="xs" style="color:#9FC3C6">${perf.days ? perf.tier : "Se calcula mañana"}</span></div></div>`
@@ -1296,12 +1163,11 @@ function home() {
         <p class="xs" style="color:#9FC3C6">Plata virtual · precios reales de cierre de BYMA</p>
       </div>
       <div class="card span-2" style="display:flex;flex-direction:column;justify-content:space-between">
-        <div class="between"><span class="eyebrow">Racha</span><span style="color:#F27B1A">${icon("flame")}</span></div>
-        <div><div class="big-num">${S.streak} días</div><p class="small muted">Entrá mañana para llegar a ${S.streak + 1}.</p></div>
+        <div style="color:#F27B1A">${icon("flame")}</div>
+        <div><div class="big-num">${S.streak} días de racha</div><p class="small muted">Entrá mañana para llegar a ${S.streak + 1}.</p></div>
       </div>
       <div class="card hover span-3">
-        <span class="eyebrow">${allDone() ? "Camino completo" : "Próxima lección"}</span>
-        <div class="row" style="margin:14px 0"><div class="icon-box">${icon(allDone() ? "star" : "play")}</div><div><b>${allDone() ? "¡Terminaste los 6 niveles!" : `Nivel ${current() + 1}: ${esc(lv.title)}`}</b><p class="small muted">${allDone() ? "Te espera el último paso." : `${lv.min} minutos · 3 tarjetas y 1 pregunta`}</p></div></div>
+        <div class="row" style="margin:0 0 14px"><div class="icon-box">${icon(allDone() ? "star" : "play")}</div><div><b>${allDone() ? "¡Terminaste los 6 niveles!" : `Nivel ${current() + 1}: ${esc(lv.title)}`}</b><p class="small muted">${allDone() ? "Te espera el último paso." : `${lv.min} minutos · 3 tarjetas y 1 pregunta`}</p></div></div>
         <button class="btn" data-go="${allDone() ? "leap" : "lesson"}">${allDone() ? "Dar el salto" : "Seguir aprendiendo"} ${icon("arrow")}</button>
       </div>
       <div class="card hover span-3" style="border-color:#BFE6D1">
@@ -1309,7 +1175,7 @@ function home() {
         <button class="btn" style="margin-top:14px" data-go="${focus[3]}">${focus[4]}</button>
       </div>
       <div class="card span-6" style="background:var(--mint-50);border-color:#CDEBDB">
-        <div class="row" style="gap:14px"><div class="icon-box" style="background:#fff">${icon("bulb")}</div><div><span class="eyebrow">Tip del día</span><p style="margin-top:2px">${TIPS[(new Date().getDate()) % TIPS.length]}</p></div></div>
+        <div class="row" style="gap:14px"><div class="icon-box" style="background:#fff">${icon("bulb")}</div><div><p>${TIPS[(new Date().getDate()) % TIPS.length]}</p></div></div>
       </div>
     </div>`;
 }
@@ -1399,7 +1265,7 @@ function verdict(ans) {
 function scam() {
   const r = V.scam;
   return `
-    <div class="page-h"><div><h1>¿Es estafa?</h1><p class="muted">Pegá o contá la oferta que te llegó. Te mostramos las señales de alerta en un semáforo.</p></div></div>
+    <div class="page-h"><div><h1>¿Es estafa?</h1></div></div>
     <div class="card">
       <div class="field"><label for="scam-in">¿Qué te ofrecieron?</label>
         <textarea class="input" id="scam-in" rows="3" placeholder="Ej.: Me ofrecen 30% mensual garantizado por Instagram" style="resize:vertical">${esc(V.scamText || "")}</textarea></div>
@@ -1423,7 +1289,7 @@ function scam() {
         </div></div>`;
     })() : ""}
     <div class="card" style="margin-top:18px">
-      <div class="row" style="gap:14px"><div class="icon-box" style="background:var(--petrol-800);color:var(--mint)">${icon("shield")}</div><div><span class="eyebrow">Por qué LBO es confiable</span><h3 style="margin-top:2px">Chequeá lo mismo que le pedimos a cualquiera</h3></div></div>
+      <div class="row" style="gap:14px"><div class="icon-box" style="background:var(--petrol-800);color:var(--mint)">${icon("shield")}</div><div><h3>Chequeá lo mismo que le pedimos a cualquiera</h3></div></div>
       <div class="grid" style="grid-template-columns:1fr 1fr;margin-top:16px">${[
         ["Registro en la CNV", "Agente registrado N.º", "a completar"],
         ["Trayectoria", "Años en el mercado de capitales", "a completar"],
@@ -1535,11 +1401,67 @@ const A = t => { const a = BROKER_CFG.assets.find(x => x.t === t); return a && a
 const lastI = () => MD.dates.length - 1;
 const idxOf = date => { const i = MD.dates.indexOf(date); return i >= 0 ? i : MD.dates.findIndex(x => x >= date); };
 const closeAt = (t, i) => { const s = MD.close[t]; for (let k = Math.min(i, s.length - 1); k >= 0; k--) if (s[k] != null) return s[k]; return null; };
-const last = t => closeAt(t, lastI());
-const prevClose = t => closeAt(t, lastI() - 1) || last(t);
-const dayVar = t => last(t) / prevClose(t) - 1;
-const bidPx = t => last(t) * (1 - A(t).spread / 2);
-const askPx = t => last(t) * (1 + A(t).spread / 2);
+// Con cotización en vivo se usan el último precio operado, la variación del día y las puntas reales.
+const last = t => LIVE[t]?.c || closeAt(t, lastI());
+const prevClose = t => LIVE[t] ? LIVE[t].c / (1 + LIVE[t].pct / 100) : (closeAt(t, lastI() - 1) || last(t));
+const dayVar = t => LIVE[t] ? LIVE[t].pct / 100 : last(t) / prevClose(t) - 1;
+const bidPx = t => LIVE[t]?.bid || last(t) * (1 - A(t).spread / 2);
+const askPx = t => LIVE[t]?.ask || last(t) * (1 + A(t).spread / 2);
+
+/* ---------- Cotizaciones en vivo ----------
+   data912.com publica las cotizaciones de BYMA (último precio, puntas, volumen y variación del día) y
+   permite leerlas desde el navegador. Funciona en la app de escritorio y abriendo el archivo; en claude.ai
+   el navegador bloquea conexiones a otros sitios, así que ahí se usan los precios de cierre. */
+const LIVE_SRC = { accion: "arg_stocks", cedear: "arg_cedears", usd: "arg_bonds", ars: "arg_notes" };
+let LIVE = {}, LIVE_AT = null, LIVE_STATE = "off", liveTimer = null, liveFails = 0, liveDirty = false;
+async function pollLive() {
+  clearTimeout(liveTimer);
+  const list = assets().filter(a => LIVE_SRC[a.cls]), files = [...new Set(list.map(a => LIVE_SRC[a.cls]))];
+  const before = {}; Object.keys(LIVE).forEach(k => before[k] = LIVE[k].c);
+  try {
+    const rows = (await Promise.all(files.map(f => fetch("https://data912.com/live/" + f, { cache: "no-store" }).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })))).flat();
+    const bySym = {}; rows.forEach(r => { if (r && r.symbol) bySym[r.symbol] = r; });
+    let n = 0;
+    list.forEach(a => {
+      const r = bySym[a.t === "LECAP" && MD.lecap ? MD.lecap : a.t];
+      if (r && +r.c > 0) { LIVE[a.t] = { c: +r.c, bid: +r.px_bid || 0, ask: +r.px_ask || 0, pct: +r.pct_change || 0, v: +r.v || 0 }; n++; }
+    });
+    if (n) { LIVE_AT = new Date(); LIVE_STATE = "on"; liveFails = 0; } else throw new Error("sin datos");
+  } catch (e) { liveFails++; if (!Object.keys(LIVE).length) LIVE_STATE = "fail"; }
+  const changed = Object.keys(LIVE).filter(k => before[k] !== undefined && before[k] !== LIVE[k].c).map(k => [k, LIVE[k].c > before[k]]);
+  const filled = S.bk && LIVE_STATE === "on" && marketStatus().open ? checkLiveOrders() : [];
+  filled.forEach(o => toast(`Se ejecutó tu orden limitada ${o.id} de ${o.t}`));
+  if (filled.length) save();
+  liveRefresh(changed);
+  // Con el mercado abierto se actualiza cada 20 segundos; cerrado, cada 5 minutos. Sin conexión, se espera más.
+  const wait = LIVE_STATE === "fail" ? Math.min(300000, 30000 * 2 ** Math.min(liveFails, 3)) : marketStatus().open ? 20000 : 300000;
+  liveTimer = setTimeout(pollLive, wait);
+}
+function checkLiveOrders() {
+  const out = [], ms = marketStatus();
+  S.bk.orders.filter(o => o.status === "Pendiente" && LIVE[o.t]).forEach(o => {
+    if (o.side === "buy" && askPx(o.t) <= o.limit) { fill(o, askPx(o.t), MD.asOf, ms.time); out.push(o); }
+    else if (o.side === "sell" && bidPx(o.t) >= o.limit) { fill(o, bidPx(o.t), MD.asOf, ms.time); out.push(o); }
+  });
+  return out;
+}
+function liveRefresh(changed) {
+  const busy = /INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName || "") || document.querySelector("#modal .bg");
+  if (!["sim", "home"].includes(V.page) || !USER) return;
+  if (busy) { liveDirty = true; return; }
+  liveDirty = false;
+  if (V.drawer) renderDrawer(true);
+  const y = document.querySelector(".main")?.scrollTop || 0;
+  render();
+  const m = document.querySelector(".main"); if (m) m.scrollTop = y;
+  changed.forEach(([t, up]) => document.querySelectorAll(`[data-live="${t}"]`).forEach(el => { el.classList.remove("fl-up", "fl-dn"); void el.offsetWidth; el.classList.add(up ? "fl-up" : "fl-dn"); }));
+}
+document.addEventListener("focusout", () => { if (liveDirty) setTimeout(() => liveRefresh([]), 50); });
+const liveTime = () => LIVE_AT ? LIVE_AT.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23" }) : "";
+function priceNote() {
+  if (LIVE_STATE === "on") return marketStatus().open ? `<span class="live-dot"></span><b>EN VIVO</b> · Cotizaciones de BYMA actualizadas a las ${liveTime()} (pueden tener unos minutos de demora) · Plata virtual` : `<b>MERCADO CERRADO</b> · Últimos precios operados en BYMA (actualizado ${liveTime()}) · Plata virtual`;
+  return `${icon("alert", "ic")}<b>MODO PRÁCTICA</b> · Plata virtual · ${MD.real ? `Precios de cierre del ${fmtDateLong(MD.asOf)}${LIVE_STATE === "fail" ? ". No se pudo conectar a las cotizaciones en vivo; se reintenta solo" : ". En este link las cotizaciones en vivo no están disponibles: usá la app de escritorio o el archivo descargado"}` : "Precios simulados"}`;
+}
 const ohlcAt = (t, i) => { const o = MD.ohlc[t]; if (!o) return null; const off = MD.dates.length - o.length; return o[i - off] || null; };
 function annualVol(t) {
   const s = MD.close[t].slice(-251).filter(v => v != null), r = s.slice(1).map((v, k) => Math.log(v / s[k]));
@@ -1664,15 +1586,24 @@ function sim() {
   const B = ensureBk(), ms = marketStatus();
   const tot = totalValue(), res = tot - BROKER_CFG.startCash, perf = perfStats();
   return `
-    <div class="practice-strip">${icon("alert", "ic")}<b>MODO PRÁCTICA</b> · Plata virtual · ${MD.real ? `Precios reales de cierre del ${fmtDateLong(MD.asOf)}, no son cotizaciones en vivo` : "Precios simulados, no son cotizaciones en vivo"}</div>
+    <div class="practice-strip ${LIVE_STATE === "on" ? "live" : ""}">${priceNote()}</div>
     <div class="bk-head">
-      <div><h1>Tu broker de práctica</h1><p class="small muted" style="margin-top:4px">Cuenta abierta el ${fmtDateLong(B.start)} · ${perf.days} ${perf.days === 1 ? "día" : "días"} de mercado</p></div>
+      <div><h1>Tu broker de práctica</h1></div>
       <div class="bk-controls">
-        <div class="mkt ${ms.open ? "open" : ""}"><i></i><div><b>Mercado ${ms.label}</b><span class="xs faint">Hoy ${ms.time} hs · Precios al cierre del ${fmtDate(MD.asOf)} · se actualizan cada día hábil</span></div></div>
+        <div class="mkt ${ms.open ? "open" : ""}"><i></i><div><b>Mercado ${ms.label}</b><span class="xs faint">Hoy ${ms.time} hs · ${LIVE_STATE === "on" ? (ms.open ? "Cotizaciones en vivo, se actualizan cada 20 segundos" : "Últimos precios operados") : `Precios al cierre del ${fmtDate(MD.asOf)} · se actualizan cada día hábil`}</span></div></div>
         <label class="toggle small"><input type="checkbox" data-bk="explain" ${B.explain ? "checked" : ""}><span class="sw"></span>Modo explicado</label>
       </div>
     </div>
-    ${ex("Acá no se adelanta el tiempo: cada día hábil, después del cierre, entran los precios reales y tu cartera cambia sola. Volvé mañana para ver cómo te fue.")}
+    <div class="bk-bar">
+      <div class="bk-kpis">
+        <div><span class="xs faint">${t("saldo", "Saldo disponible")}</span><b class="num">${m2(B.cash)}</b></div>
+        <div><span class="xs faint">Valor total</span><b class="num">${m2(tot)}</b></div>
+        <div><span class="xs faint">Resultado total</span><b class="num ${res >= 0 ? "up" : "down"}">${m2(res)} (${pc2(res / BROKER_CFG.startCash)})</b></div>
+        <div><span class="xs faint">Empezaste el</span><b>${fmtDateLong(B.start)} · ${perf.days} ${perf.days === 1 ? "día" : "días"}</b></div>
+      </div>
+      <button class="score-chip" data-bkview="port"><span class="xs">Tu nivel de inversor</span><b>${perf.days ? `${perf.tier} · ${perf.score}/100` : "Se calcula mañana"}</b></button>
+    </div>
+    ${ex(LIVE_STATE === "on" ? "Los precios son los de BYMA: con el mercado abierto (de 11 a 17 hs) se mueven en vivo y tu cartera cambia con ellos. Comprás y vendés con plata virtual a las puntas reales." : "Acá no se adelanta el tiempo: cada día hábil, después del cierre, entran los precios reales y tu cartera cambia sola. Volvé mañana para ver cómo te fue.")}
     <div class="tabs bk-tabs">${[["quotes", "Cotizaciones"], ["port", "Mi cartera"], ["hist", "Historial"]].map(([k, l]) => `<button class="${B.view === k ? "on" : ""}" data-bkview="${k}">${l}</button>`).join("")}</div>
     ${V.sym ? assetView(V.sym) : B.view === "port" ? portView(perf) : B.view === "hist" ? histView() : quotesView()}`;
 }
@@ -1693,11 +1624,11 @@ function quotesView() {
       <table class="bk-table">
         <thead><tr><th>Ticker</th><th>Nombre</th><th class="r">Último precio</th><th class="r">Var. % día</th><th class="r">${tab === "fci" ? "" : `Punta compradora ${q("compradora")}`}</th><th class="r">${tab === "fci" ? "" : `Punta vendedora ${q("vendedora")}`}</th><th class="r">Volumen ${q("volumen")}</th><th>5 días</th><th></th></tr></thead>
         <tbody>${list.length ? list.map(a0 => {
-          const a = A(a0.t), v = dayVar(a.t), vol = ohlcAt(a.t, lastI())?.[4];
+          const a = A(a0.t), v = dayVar(a.t), vol = LIVE[a.t]?.v || ohlcAt(a.t, lastI())?.[4];
           return `<tr class="click" data-sym="${a.t}">
             <td><b class="tk">${a.t === "LECAP" && MD.lecap ? MD.lecap : a.t}</b></td>
             <td><div>${a.name}</div><div class="xs faint">${a.tag || (a.per === 100 ? "Precio cada 100 VN" : a.ccl ? "En pesos · se mueve con el dólar CCL" : "En pesos")}</div></td>
-            <td class="r num"><b>${m2(last(a.t))}</b></td>
+            <td class="r num"><b data-live="${a.t}">${m2(last(a.t))}</b></td>
             <td class="r"><span class="chg ${v >= 0 ? "up" : "down"}">${pc2(v)}</span></td>
             <td class="r num">${a.cls === "fci" ? "" : m2(bidPx(a.t))}</td>
             <td class="r num">${a.cls === "fci" ? "" : m2(askPx(a.t))}</td>
@@ -1707,14 +1638,14 @@ function quotesView() {
         }).join("") : `<tr><td colspan="9" class="muted" style="text-align:center;padding:30px">No hay datos para este tipo de activo.</td></tr>`}</tbody>
       </table>
     </div>
-    <p class="note" style="margin-top:10px">${MD.real ? `Precios de cierre reales de BYMA al ${fmtDateLong(MD.asOf)}${MD.sources.precios ? " (" + esc(MD.sources.precios) + ")" : ""}. Las puntas compradora y vendedora son estimadas a partir del cierre.${MD.fund ? " Fondo: " + esc(MD.fund) + "." : ""}` : "Precios simulados: todavía no se cargaron los datos reales."}</p>`;
+    <p class="note" style="margin-top:10px">${LIVE_STATE === "on" ? `Cotizaciones de BYMA vía data912.com, actualizadas a las ${liveTime()}: último precio, puntas y volumen reales. Pueden tener unos minutos de demora. Los gráficos usan precios de cierre.` : MD.real ? `Precios de cierre reales de BYMA al ${fmtDateLong(MD.asOf)}${MD.sources.precios ? " (" + esc(MD.sources.precios) + ")" : ""}. Las puntas compradora y vendedora son estimadas a partir del cierre.${MD.fund ? " Fondo: " + esc(MD.fund) + "." : ""}` : "Precios simulados: todavía no se cargaron los datos reales."}</p>`;
 }
 
 function riskMeter(a) {
   const vol = annualVol(a.t), drop = Math.min(0.95, 2 * vol);
   const label = drop < 0.1 ? "Bajo" : drop < 0.4 ? "Medio" : drop < 0.7 ? "Alto" : "Muy alto";
   return `<div class="card">
-    <div class="between"><span class="eyebrow">Riesgo</span><span class="pill ${drop < 0.1 ? "" : drop < 0.4 ? "amber" : "red"}">${label}</span></div>
+    <div class="between"><h3>Riesgo</h3><span class="pill ${drop < 0.1 ? "" : drop < 0.4 ? "amber" : "red"}">${label}</span></div>
     <p style="margin-top:8px;font-size:16px">En un año malo podrías ver aprox. <b>${Math.round(drop * 100)}% de baja</b>.</p>
     <div class="risk-bar"><i style="left:${Math.min(98, drop / 0.95 * 100)}%"></i></div>
     <div class="between xs faint" style="margin-top:4px"><span>Bajo</span><span>Medio</span><span>Alto</span></div>
@@ -1734,7 +1665,7 @@ function assetView(tk) {
         <div><div class="row" style="gap:10px"><h2>${a.t === "LECAP" && MD.lecap ? MD.lecap : a.t}</h2><span class="pill" style="background:${CLASSES[a.cls].color}1a;color:${CLASSES[a.cls].color}">${CLASSES[a.cls].name}</span></div>
           <p class="muted">${a.name}${a.per === 100 ? " · precio cada 100 " + t("vn", "VN") : ""}</p></div>
         <div class="row" style="gap:18px;align-items:center">
-          <div style="text-align:right"><div class="big-num num">${m2(last(tk))}</div><span class="chg ${v >= 0 ? "up" : "down"}">${pc2(v)} en el día</span><div class="xs faint" style="margin-top:4px">Cierre del ${fmtDate(MD.asOf)}</div></div>
+          <div style="text-align:right"><div class="big-num num" data-live="${tk}">${m2(last(tk))}</div><span class="chg ${v >= 0 ? "up" : "down"}">${pc2(v)} en el día</span><div class="xs faint" style="margin-top:4px">${LIVE[tk] ? `${marketStatus().open ? "En vivo" : "Último operado"} · ${liveTime()}` : `Cierre del ${fmtDate(MD.asOf)}`}</div></div>
           <div class="stack" style="gap:8px"><button class="btn" data-trade="${tk}" data-side="buy">${a.cls === "fci" ? "Suscribir" : "Comprar"}</button><button class="btn dark" data-trade="${tk}" data-side="sell" ${h ? "" : "disabled"}>${a.cls === "fci" ? "Rescatar" : "Vender"}</button></div>
         </div>
       </div>
@@ -1749,7 +1680,7 @@ function assetView(tk) {
       ["Máximo del día", k ? m2(k[1]) : "—"], ["Mínimo del día", k ? m2(k[2]) : "—"], [`Volumen ${q("volumen")}`, k && k[4] ? big(k[4], false) : "—"], ["Rango 12 meses", `${big(Math.min(...year))} – ${big(Math.max(...year))}`]
     ].map(([l, val]) => `<div class="card kv-card"><span class="xs faint">${l}</span><b class="num">${val}</b></div>`).join("")}</div>
     <div class="grid" style="grid-template-columns:1fr 1fr;margin-top:14px;align-items:start">
-      <div class="card"><span class="eyebrow">En simple</span><p style="margin-top:8px;font-size:16px">${a.simple}</p>${a.ccl ? `<p class="small muted" style="margin-top:8px">Cotiza en pesos y se mueve con la empresa y con el ${t("ccl", "dólar CCL")}.</p>` : ""}
+      <div class="card"><p style="font-size:16px">${a.simple}</p>${a.ccl ? `<p class="small muted" style="margin-top:8px">Cotiza en pesos y se mueve con la empresa y con el ${t("ccl", "dólar CCL")}.</p>` : ""}
         ${h ? `<div class="callout" style="margin-top:12px;font-size:14px">Tenés <b>${qtyF(a, h.qty)} ${a.unit}</b> · valorizado ${m2(units(a, h.qty, last(tk)))}</div>` : ""}</div>
       ${riskMeter(a)}
     </div>`;
@@ -1766,7 +1697,7 @@ function drawer() {
   return `<div class="dr-bg" data-drclose="1"></div>
   <aside class="drawer ${V.drIn ? "in" : ""}" role="dialog" aria-modal="true" aria-label="Operar ${a.t}">
     <div class="dr-head">
-      <div><span class="eyebrow">${CLASSES[a.cls].name}</span><h2 style="margin-top:2px">${a.t === "LECAP" && MD.lecap ? MD.lecap : a.t} <span class="muted" style="font-size:15px;font-weight:600">${a.name}</span></h2>
+      <div><h2>${a.t === "LECAP" && MD.lecap ? MD.lecap : a.t} <span class="muted" style="font-size:15px;font-weight:600">${a.name}</span></h2>
         <div class="row" style="gap:10px;margin-top:4px"><b class="num" style="font-size:20px">${m2(last(tk))}</b><span class="chg ${dayVar(tk) >= 0 ? "up" : "down"}">${pc2(dayVar(tk))}</span></div>
         ${h ? `<p class="xs faint" style="margin-top:4px">Tenés ${qtyF(a, h.qty)} ${a.unit}</p>` : ""}</div>
       <button class="dr-x" data-drclose="1" aria-label="Cerrar">×</button>
@@ -1796,7 +1727,6 @@ function ticket(tk) {
   }
   const c = calc(o);
   if (o.step === "review") return `<div class="ticket">
-    <span class="eyebrow">Revisá antes de confirmar</span>
     <h2>${o.side === "buy" ? (fci ? "Suscribir" : "Comprar") : (fci ? "Rescatar" : "Vender")} ${a.t === "LECAP" && MD.lecap ? MD.lecap : a.t}</h2>
     ${ex("Siempre revisá el total: incluye los costos de la operación.")}
     ${summary(o, c)}
@@ -1857,7 +1787,7 @@ function perfCard(p) {
   const fresh0 = p.days === 0;
   return `<div class="card perf">
     <div class="perf-left">
-      <span class="eyebrow">¿Qué tan buen inversor sos?</span>
+      <h3>¿Qué tan buen inversor sos?</h3>
       <div class="perf-score"><b>${fresh0 ? "—" : p.score}</b><span>/100</span></div>
       <span class="pill ${fresh0 ? "grey" : p.score >= 60 ? "" : p.score >= 40 ? "amber" : "grey"}" style="font-size:13px">${fresh0 ? "Se calcula mañana" : p.tier}</span>
       <p class="small muted" style="margin-top:10px">${fresh0 ? "Recién empezás: volvé mañana. Cada día hábil entran los precios reales y tu puntaje se actualiza." : `En ${p.days} ${p.days === 1 ? "día" : "días"} de mercado real.`}</p>
@@ -1882,10 +1812,15 @@ function portView(perf) {
   const top = rows.slice().sort((x, y) => y.val - x.val)[0], topShare = top && hv ? top.val / hv : 0;
   return `
     <div style="margin-top:16px">${perfCard(perf)}</div>
-    ${perf.days > 0 ? `<div class="card" style="margin-top:14px"><span class="eyebrow">Tu cartera desde el ${fmtDateLong(B.start)}</span><div id="chart-equity" style="margin-top:10px"></div></div>` : ""}
+    <div class="grid" style="grid-template-columns:repeat(4,1fr);margin-top:14px">${[
+      [t("saldo", "Saldo disponible"), m2(B.cash), ""], ["Valor total", m2(tot), ""],
+      ["Resultado del día", `${m2(dr)} (${pc2(dr / Math.max(1, tot - dr))})`, dr >= 0 ? "up" : "down"],
+      ["Resultado total", `${m2(res)} (${pc2(res / BROKER_CFG.startCash)})`, res >= 0 ? "up" : "down"]
+    ].map(([l, v, c]) => `<div class="card kv-card"><span class="xs faint">${l}</span><b class="num ${c}" style="font-size:19px">${v}</b></div>`).join("")}</div>
+    ${perf.days > 0 ? `<div class="card" style="margin-top:14px"><h3>Tu cartera desde el ${fmtDateLong(B.start)}</h3><div id="chart-equity" style="margin-top:10px"></div></div>` : ""}
     <div class="grid" style="grid-template-columns:1fr 2fr;margin-top:14px;align-items:start">
       <div class="card" style="text-align:center">
-        <span class="eyebrow">Por tipo de activo</span>
+        <h3>Por tipo de activo</h3>
         <div style="margin:12px auto 8px;width:180px">${donut(parts)}</div>
         <div class="stack" style="gap:6px;text-align:left">${parts.map(p => `<div class="between small"><span class="row" style="gap:8px"><i style="width:10px;height:10px;border-radius:3px;background:${p.color};display:inline-block"></i>${p.name}</span><b class="num">${Math.round(p.v / (tot || 1) * 100)}%</b></div>`).join("")}</div>
         ${topShare >= 0.5 && rows.length ? `<div class="callout" style="margin-top:14px;font-size:13.5px;background:var(--amber-100);text-align:left">Tenés el <b>${Math.round(topShare * 100)}%</b> de lo invertido en un solo activo (${top.a.t}). Probá ${t("diversificar", "diversificar")}.</div>` : ""}
@@ -2055,7 +1990,7 @@ function ask() {
     { me: false, h: ANSWERS[0].a }
   ];
   return `
-    <div class="page-h"><div><h1>Preguntá sin vergüenza</h1><p class="muted">${AI ? "Preguntá lo que quieras: te responde una IA, al toque." : "Lo que te da vergüenza preguntar en voz alta, preguntalo acá."}</p></div>
+    <div class="page-h"><div><h1>Preguntá sin vergüenza</h1></div>
       <div class="row">${AI ? `<span class="pill">${icon("sparkle", "ic")}IA conectada</span>` : `<span class="pill grey">Respuestas guardadas</span>`}${S.chat.length > 3 ? `<button class="btn ghost sm" data-act="chatReset">Empezar de nuevo</button>` : ""}</div></div>
     <div class="card chat-box">
       <div class="chat-log" id="chat-log">${S.chat.map(m => `<div class="msg ${m.me ? "me" : "bot"}"${m.pending ? ' id="ai-live"' : ""}>${m.me ? esc(m.h) : m.pending && !m.h ? `<span class="typing"><i></i><i></i><i></i></span>` : m.h}</div>`).join("")}${V.typing ? `<div class="msg bot"><span class="typing"><i></i><i></i><i></i></span></div>` : ""}</div>
@@ -2392,6 +2327,7 @@ function jump(id) {
   render();
   refreshMarketData();
   initAI();
+  pollLive();
 })();
 </script>
 </body>

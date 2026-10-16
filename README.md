@@ -114,6 +114,10 @@ Antes de usarlo con usuarios reales (y menores de edad) hace falta que LBO revis
 
 XP por nivel (+50, +20 si respondés bien al primer intento), estrellas, meta diaria, niveles de jugador, insignias y un cofre. La **esfera flotante** ("¿Qué querés aprender hoy?") abre micro-lecciones de 1 minuto con una pregunta y XP.
 
+### Cotizaciones en vivo
+
+En la app de escritorio y abriendo el archivo en el navegador, el simulador trae las cotizaciones de BYMA desde data912.com (último precio, puntas, volumen y variación del día): cada 20 segundos con el mercado abierto y cada 5 minutos cerrado. Las órdenes a mercado se ejecutan a las puntas reales y las limitadas pendientes se revisan con cada actualización. Pueden tener unos minutos de demora. En claude.ai el navegador bloquea las conexiones a otros sitios, así que ahí se usan los precios de cierre. Si la fuente no responde, también se usan los cierres y se reintenta solo.
+
 ### Simulador día a día con datos reales
 
 - Plata de mentira ($1.000.000), precios **reales** de cierre. No se adelanta el tiempo: cada día hábil, después del cierre, entran los precios nuevos y la cartera cambia sola. Las órdenes limitadas pendientes se ejecutan si el cierre del día las alcanza.
