@@ -55,14 +55,12 @@ Para presentar, ver [PRESENTACION.md](PRESENTACION.md).
 
 ## App de escritorio (Windows)
 
-La carpeta `desktop/` convierte el prototipo en una app de escritorio con [Electron](https://www.electronjs.org/). Usa el mismo `index.html`.
+La carpeta `desktop/` convierte el **prototipo** (`prototipo/index.html`) en una app de escritorio con [Electron](https://www.electronjs.org/).
 
-- Para armarla (en Linux o Mac, con `curl`, `unzip` y `zip`): `./desktop/build-windows.sh`. Deja `desktop/dist/Sin-Miedo-Windows.zip`.
-- En Windows: descomprimir el .zip y abrir `Sin Miedo.exe`. F11 pone pantalla completa.
-- Como no está firmada, Windows puede mostrar "Windows protegió su PC": "Más información" → "Ejecutar de todas formas".
-- Para probarla con Node instalado: `cd desktop && npm install && npm start` (copiar antes `index.html` dentro de `desktop/`).
-
----
+- Se arma sola en GitHub Actions (workflow "Sin Miedo para Windows") cada vez que cambia el prototipo o `desktop/`, o a mano con "Run workflow". El resultado se descarga desde la sección "Artifacts" de la ejecución (Sin-Miedo-Windows): descomprimir y abrir "Sin Miedo.exe".
+- También se puede armar desde Linux o Mac con `./desktop/build-windows.sh`.
+- Con internet, la app trae los precios nuevos de `data/mercado.json` (copia pública en GitHub, `DATA_URL` en el prototipo); sin internet usa los que trae incluidos. Si el repositorio pasa a ser privado o cambia la rama, hay que actualizar `DATA_URL`.
+- F11 pone pantalla completa para presentar.
 
 ## Traste (carpeta `traste/`)
 

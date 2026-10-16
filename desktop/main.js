@@ -1,14 +1,14 @@
 const { app, BrowserWindow, Menu, shell } = require("electron");
 const path = require("path");
 
-// La app de escritorio muestra el mismo index.html del prototipo web.
+// La app de escritorio muestra el prototipo (prototipo/index.html, copiado como index.html al armarla).
 const PAGE = path.join(__dirname, "index.html");
 
 function createWindow() {
   const win = new BrowserWindow({
-    width: 1366,
-    height: 860,
-    minWidth: 1000,
+    width: 1440,
+    height: 900,
+    minWidth: 1200,
     minHeight: 680,
     title: "Sin Miedo",
     icon: path.join(__dirname, "icon.png"),

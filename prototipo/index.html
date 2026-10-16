@@ -1785,9 +1785,12 @@ function candleChart(el, bars) {
 }
 
 // Si el prototipo está publicado en un servidor, busca el archivo de datos más nuevo (se actualiza cada día hábil).
+// Copia pública de los datos que el workflow "Datos de mercado" actualiza cada día hábil.
+// La usa la app de escritorio (o el archivo abierto suelto) para traer los precios nuevos.
+const DATA_URL = "https://raw.githubusercontent.com/agcevini-maker/project/claude/investment-app-practice-iu56nt/data/mercado.json";
 async function refreshMarketData() {
-  if (!/^https?:/.test(location.protocol)) return;
-  for (const path of ["../data/mercado.json", "data/mercado.json"]) {
+  const paths = /^https?:/.test(location.protocol) ? ["../data/mercado.json", "data/mercado.json", DATA_URL] : [DATA_URL];
+  for (const path of paths) {
     try {
       const r = await fetch(new URL(path, location.href), { cache: "no-store" }); if (!r.ok) continue;
       const j = await r.json();

@@ -25,7 +25,7 @@ rm -f "$WORK/resources/default_app.asar"
 APP="$WORK/resources/app"
 mkdir -p "$APP"
 cp "$HERE/package.json" "$HERE/main.js" "$HERE/icon.png" "$APP/"
-cp "$HERE/../index.html" "$APP/index.html"
+cp "$HERE/../prototipo/index.html" "$APP/index.html"
 
 cat > "$WORK/LEEME.txt" <<'TXT'
 Sin Miedo - prototipo educativo
@@ -36,7 +36,13 @@ F11 pone la app en pantalla completa (para presentar). Esc sale de pantalla comp
 Si Windows muestra "Windows protegió su PC", tocá "Más información" y después "Ejecutar de todas formas".
 Aparece porque la app no está firmada digitalmente; es normal en un prototipo.
 
-Los precios, comisiones e inflación del simulador son inventados. No es una plataforma real.
+Para entrar: "Continuar con Google" (simulado en el prototipo) o crear una cuenta con email.
+Las cuentas y el progreso se guardan en esta computadora.
+
+El simulador usa plata virtual y precios reales de cierre de BYMA. Con internet, la app trae
+los precios nuevos cada día hábil; sin internet, usa los que trae incluidos.
+Las puntas de compra/venta son estimadas y las comisiones son de ejemplo. No es una plataforma real
+ni una recomendación de inversión.
 TXT
 
 (cd "$OUT" && rm -f "Sin-Miedo-Windows.zip" && zip -qr "Sin-Miedo-Windows.zip" "$NAME")

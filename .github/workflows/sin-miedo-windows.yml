@@ -1,5 +1,5 @@
 # Arma la app de escritorio de Sin Miedo para Windows (carpeta con "Sin Miedo.exe").
-# Corre cuando cambia index.html o desktop/, o a mano desde la pestaña Actions ("Run workflow").
+# Usa el prototipo (prototipo/index.html). Corre cuando cambia el prototipo o desktop/, o a mano desde la pestaña Actions ("Run workflow").
 # El resultado queda para descargar en la sección "Artifacts" de la ejecución.
 name: Sin Miedo para Windows
 
@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - "index.html"
+      - "prototipo/index.html"
       - "desktop/**"
       - ".github/workflows/sin-miedo-windows.yml"
 
