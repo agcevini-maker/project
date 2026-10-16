@@ -160,6 +160,8 @@
   .nav-i .badge { margin-left: auto; font-size: 11px; background: var(--mint); color: #062018; border-radius: 99px; padding: 1px 7px; font-weight: 800; }
   .side-foot { margin-top: auto; display: flex; flex-direction: column; gap: 10px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,.08); }
   .me { display: flex; gap: 10px; align-items: center; padding: 6px 8px; }
+  .saved { display: flex; gap: 6px; align-items: center; font-size: 12px; color: var(--petrol-200); padding: 0 10px; }
+  .saved .ic { width: 14px; height: 14px; color: var(--mint); }
   .avatar { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; font-size: 13px; color: #fff; background: var(--petrol-600); flex: none; }
   .main { overflow-y: auto; }
   .main-in { padding: 30px 36px 130px; max-width: 980px; margin: 0 auto; }
@@ -424,6 +426,8 @@
   .msg.bot { background: #F1F6F5; border-top-left-radius: 4px; align-self: flex-start; }
   .msg.me { background: var(--petrol-800); color: #fff; border-top-right-radius: 4px; align-self: flex-end; }
   .msg ul { margin: 8px 0 0; padding-left: 18px; }
+  .msg p + p, .msg p + ul, .msg ul + p { margin-top: 8px; }
+  .pill .ic { width: 14px; height: 14px; }
   .typing { display: inline-flex; gap: 4px; }
   .typing i { width: 7px; height: 7px; border-radius: 50%; background: #9DB3B6; animation: blink 1s infinite; }
   .typing i:nth-child(2) { animation-delay: .15s; } .typing i:nth-child(3) { animation-delay: .3s; }
@@ -641,8 +645,45 @@ const AUTH_CFG = { supabaseUrl: "", supabaseAnonKey: "", googleClientId: "" };
 const ACCOUNTS_KEY = "sinmiedo-cuentas.v1", SESSION_KEY = "sinmiedo-sesion.v1";
 const cloudOn = () => !!(AUTH_CFG.supabaseUrl && AUTH_CFG.supabaseAnonKey);
 const keyFor = email => "sinmiedo-progreso.v2:" + email.toLowerCase();
-const lsGet = (k, def) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : def; } catch (e) { return def; } };
-const lsSet = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
+/* Guardado del progreso. Siempre en este navegador (localStorage). Abierto en claude.ai, además se guarda
+   en la base de datos privada de cada persona (capacidad "db", carpeta data/users/<id>), así el progreso
+   sigue ahí al volver, desde cualquier dispositivo. */
+const STORE = { db: null, uid: null, cache: {}, queue: {}, busy: {}, status: "local" };
+const docKey = k => k.replace(/[^A-Za-z0-9_\-.~:@+]/g, "_").slice(0, 190);
+async function initStore() {
+  if (!window.claude?.use) return;
+  try {
+    const [db, user] = await Promise.all([window.claude.use("db"), window.claude.use("user")]);
+    const uid = db && user ? await user.id() : null;
+    if (!uid) return;
+    const snap = await db.collection("data/users/" + uid).get();
+    snap.docs.forEach(d => { if (d.exists && d.data()) STORE.cache[d.id] = d.data().v; });
+    STORE.db = db; STORE.uid = uid; STORE.status = "cloud";
+    // Lo que ya estaba guardado solo en este navegador también sube a la cuenta.
+    try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k.startsWith("sinmiedo-") && !(docKey(k) in STORE.cache)) cloudPut(k, JSON.parse(localStorage.getItem(k))); } } catch (e) {}
+  } catch (e) { STORE.db = null; }
+}
+async function cloudPut(k, v) {
+  if (!STORE.db) return;
+  const id = docKey(k); STORE.cache[id] = v; STORE.queue[id] = v;
+  if (STORE.busy[id]) return;
+  STORE.busy[id] = true;
+  while (id in STORE.queue) {
+    const val = STORE.queue[id]; delete STORE.queue[id];
+    try { await STORE.db.collection("data/users/" + STORE.uid).doc(id).set({ v: val === undefined ? null : val, at: new Date().toISOString() }); STORE.status = "cloud"; }
+    catch (e) { STORE.status = e?.code === "quota_exceeded" ? "full" : "error"; }
+  }
+  STORE.busy[id] = false; renderSaved();
+}
+function renderSaved() { const el = document.getElementById("saved"); if (el) el.innerHTML = savedLabel(); }
+const savedLabel = () => `${icon("check", "ic")}${STORE.status === "cloud" ? "Progreso guardado en tu cuenta" : STORE.status === "local" ? "Progreso guardado en este dispositivo" : STORE.status === "full" ? "No hay más espacio para guardar" : "No se pudo guardar en la nube; quedó en este dispositivo"}`;
+const lsGet = (k, def) => {
+  const id = docKey(k);
+  if (STORE.db && id in STORE.cache) return STORE.cache[id] ?? def;
+  try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : def; } catch (e) { return def; }
+};
+const lsSet = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} cloudPut(k, v); };
+const lsDel = k => { try { localStorage.removeItem(k); } catch (e) {} if (STORE.db) { const id = docKey(k); delete STORE.cache[id]; STORE.db.collection("data/users/" + STORE.uid).doc(id).delete().catch(() => {}); } };
 const googleReady = () => cloudOn() || !!(AUTH_CFG.googleClientId && location.protocol.startsWith("http"));
 const validEmail = e => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e);
 let USER = null, SB = null, cloudTimer = null;
@@ -659,6 +700,7 @@ function startSession(user, state) {
   USER = user;
   S = Object.assign(fresh(), state || lsGet(keyFor(user.email), {}));
   if (!S.name) S.name = user.name || "";
+  if (Array.isArray(S.chat)) S.chat = S.chat.filter(m => !m.pending);
   lsSet(SESSION_KEY, { email: user.email, name: user.name });
   save();
 }
@@ -697,7 +739,7 @@ async function login(email, pw) {
 async function logout() {
   if (cloudOn() && SB) await SB.auth.signOut();
   USER = null; S = fresh();
-  try { localStorage.removeItem(SESSION_KEY); } catch (e) {}
+  lsDel(SESSION_KEY);
   go("landing");
 }
 async function cloudLoad(user) {
@@ -948,6 +990,7 @@ function shell() {
       ${logo()}
       ${NAV.map(([id, l, ic]) => `<button class="nav-i ${active === id ? "on" : ""}" data-go="${id}">${icon(ic)}${l}${id === "learn" && !allDone() ? `<span class="badge">${current() + 1}/6</span>` : ""}</button>`).join("")}
       <div class="side-foot">
+        <div class="saved" id="saved">${savedLabel()}</div>
         <button class="nav-i" data-act="map">${icon("map")}Mapa del prototipo</button>
         <div class="me"><div class="avatar" style="background:var(--mint);color:#062018">${esc(myName()[0].toUpperCase())}</div><div style="min-width:0"><b style="color:#fff">${esc(myName())}</b><div class="xs" style="color:var(--petrol-200);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(USER?.email || "")}</div></div></div>
         <button class="nav-i" data-act="logout" style="padding:8px 12px;font-size:13.5px">${icon("back")}Cerrar sesión</button>
@@ -1029,8 +1072,7 @@ function landing() {
 
     <section class="l-section" id="frenos">
       <div class="l-wrap">
-        <span class="eyebrow">Los 3 frenos</span>
-        <h2 style="margin-top:8px">Sabemos por qué todavía no invertiste</h2>
+        <h2>Sabemos por qué todavía no invertiste</h2>
         <p class="muted" style="margin-top:8px;max-width:60ch">Hablamos con chicos y chicas de 16 a 22 años. Estas son las tres cosas que más los frenan, y cómo las resolvemos.</p>
         <div class="frenos">${Object.values(FRENOS).map(f => `
           <article class="card hover freno">
@@ -1044,8 +1086,7 @@ function landing() {
 
     <section class="l-section" style="background:#fff;border-block:1px solid var(--line)">
       <div class="l-wrap">
-        <span class="eyebrow">Cómo funciona</span>
-        <h2 style="margin-top:8px">De cero a tu primera inversión, a tu ritmo</h2>
+        <h2>De cero a tu primera inversión, a tu ritmo</h2>
         <div class="steps">${[
           ["Aprendé", "6 niveles cortos, estilo juego. Cada palabra rara viene explicada."],
           ["Detectá estafas", "Pegá cualquier oferta que te llegue y mirá el semáforo."],
@@ -1101,7 +1142,7 @@ function home() {
     poca: ["Empezá por acá", "Con poco sí se puede", "Probá en el simulador con montos chicos, con plata virtual y precios reales.", "sim", "Ir al simulador"]
   }[S.freno || "miedo"];
   return `
-    <div class="page-h"><div><span class="eyebrow">Inicio</span><h1 style="margin-top:6px">Hola, ${esc(myName())}</h1>
+    <div class="page-h"><div><h1>Hola, ${esc(myName())}</h1>
       <p class="muted">${{ nunca: "Arrancás de cero, y está perfecto: vamos paso a paso.", poco: "Ya probaste algo. Ahora vamos a entenderlo bien.", si: "Ya invertiste: acá vas a hacerlo con más confianza." }[S.exp || "nunca"]}</p></div>
       <span class="sim-tag"><i></i>Modo práctica · plata virtual</span></div>
     <div class="grid dash">
@@ -1124,8 +1165,7 @@ function home() {
         <button class="btn" data-go="${allDone() ? "leap" : "lesson"}">${allDone() ? "Dar el salto" : "Seguir aprendiendo"} ${icon("arrow")}</button>
       </div>
       <div class="card hover span-3" style="border-color:#BFE6D1">
-        <span class="eyebrow">${focus[0]} · porque elegiste “${FRENOS[S.freno || "miedo"].short}”</span>
-        <h3 style="margin:10px 0 6px">${focus[1]}</h3><p class="small muted">${focus[2]}</p>
+        <h3 style="margin:0 0 6px">${focus[1]}</h3><p class="small muted">${focus[2]}</p>
         <button class="btn" style="margin-top:14px" data-go="${focus[3]}">${focus[4]}</button>
       </div>
       <div class="card span-6" style="background:var(--mint-50);border-color:#CDEBDB">
@@ -1138,7 +1178,7 @@ function home() {
 function learn() {
   return `
     ${learnHeader()}
-    <div class="page-h"><div><span class="eyebrow">Aprender</span><h1 style="margin-top:6px">Tu camino</h1><p class="muted">6 niveles cortos: ganá XP, juntá estrellas y desbloqueá insignias.</p></div>
+    <div class="page-h"><div><h1>Tu camino</h1></div>
       <div style="min-width:220px"><div class="between small"><b>${S.done.length} de 6 niveles</b><span class="muted">${Math.round(S.done.length / 6 * 100)}%</span></div><div class="bar" style="margin-top:8px"><span style="width:${S.done.length / 6 * 100}%"></span></div></div></div>
     <div class="card" style="padding:34px 40px">
       <div class="path">${LEVELS.map((l, i) => {
@@ -1219,7 +1259,7 @@ function verdict(ans) {
 function scam() {
   const r = V.scam;
   return `
-    <div class="page-h"><div><span class="eyebrow">Detector</span><h1 style="margin-top:6px">¿Es estafa?</h1><p class="muted">Pegá o contá la oferta que te llegó. Te mostramos las señales de alerta en un semáforo.</p></div></div>
+    <div class="page-h"><div><h1>¿Es estafa?</h1><p class="muted">Pegá o contá la oferta que te llegó. Te mostramos las señales de alerta en un semáforo.</p></div></div>
     <div class="card">
       <div class="field"><label for="scam-in">¿Qué te ofrecieron?</label>
         <textarea class="input" id="scam-in" rows="3" placeholder="Ej.: Me ofrecen 30% mensual garantizado por Instagram" style="resize:vertical">${esc(V.scamText || "")}</textarea></div>
@@ -1486,7 +1526,7 @@ function sim() {
   return `
     <div class="practice-strip">${icon("alert", "ic")}<b>MODO PRÁCTICA</b> · Plata virtual · ${MD.real ? `Precios reales de cierre del ${fmtDateLong(MD.asOf)}, no son cotizaciones en vivo` : "Precios simulados, no son cotizaciones en vivo"}</div>
     <div class="bk-head">
-      <div><span class="eyebrow">Simulador</span><h1 style="margin-top:4px">Tu broker de práctica</h1></div>
+      <div><h1>Tu broker de práctica</h1></div>
       <div class="bk-controls">
         <div class="mkt ${ms.open ? "open" : ""}"><i></i><div><b>Mercado ${ms.label}</b><span class="xs faint">Hoy ${ms.time} hs · Precios al cierre del ${fmtDate(MD.asOf)} · se actualizan cada día hábil</span></div></div>
         <label class="toggle small"><input type="checkbox" data-bk="explain" ${B.explain ? "checked" : ""}><span class="sw"></span>Modo explicado</label>
@@ -1815,7 +1855,73 @@ const ANSWERS = [
   { k: /cedear/i, a: `Un <b>CEDEAR</b> es un certificado que comprás en pesos y representa acciones de empresas de afuera, como Apple o Coca-Cola. Tiene <b>riesgo medio-alto</b>: se mueve con la empresa y con el dólar.` },
   { k: /fci|fondo/i, a: `Un <b>FCI</b> (fondo común de inversión) es como hacer una vaquita con otros: mucha gente junta su plata y un equipo profesional la invierte. Cada uno tiene “cuotapartes”, que son su porción del fondo.` }
 ];
-const ASK_SUGGEST = ["¿Qué es una acción?", "¿Cómo sé si algo es una estafa?", "¿Con $10.000 puedo invertir?"];
+const ASK_SUGGEST = ["¿Qué es una acción?", "¿Me conviene un plazo fijo o un FCI?", "¿Cómo sé si algo es una estafa?", "¿Qué es el dólar MEP?", "¿Con $10.000 puedo invertir?"];
+
+/* ---------- Asistente con IA ----------
+   En claude.ai la página pide respuestas a Claude (capacidad "sample"). Como archivo suelto o app de
+   escritorio no hay IA disponible y responde con las respuestas guardadas de ANSWERS. */
+let AI = null, aiCtl = null;
+const AI_RULES = `Sos el asistente de "Sin Miedo", una app educativa de LBO (un broker argentino) para que chicos y chicas de 16 a 22 años aprendan a invertir.
+
+Cómo respondés:
+- Respondé cualquier pregunta que te hagan, de cualquier tema, con claridad y buena onda. Si no es de finanzas, respondela igual y, si viene al caso, conectala con la plata o el ahorro.
+- Escribí en español rioplatense con voseo ("vos tenés", "fijate"), simple, sin palabras técnicas sin explicar. Si usás una, explicala con un ejemplo cotidiano.
+- Sé breve: hasta unas 140 palabras, salvo que pidan más detalle. Párrafos cortos. Podés usar **negrita** y listas con "- ". Nada de títulos ni tablas.
+- Usá ejemplos de Argentina cuando ayuden: pesos, inflación, plazo fijo, fondos comunes (FCI), Money Market, bonos, Lecaps, CEDEARs, acciones del Merval, dólar MEP, CNV.
+
+Reglas que nunca rompés:
+- Nunca prometas ganancias ni digas que una inversión es segura o garantizada. Cuando hables de invertir, mencioná el riesgo.
+- No des recomendaciones personales del tipo "comprá tal cosa". Explicá las opciones, para qué sirve cada una y sus riesgos, y sugerí decidir según para qué y para cuándo se necesita la plata.
+- No tenés datos en tiempo real: si te piden precios, cotizaciones o noticias de hoy, decilo y explicá dónde se pueden consultar.
+- No inventes datos de LBO (tasas, comisiones, productos, requisitos). Si te preguntan, decí que hay que consultarlo con LBO.
+- Si la persona es menor de 18, recordá que para abrir una cuenta real necesita a un adulto responsable.
+- Si una oferta suena a estafa (ganancias garantizadas, apuro, traer gente, no registrada en la CNV), avisalo claramente.
+- Si alguien cuenta que está en riesgo o pasándola muy mal, respondé con cuidado y sugerí hablar con un adulto de confianza o un profesional.`;
+
+async function initAI() {
+  if (!window.claude?.use) return;
+  try { AI = await window.claude.use("sample"); } catch (e) { AI = null; }
+  if (AI && V.page === "ask") render();
+}
+const plain = h => String(h).replace(/<li>/g, "\n- ").replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').trim();
+function mdLite(t) {
+  const inline = x => esc(x).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").replace(/(^|[\s(])\*(?!\s)(.+?)\*(?=[\s.,;:!?)]|$)/g, "$1<i>$2</i>");
+  const out = []; let list = null;
+  String(t).replace(/\r/g, "").split("\n").forEach(line => {
+    const m = line.match(/^\s*(?:[-•*]|\d+[.)])\s+(.*)$/);
+    if (m) { if (!list) { list = []; out.push(list); } list.push(inline(m[1])); return; }
+    list = null;
+    if (line.trim()) out.push(inline(line.replace(/^#+\s*/, "")));
+  });
+  return out.map(x => Array.isArray(x) ? `<ul>${x.map(i => `<li>${i}</li>`).join("")}</ul>` : `<p>${x}</p>`).join("");
+}
+const AI_ERR = {
+  rate_limited: "Hiciste muchas preguntas seguidas. Esperá un ratito y volvé a intentar.",
+  session_expired: "Tu sesión de Claude venció. Volvé a ingresar y probá de nuevo.",
+  refused: "Esa pregunta no la puedo responder. Probá preguntarla de otra forma.",
+  empty_completion: "No me salió una respuesta. Probá preguntarlo de otra forma.",
+  prompt_too_large: "La conversación quedó muy larga. Tocá “Empezar de nuevo” y volvé a preguntar."
+};
+async function askAI(q) {
+  const msg = { me: false, h: "", t: "", pending: true };
+  S.chat.push(msg); V.aiBusy = true; render(); scrollChat();
+  const hist = S.chat.slice(-13, -1).filter(m => (m.t || plain(m.h)).trim());
+  const turns = [{ role: "user", content: AI_RULES }, ...hist.map(m => ({ role: m.me ? "user" : "assistant", content: m.me ? m.h : (m.t || plain(m.h)) }))];
+  aiCtl = new AbortController();
+  try {
+    const { text, truncated } = await AI(turns, {
+      modelTier: "quick", cache: false, signal: aiCtl.signal,
+      onText: ({ text }) => { msg.t = text; msg.h = mdLite(text); const el = document.getElementById("ai-live"); if (el) { el.innerHTML = msg.h; scrollChat(); } }
+    });
+    msg.t = text; msg.h = mdLite(text) + (truncated ? `<p class="xs faint">La respuesta quedó cortada. Pedime que siga.</p>` : "");
+  } catch (e) {
+    const off = ["not_granted", "sampling_disabled", "not_declared", "capability_disabled", "capability_removed"].includes(e?.code);
+    if (off) { AI = null; msg.h = answerFor(q); msg.t = ""; }
+    else if (e?.code === "cancelled") { msg.t = e.text || ""; msg.h = e.text ? mdLite(e.text) : `<span class="faint">Respuesta detenida.</span>`; }
+    else { msg.t = e?.text || ""; msg.h = (e?.text ? mdLite(e.text) : "") + `<p class="small" style="color:var(--red)">${AI_ERR[e?.code] || "Se cortó la conexión. Volvé a intentar en un momento."}</p>`; }
+  }
+  delete msg.pending; V.aiBusy = false; aiCtl = null; save(); render(); scrollChat();
+}
 function ask() {
   if (!S.chat) S.chat = [
     { me: false, h: `¡Hola! Preguntame lo que quieras sobre inversiones. <b>Acá no hay preguntas tontas</b>, y nadie más ve lo que preguntás.` },
@@ -1823,13 +1929,14 @@ function ask() {
     { me: false, h: ANSWERS[0].a }
   ];
   return `
-    <div class="page-h"><div><span class="eyebrow">Asistente</span><h1 style="margin-top:6px">Preguntá sin vergüenza</h1><p class="muted">Lo que te da vergüenza preguntar en voz alta, preguntalo acá.</p></div></div>
+    <div class="page-h"><div><h1>Preguntá sin vergüenza</h1><p class="muted">${AI ? "Preguntá lo que quieras: te responde una IA, al toque." : "Lo que te da vergüenza preguntar en voz alta, preguntalo acá."}</p></div>
+      <div class="row">${AI ? `<span class="pill">${icon("sparkle", "ic")}IA conectada</span>` : `<span class="pill grey">Respuestas guardadas</span>`}${S.chat.length > 3 ? `<button class="btn ghost sm" data-act="chatReset">Empezar de nuevo</button>` : ""}</div></div>
     <div class="card chat-box">
-      <div class="chat-log" id="chat-log">${S.chat.map(m => `<div class="msg ${m.me ? "me" : "bot"}">${m.me ? esc(m.h) : m.h}</div>`).join("")}${V.typing ? `<div class="msg bot"><span class="typing"><i></i><i></i><i></i></span></div>` : ""}</div>
+      <div class="chat-log" id="chat-log">${S.chat.map(m => `<div class="msg ${m.me ? "me" : "bot"}"${m.pending ? ' id="ai-live"' : ""}>${m.me ? esc(m.h) : m.pending && !m.h ? `<span class="typing"><i></i><i></i><i></i></span>` : m.h}</div>`).join("")}${V.typing ? `<div class="msg bot"><span class="typing"><i></i><i></i><i></i></span></div>` : ""}</div>
       <div class="chat-in">
         <div class="row" style="flex-wrap:wrap;gap:8px">${ASK_SUGGEST.map(q => `<button class="chip" data-ask="${esc(q)}">${esc(q)}</button>`).join("")}</div>
-        <form class="row" id="ask-form"><input class="input" id="ask-in" placeholder="Escribí tu pregunta…" autocomplete="off" maxlength="200"><button class="btn" aria-label="Enviar">${icon("send")}</button></form>
-        <p class="xs faint">Respuestas educativas y generales. No son recomendaciones personales de inversión.</p>
+        <form class="row" id="ask-form"><input class="input" id="ask-in" placeholder="${AI ? "Preguntá lo que quieras…" : "Escribí tu pregunta…"}" autocomplete="off" maxlength="600" ${V.aiBusy ? "disabled" : ""}>${V.aiBusy ? `<button type="button" class="btn ghost" data-act="aiStop">Detener</button>` : `<button class="btn" aria-label="Enviar">${icon("send")}</button>`}</form>
+        <p class="xs faint">${AI ? "Responde una IA (Claude): puede equivocarse, así que chequeá lo importante. Son respuestas educativas, no recomendaciones de inversión." : "Respuestas educativas y generales. No son recomendaciones personales de inversión. Con IA: abrí la versión online."}</p>
       </div>
     </div>`;
 }
@@ -1851,8 +1958,7 @@ function leap() {
     </div>
     <div class="grid" style="grid-template-columns:1.3fr 1fr;margin-top:18px;align-items:start">
       <div class="card">
-        <span class="eyebrow">Tu primera inversión real</span>
-        <h2 style="margin-top:6px">Empezá con poco, en LBO</h2>
+        <h2>Empezá con poco, en LBO</h2>
         <p class="muted" style="margin-top:6px">Por ejemplo, con <b>$5.000</b> en una opción de riesgo bajo. Lo definís vos al abrir tu cuenta.</p>
         <div class="row" style="margin-top:18px;flex-wrap:wrap"><button class="btn lg" data-act="openAccount">Abrir mi cuenta en LBO ${icon("arrow")}</button><button class="btn lg ghost" data-go="sim">Seguir practicando</button></div>
         <p class="note" style="margin-top:16px">Invertir tiene riesgos. Antes de invertir, leé las condiciones de cada producto.</p>
@@ -2009,6 +2115,8 @@ document.addEventListener("click", e => {
     case "openAccount": modal(`<div class="medal" style="width:72px;height:72px">${icon("rocket")}</div><h2 style="text-align:center">Acá empieza tu cuenta en LBO</h2><p class="muted" style="text-align:center;margin:8px 0 18px">En el producto real, este botón lleva al alta de cuenta en LBO con el monto que elegiste. En el prototipo termina acá.</p><button class="btn block" data-act="closeModal">Entendido</button>`); break;
     case "minor": S.minor = el.checked; save(); render(); break;
     case "map": showMap(); break;
+    case "aiStop": aiCtl?.abort(); break;
+    case "chatReset": S.chat = null; save(); render(); break;
     case "reset": { const nm = S.name; S = fresh(); S.name = nm; save(); modal(""); go("diag", { step: 0 }); break; }
     case "demoPort": demoPortfolio(); modal(""); go("sim"); break;
   }
@@ -2043,7 +2151,7 @@ function gameClick(el) {
 }
 function bkClick(b, e) {
   const d = b.dataset, B = S.bk;
-  if (d.q) { e.stopPropagation(); const x = TERMS[d.q]; modal(`<span class="eyebrow">¿Qué es?</span><h2 style="margin-top:6px">${x[0]}</h2><p style="margin:10px 0;font-size:16px">${x[1]}</p><div class="callout" style="font-size:14px">Ejemplo: ${x[2]}</div><button class="btn block" style="margin-top:16px" data-act="closeModal">Entendido</button>`); return; }
+  if (d.q) { e.stopPropagation(); const x = TERMS[d.q]; modal(`<h2>${x[0]}</h2><p style="margin:10px 0;font-size:16px">${x[1]}</p><div class="callout" style="font-size:14px">Ejemplo: ${x[2]}</div><button class="btn block" style="margin-top:16px" data-act="closeModal">Entendido</button>`); return; }
   if (d.trade) { e.stopPropagation(); V.tk = newTicket(d.trade, d.side || "buy"); V.drawer = true; V.drIn = false; renderDrawer(); setTimeout(() => { V.drIn = true; document.querySelector(".drawer")?.classList.add("in"); document.querySelector(".drawer input, .drawer button")?.focus(); }, 20); return; }
   if (d.drclose) { closeDrawer(); return; }
   if (d.drgo) { closeDrawer(); B.view = d.drgo; V.sym = null; save(); render(); return; }
@@ -2083,7 +2191,8 @@ function finishLevel() {
 document.getElementById("modal").addEventListener("click", e => { if (e.target.closest("[data-go]")) modal(""); });
 
 function sendAsk(q) {
-  q = q.trim(); if (!q) return;
+  q = q.trim(); if (!q || V.aiBusy) return;
+  if (AI) { S.chat.push({ me: true, h: q }); askAI(q); return; }
   S.chat.push({ me: true, h: q }); V.typing = true; render(); scrollChat();
   setTimeout(() => { V.typing = false; S.chat.push({ me: false, h: answerFor(q) }); save(); render(); scrollChat(); }, 800);
 }
@@ -2150,10 +2259,13 @@ function jump(id) {
 }
 
 (async () => {
+  render();
+  await initStore();
   await initAuth();
   if (USER && S.bk) processNewDays();
   render();
   refreshMarketData();
+  initAI();
 })();
 </script>
 </body>
