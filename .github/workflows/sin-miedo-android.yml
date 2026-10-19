@@ -1,0 +1,75 @@
+# Arma la app de Sin Miedo para celulares Android (archivo .apk) con Capacitor.
+# Usa la versión para celular (celular/index.html), que se genera desde el prototipo con scripts/build_mobile.py.
+# Corre cuando cambia el prototipo o la versión para celular, o a mano desde la pestaña Actions ("Run workflow").
+# El resultado queda para descargar en la sección "Artifacts" de la ejecución.
+name: Sin Miedo para Android
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "prototipo/index.html"
+      - "celular/**"
+      - "scripts/build_mobile.py"
+      - ".github/workflows/sin-miedo-android.yml"
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - name: Generar la versión para celular
+        run: python3 scripts/build_mobile.py
+      - name: Armar el proyecto de Android
+        run: |
+          mkdir -p "$RUNNER_TEMP/app/www" && cd "$RUNNER_TEMP/app"
+          cp "$GITHUB_WORKSPACE/celular/index.html" www/index.html
+          npm init -y > /dev/null
+          npm install --no-audit --no-fund @capacitor/core@6.2.0 @capacitor/cli@6.2.0 @capacitor/android@6.2.0
+          cat > capacitor.config.json <<'JSON'
+          { "appId": "ar.sinmiedo.prototipo", "appName": "Sin Miedo", "webDir": "www", "android": { "backgroundColor": "#0B2A33" } }
+          JSON
+          npx cap add android
+          npx cap sync android
+      - name: Ícono de la app
+        run: |
+          cd "$RUNNER_TEMP/app/android/app/src/main/res"
+          for d in mdpi:48 hdpi:72 xhdpi:96 xxhdpi:144 xxxhdpi:192; do
+            dir="mipmap-${d%%:*}"; px="${d##*:}"
+            [ -d "$dir" ] || continue
+            convert "$GITHUB_WORKSPACE/desktop/icon.png" -resize "${px}x${px}" "$dir/ic_launcher.png"
+            convert "$GITHUB_WORKSPACE/desktop/icon.png" -resize "${px}x${px}" "$dir/ic_launcher_round.png"
+            fg=$((px * 108 / 48)); inner=$((fg * 62 / 100))
+            convert "$GITHUB_WORKSPACE/desktop/icon.png" -resize "${inner}x${inner}" -background none -gravity center -extent "${fg}x${fg}" "$dir/ic_launcher_foreground.png"
+          done
+          sed -i 's/#FFFFFF/#0B2A33/I' values/ic_launcher_background.xml 2>/dev/null || true
+      - name: Compilar el APK
+        run: |
+          cd "$RUNNER_TEMP/app/android"
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon -q
+          mkdir -p "$RUNNER_TEMP/out"
+          cp app/build/outputs/apk/debug/app-debug.apk "$RUNNER_TEMP/out/Sin-Miedo.apk"
+          cat > "$RUNNER_TEMP/out/LEEME.txt" <<'TXT'
+          Sin Miedo para Android (prototipo)
+
+          1. Pasá Sin-Miedo.apk al celular (por cable, Drive o mail).
+          2. Abrilo. Android te va a pedir permiso para instalar apps de esta fuente: aceptalo.
+             Aparece porque la app no viene de Google Play; es normal en un prototipo.
+          3. Abrí "Sin Miedo" desde la pantalla de inicio.
+
+          Con internet, el simulador trae cotizaciones de BYMA (pueden tener unos minutos de demora).
+          El progreso y las cuentas se guardan en el celular. Plata virtual: no es una plataforma real
+          ni una recomendación de inversión.
+          TXT
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Sin-Miedo-Android
+          path: ${{ runner.temp }}/out/

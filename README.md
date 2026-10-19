@@ -53,6 +53,14 @@ Para presentar, ver [PRESENTACION.md](PRESENTACION.md).
 - El botón "Hacerlo en LBO" no lleva a ningún lado todavía.
 - El contenido de las lecciones es un borrador: conviene que alguien de LBO lo revise antes de usarlo.
 
+## App para celular (Android)
+
+`celular/index.html` es la versión para celular en vertical: pestañas abajo, barra superior con la cuenta y todo en una columna. No se edita a mano: se genera desde el prototipo con `python3 scripts/build_mobile.py`, que le suma `celular/movil.css` y algunos ajustes táctiles (el workflow de datos la regenera cada día).
+
+- El workflow "Sin Miedo para Android" arma un `.apk` con Capacitor cada vez que cambia el prototipo o la versión para celular (o a mano con "Run workflow"). Se descarga desde "Artifacts" (Sin-Miedo-Android) y se instala en el celular aceptando instalar apps de esta fuente.
+- En la app, las cotizaciones en vivo, las cuentas y el progreso funcionan igual que en el escritorio. El asistente usa las respuestas guardadas (la IA solo está en claude.ai).
+- Para iPhone hace falta una cuenta de desarrollador de Apple; mientras tanto se puede abrir `celular/index.html` publicado en una web.
+
 ## App de escritorio (Windows)
 
 La carpeta `desktop/` convierte el **prototipo** (`prototipo/index.html`) en una app de escritorio con [Electron](https://www.electronjs.org/).
