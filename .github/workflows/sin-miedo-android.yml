@@ -40,16 +40,26 @@ jobs:
           npx cap sync android
       - name: Ícono de la app
         run: |
-          cd "$RUNNER_TEMP/app/android/app/src/main/res"
-          for d in mdpi:48 hdpi:72 xhdpi:96 xxhdpi:144 xxxhdpi:192; do
-            dir="mipmap-${d%%:*}"; px="${d##*:}"
-            [ -d "$dir" ] || continue
-            convert "$GITHUB_WORKSPACE/desktop/icon.png" -resize "${px}x${px}" "$dir/ic_launcher.png"
-            convert "$GITHUB_WORKSPACE/desktop/icon.png" -resize "${px}x${px}" "$dir/ic_launcher_round.png"
-            fg=$((px * 108 / 48)); inner=$((fg * 62 / 100))
-            convert "$GITHUB_WORKSPACE/desktop/icon.png" -resize "${inner}x${inner}" -background none -gravity center -extent "${fg}x${fg}" "$dir/ic_launcher_foreground.png"
-          done
-          sed -i 's/#FFFFFF/#0B2A33/I' values/ic_launcher_background.xml 2>/dev/null || true
+          pip install --quiet pillow
+          python3 - "$GITHUB_WORKSPACE/desktop/icon.png" "$RUNNER_TEMP/app/android/app/src/main/res" <<'PY'
+          import sys, pathlib
+          from PIL import Image
+          src = Image.open(sys.argv[1]).convert("RGBA"); res = pathlib.Path(sys.argv[2])
+          for name, px in {"mdpi": 48, "hdpi": 72, "xhdpi": 96, "xxhdpi": 144, "xxxhdpi": 192}.items():
+              d = res / f"mipmap-{name}"
+              if not d.is_dir():
+                  continue
+              icon = src.resize((px, px), Image.LANCZOS)
+              icon.save(d / "ic_launcher.png"); icon.save(d / "ic_launcher_round.png")
+              fg = px * 108 // 48; inner = fg * 62 // 100
+              canvas = Image.new("RGBA", (fg, fg), (0, 0, 0, 0))
+              canvas.paste(src.resize((inner, inner), Image.LANCZOS), ((fg - inner) // 2, (fg - inner) // 2))
+              canvas.save(d / "ic_launcher_foreground.png")
+          bg = res / "values" / "ic_launcher_background.xml"
+          if bg.exists():
+              bg.write_text(bg.read_text().replace("#FFFFFF", "#0B2A33").replace("#ffffff", "#0B2A33"))
+          print("íconos listos")
+          PY
       - name: Compilar el APK
         run: |
           cd "$RUNNER_TEMP/app/android"
