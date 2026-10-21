@@ -471,6 +471,41 @@
   .map-grid button:hover { border-color: var(--mint); background: var(--mint-50); }
   .map-grid b { color: var(--ink-3); margin-right: 6px; }
 
+  .shell.norail { grid-template-columns: 252px minmax(0, 1fr); }
+  /* Inicio: el próximo paso y el camino son lo principal */
+  .next-hero { display: flex; align-items: center; gap: 22px; background: linear-gradient(135deg, var(--petrol-800), var(--petrol-700)); color: #fff; border-radius: 20px; padding: 26px 28px; margin-bottom: 18px; }
+  .next-hero h2 { color: #fff; font-size: 26px; margin-top: 4px; } .next-hero p { color: #B9D3D5; margin-top: 4px; }
+  .nh-ic { width: 64px; height: 64px; border-radius: 18px; background: rgba(43,182,115,.18); color: #7EE2AE; display: grid; place-items: center; flex: none; }
+  .nh-ic .ic { width: 30px; height: 30px; }
+  .nh-lab { font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: #7EE2AE; }
+  .home-grid { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+  .steps-list { display: flex; flex-direction: column; gap: 8px; }
+  .step-i { display: flex; align-items: center; gap: 14px; width: 100%; text-align: left; background: #fff; border: 1.5px solid var(--line); border-radius: 14px; padding: 12px 14px; transition: border-color .15s, background .15s; }
+  .step-i:hover:not(:disabled) { border-color: var(--mint); background: var(--mint-50); }
+  .step-i > .ic { color: var(--ink-3); width: 18px; height: 18px; }
+  .st-n { width: 32px; height: 32px; border-radius: 50%; background: #EEF3F2; color: var(--ink-2); display: grid; place-items: center; font-weight: 800; flex: none; }
+  .st-n .ic { width: 18px; height: 18px; }
+  .st-t { flex: 1; min-width: 0; } .st-t b { display: block; } .st-t span { font-size: 13px; color: var(--ink-3); }
+  .step-i.done { background: #F6F9F8; } .step-i.done .st-n { background: var(--mint); color: #fff; } .step-i.done b { color: var(--ink-2); }
+  .step-i.cur { border-color: var(--mint); box-shadow: 0 0 0 3px rgba(43,182,115,.15); } .step-i.cur .st-n { background: var(--petrol-800); color: #fff; } .step-i.cur > .ic { color: var(--mint-600); }
+  .step-i.lock { opacity: .6; cursor: not-allowed; }
+  .mini-c { display: flex; flex-direction: column; gap: 4px; text-align: left; width: 100%; cursor: pointer; transition: border-color .15s, box-shadow .15s; }
+  button.mini-c:hover { border-color: #c5d6d4; box-shadow: var(--shadow-lg); }
+  .mini-c .ic { width: 18px; height: 18px; vertical-align: -3px; }
+  /* Bienvenida */
+  .welcome { min-height: 100%; background: var(--bg); }
+  .welcome h1 { margin: 10px 0 22px; font-size: 34px; }
+  .welcome .logo { color: var(--ink); } .welcome .logo small { color: var(--ink-3); }
+  .btn.on-dark { background: transparent; color: #fff; border: 1.5px solid rgba(255,255,255,.35); }
+  .btn.on-dark:hover { background: rgba(255,255,255,.08); box-shadow: none; }
+  .wl-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; }
+  .wl-i { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 6px; }
+  .wl-i b { font-size: 16px; margin-top: 6px; } .wl-i span { font-size: 13.5px; color: var(--ink-2); }
+  .wl-start { display: flex; align-items: center; gap: 24px; margin-top: 20px; background: linear-gradient(135deg, var(--petrol-800), var(--petrol-700)); color: #fff; border-radius: 20px; padding: 26px 28px; }
+  .wl-start h2 { color: #fff; font-size: 24px; }
+  /* Ranking */
+  .rank-t td { vertical-align: middle; } .ex-row td { color: var(--ink-3); background: #FAFCFB; } .ex-row b { color: var(--ink-2); }
+  @media (max-width: 1000px) { .home-grid { grid-template-columns: minmax(0, 1fr); } .wl-grid { grid-template-columns: 1fr 1fr; } .next-hero, .wl-start { flex-wrap: wrap; } }
   @media (max-width: 1240px) { .shell { grid-template-columns: 232px minmax(0, 1fr); } .rail { display: none; } }
   @media (max-width: 1000px) { .l-hero-in, .frenos, .steps { grid-template-columns: 1fr; } .preview { display: none; } .opt4, .opts { grid-template-columns: 1fr; } }
   .m-top { display: none; }
@@ -754,11 +789,11 @@ const icon = (n, cls = "ic") => `<svg class="${cls}" viewBox="0 0 24 24" fill="n
    ================================================================= */
 const fresh = () => ({
   name: "", exp: null, freno: null, started: false,
-  done: [0, 1], streak: 5, scams: 0, minor: false,
-  chat: null, xp: 120, stars: { 0: 3, 1: 2 }, micro: {}, xpDay: null, chest: false
+  done: [], streak: 1, scams: 0, minor: false,
+  chat: null, xp: 0, stars: {}, micro: {}, xpDay: null, chest: false
 });
 let S = fresh();
-const save = () => { if (!USER) return; lsSet(keyFor(USER.email), S); cloudSave(); };
+const save = () => { if (!USER) return; lsSet(keyFor(USER.email), S); cloudSave(); if (typeof publishRank === "function") publishRank(); };
 let V = { page: "landing" };
 
 const money = n => "$" + Math.round(n).toLocaleString("es-AR");
@@ -834,6 +869,9 @@ function startSession(user, state) {
   S = Object.assign(fresh(), state || lsGet(keyFor(user.email), {}));
   if (!S.name) S.name = user.name || "";
   if (Array.isArray(S.chat)) S.chat = S.chat.filter(m => !m.pending);
+  // Racha real: suma un día si entraste ayer, se reinicia si pasó más de un día.
+  const hoy = new Date().toISOString().slice(0, 10), ayer = new Date(Date.now() - 864e5).toISOString().slice(0, 10);
+  if (S.lastDay !== hoy) { S.streak = S.lastDay === ayer ? (S.streak || 0) + 1 : 1; S.lastDay = hoy; }
   lsSet(SESSION_KEY, { email: user.email, name: user.name });
   save();
 }
@@ -957,6 +995,44 @@ function googleDemoCard() {
   </form>`;
 }
 
+function resetCard() {
+  const pwStep = V.resetStep === "pw";
+  return `<form class="card auth-card" id="reset-form" novalidate>
+    <h2>Recuperar tu contraseña</h2>
+    ${pwStep ? `<p class="small muted">Cuenta: <b>${esc(V.resetEmail)}</b></p>
+      <div class="callout amber" style="font-size:13.5px">En la app real te mandamos un link a tu email para crear una contraseña nueva. En este prototipo la creás directamente acá.</div>
+      <div class="field"><label for="rs-pw">Contraseña nueva</label><input class="input" id="rs-pw" type="password" autocomplete="new-password" placeholder="Al menos 8 caracteres"></div>
+      <div class="field"><label for="rs-pw2">Repetila</label><input class="input" id="rs-pw2" type="password" autocomplete="new-password"></div>`
+    : `<p class="small muted">Escribí el email con el que creaste tu cuenta.</p>
+      <div class="field"><label for="rs-email">Email</label><input class="input" id="rs-email" type="email" autocomplete="email" placeholder="tu@email.com" value="${esc(V.authEmail || "")}"></div>`}
+    <div id="auth-msg" aria-live="polite"></div>
+    <button class="btn block lg" type="submit">${pwStep ? "Guardar y entrar" : cloudOn() ? "Mandarme el link" : "Seguir"} ${icon("arrow")}</button>
+    <button type="button" class="link small" style="align-self:center" data-auth="login">Volver a ingresar</button>
+  </form>`;
+}
+async function submitReset() {
+  if (V.resetStep === "pw") {
+    const a = document.getElementById("rs-pw").value, b = document.getElementById("rs-pw2").value;
+    if (a.length < 8) return authMsg("La contraseña tiene que tener al menos 8 caracteres.");
+    if (a !== b) return authMsg("Las dos contraseñas no coinciden.");
+    const accs = lsGet(ACCOUNTS_KEY, {}), em = V.resetEmail;
+    accs[em].pw = await hashPw(em, a); lsSet(ACCOUNTS_KEY, accs);
+    startSession({ email: em, name: accs[em].name }); V.resetStep = null;
+    go(S.started ? "home" : "diag", { step: 0 }); toast("Listo: cambiaste tu contraseña.");
+    return;
+  }
+  const em = document.getElementById("rs-email").value.trim().toLowerCase();
+  if (!validEmail(em)) return authMsg("Revisá el email: parece que tiene un error.");
+  if (cloudOn()) {
+    const { error } = await SB.auth.resetPasswordForEmail(em, { redirectTo: location.href.split("#")[0] });
+    return authMsg(error ? error.message : "OK:Si hay una cuenta con ese email, te llega un link para crear una contraseña nueva. Revisá también el correo no deseado.");
+  }
+  const acc = lsGet(ACCOUNTS_KEY, {})[em];
+  if (!acc) return authMsg("No encontramos una cuenta con ese email en este dispositivo. ¿La creaste con otro email?");
+  if (!acc.pw) return authMsg("Esa cuenta se creó con Google, así que no tiene contraseña. Volvé y tocá “Continuar con Google”.");
+  V.resetEmail = em; V.resetStep = "pw"; render();
+}
+
 function authPage() {
   const signupMode = V.mode !== "login";
   return `<div class="auth">
@@ -967,15 +1043,17 @@ function authPage() {
       <div class="stack" style="gap:12px;margin-top:26px">${[["learn", "Aprendé a tu ritmo, con niveles y desafíos"], ["sim", "Practicá con $1.000.000 virtuales y precios reales"], ["shield", "Detectá estafas antes de caer en una"]].map(([ic, l]) => `<div class="row">${icon(ic)}<span>${l}</span></div>`).join("")}</div>
     </div>
     <div class="auth-main">
-      ${V.gdemo ? googleDemoCard() : `<form class="card auth-card" id="auth-form" novalidate>
+      ${V.gdemo ? googleDemoCard() : V.mode === "reset" ? resetCard() : `<form class="card auth-card" id="auth-form" novalidate>
         <div class="tabs full" style="margin-bottom:8px"><button type="button" class="${signupMode ? "on" : ""}" data-auth="signup">Crear cuenta</button><button type="button" class="${signupMode ? "" : "on"}" data-auth="login">Ingresar</button></div>
         <button type="button" class="btn-google" data-auth="google">${G_LOGO}Continuar con Google</button>
         <p class="xs faint" style="text-align:center;margin-top:-6px">Al continuar con Google aceptás los términos y la política de privacidad <span class="placeholder" style="padding:1px 6px">a completar</span></p>
         <div class="or-sep"><span>o con tu email</span></div>
+        ${signupMode ? "" : `<p class="small muted">Entrás con el <b>email</b> y la <b>contraseña</b> con los que creaste tu cuenta, o con Google. Tu nombre solo lo usamos para saludarte.</p>`}
         ${signupMode ? `<div class="field"><label for="au-name">¿Cómo te llamás?</label><input class="input" id="au-name" autocomplete="given-name" maxlength="30" placeholder="Tu nombre o apodo"></div>` : ""}
         <div class="field"><label for="au-email">Email</label><input class="input" id="au-email" type="email" autocomplete="email" placeholder="tu@email.com" value="${esc(V.authEmail || "")}"></div>
         <div class="field"><label for="au-pw">Contraseña</label><input class="input" id="au-pw" type="password" autocomplete="${signupMode ? "new-password" : "current-password"}" placeholder="${signupMode ? "Al menos 8 caracteres" : "Tu contraseña"}"></div>
         ${signupMode ? `<label class="row small" style="align-items:flex-start;gap:10px;cursor:pointer"><input type="checkbox" id="au-terms" style="margin-top:3px;accent-color:var(--mint)"><span class="muted">Acepto los términos y la política de privacidad <span class="placeholder" style="padding:1px 6px">a completar</span></span></label>` : ""}
+        ${signupMode ? "" : `<button type="button" class="link small" style="align-self:flex-end;margin-top:-6px" data-auth="reset">¿Te olvidaste la contraseña?</button>`}
         <div id="auth-msg" aria-live="polite"></div>
         <button class="btn block lg" type="submit" id="auth-submit">${signupMode ? "Crear mi cuenta" : "Ingresar"} ${icon("arrow")}</button>
         <p class="xs faint" style="text-align:center">${cloudOn() ? "Tu cuenta y tu progreso se guardan de forma segura." : "Prototipo: las cuentas y el progreso se guardan en este dispositivo y navegador."}</p>
@@ -1095,6 +1173,7 @@ function render() {
   if (V.page === "landing") root.innerHTML = landing();
   else if (V.page === "auth") root.innerHTML = authPage();
   else if (V.page === "diag") root.innerHTML = diag();
+  else if (V.page === "welcome") root.innerHTML = welcome();
   else root.innerHTML = shell();
   hideTip();
   mountCharts();
@@ -1104,7 +1183,7 @@ function render() {
 
 const NAV = [
   ["home", "Inicio", "home"], ["learn", "Aprender", "learn"], ["sim", "Simulador", "sim"],
-  ["scam", "¿Es estafa?", "shield"], ["ask", "Preguntá", "chat"]
+  ["scam", "Detector de estafas", "shield"], ["ask", "Preguntá", "chat"], ["rank", "Ranking", "league"]
 ];
 const NAV_OF = { lesson: "learn", leap: "learn" };
 
@@ -1116,9 +1195,10 @@ function logo(light = true) {
 
 function shell() {
   const active = NAV_OF[V.page] || V.page;
-  const pages = { home, learn, lesson, sim, scam, ask, leap };
+  const pages = { home, learn, lesson, sim, scam, ask, leap, rank };
   const wide = V.page === "sim";
-  return `<div class="shell ${wide ? "wide" : ""}">
+  const norail = V.page === "home";
+  return `<div class="shell ${wide ? "wide" : ""} ${norail ? "norail" : ""}">
     <header class="m-top">${logo()}<button class="m-me" data-act="mmenu" aria-label="Tu cuenta y opciones">${esc(myName())}<span class="avatar" style="background:var(--mint);color:#062018">${esc(myName()[0].toUpperCase())}</span></button></header>
     <aside class="side">
       ${logo()}
@@ -1131,7 +1211,7 @@ function shell() {
       </div>
     </aside>
     <main class="main"><div class="main-in">${(pages[V.page] || home)()}</div></main>
-    ${wide ? "" : rail()}
+    ${wide || norail ? "" : rail()}
   </div>`;
 }
 
@@ -1142,12 +1222,7 @@ function ringSvg(frac, size = 84) {
 
 function rail() {
   const dn = S.done.length;
-  const todos = [
-    { t: `Terminar el nivel ${current() + 1}`, done: allDone(), go: allDone() ? "learn" : "lesson" },
-    { t: "Revisar una oferta en el detector", done: S.scams > 0, go: "scam" },
-    { t: "Armar tu cartera de práctica", done: !!S.simTouched, go: "sim" },
-    { t: "Dar el salto", done: false, go: allDone() ? "leap" : "learn" }
-  ];
+  const nx = nextStep();
   return `<aside class="rail">
     <section>
       <h4>Tu progreso</h4>
@@ -1156,12 +1231,12 @@ function rail() {
     </section>
     <section>
       <h4>Racha</h4>
-      <div class="row"><span style="color:#F27B1A">${icon("flame", "ic")}</span><b style="font-size:20px">${S.streak} días seguidos</b></div>
+      <div class="row"><span style="color:#F27B1A">${icon("flame", "ic")}</span><b style="font-size:20px">${S.streak} ${S.streak === 1 ? "día seguido" : "días seguidos"}</b></div>
       <div class="streak-days">${["L", "M", "M", "J", "V", "S", "D"].map((d, k) => `<div class="${k < S.streak ? "on" : ""}"><i></i>${d}</div>`).join("")}</div>
     </section>
     <section>
-      <h4>Próximos pasos</h4>
-      <div class="stack" style="gap:8px">${todos.map(x => `<button class="todo ${x.done ? "done" : ""}" data-go="${x.go}"><span class="chk">${x.done ? icon("check", "ic") : ""}</span><span class="t small">${x.t}</span></button>`).join("")}</div>
+      <h4>Tu próximo paso</h4>
+      ${nx ? `<button class="todo" data-step="${nx.id}"><span class="chk"></span><span class="t small"><b>${nx.t}</b><span class="xs faint" style="display:block">${nx.d}</span></span></button>` : `<p class="small muted">¡Hiciste todo el camino!</p>`}
     </section>
     ${S.bk ? (() => { const p = perfStats(); return `<section>
       <h4>Tu nivel de inversor</h4>
@@ -1268,45 +1343,158 @@ function diag() {
 }
 
 /* ---------- 3. Inicio ---------- */
+/* El camino de pasos: lo primero que ve cada persona al entrar, para saber por dónde seguir. */
+function journey() {
+  const bought = !!S.bk?.orders?.some(o => o.status === "Ejecutada");
+  return [
+    { id: "l1", t: "Hacé el nivel 1", d: "Por qué la plata guardada pierde valor · 3 minutos", done: S.done.includes(0), ic: "learn", cta: "Empezar el nivel 1" },
+    { id: "buy", t: "Hacé tu primera compra de práctica", d: "Tenés $1.000.000 virtuales y precios reales", done: bought, ic: "sim", cta: "Ir al simulador" },
+    { id: "scam", t: "Revisá una oferta en el detector de estafas", d: "Pegá un mensaje que te llegó y mirá el semáforo", done: S.scams > 0, ic: "shield", cta: "Abrir el detector" },
+    { id: "ask", t: "Hacé una pregunta sin vergüenza", d: "Lo que quieras: te respondemos en criollo", done: !!S.asked, ic: "chat", cta: "Hacer una pregunta" },
+    { id: "all", t: "Completá los 6 niveles", d: `Vas ${S.done.length} de 6 · cada uno dura 3 o 4 minutos`, done: allDone(), ic: "star", cta: `Seguir con el nivel ${current() + 1}` },
+    { id: "leap", t: "Dá el salto", d: "Tu primera inversión real en LBO, arrancando con poco", done: false, ic: "rocket", cta: "Dar el salto", lock: !allDone() }
+  ];
+}
+const nextStep = () => journey().find(x => !x.done && !x.lock) || null;
+function goStep(id) {
+  if (id === "rank") V.rank = null;
+  if (id === "l1") return go("lesson", { lvl: 0, step: 0 });
+  if (id === "all") return go("lesson", { lvl: current(), step: 0 });
+  if (id === "buy") { ensureBk(); return go("sim"); }
+  if (id === "leap") return go(allDone() ? "leap" : "learn");
+  go(id);
+}
 function home() {
-  const lv = LEVELS[current()], perf = S.bk ? perfStats() : null;
-  const focus = {
-    miedo: ["Empezá por acá", "Las palabras raras, traducidas", "Tocá cualquier palabra subrayada o preguntale al asistente sin vergüenza.", "ask", "Preguntá sin vergüenza"],
-    estafa: ["Empezá por acá", "¿Te llegó una oferta rara?", "Pegala en el detector y mirá el semáforo. Además, el nivel 3 te enseña a reconocerlas.", "scam", "Abrir el detector"],
-    poca: ["Empezá por acá", "Con poco sí se puede", "Probá en el simulador con montos chicos, con plata virtual y precios reales.", "sim", "Ir al simulador"]
-  }[S.freno || "miedo"];
+  const steps = journey(), nx = nextStep(), done = steps.filter(x => x.done).length, perf = S.bk ? perfStats() : null;
+  const me = rankMe();
   return `
-    <div class="page-h"><div><h1>Hola, ${esc(myName())}</h1>
-</div>
-      <span class="sim-tag"><i></i>Modo práctica · plata virtual</span></div>
-    <div class="grid dash">
-      <div class="card goal-hero span-4">
-        <div class="between"><span></span><button class="link" style="color:#7EE2AE" data-go="sim">Ir al simulador</button></div>
-        ${perf ? `<div class="row" style="margin:16px 0 18px;gap:16px"><div class="icon-box" style="background:rgba(43,182,115,.18);color:#7EE2AE;width:56px;height:56px">${icon("sim")}</div>
-          <div><h2 style="color:#fff">${m2(totalValue())}</h2><p class="muted">Valor de tu cartera virtual · ${perf.days ? `${pc2(perf.ret)} en ${perf.days} ${perf.days === 1 ? "día" : "días"} de mercado real` : "se actualiza cada día hábil"}</p></div>
-          <div style="margin-left:auto;text-align:right"><div class="big-num">${perf.days ? perf.score : "—"}</div><span class="xs" style="color:#9FC3C6">${perf.days ? perf.tier : "Se calcula mañana"}</span></div></div>`
-        : `<div class="row" style="margin:16px 0 18px;gap:16px"><div class="icon-box" style="background:rgba(43,182,115,.18);color:#7EE2AE;width:56px;height:56px">${icon("sim")}</div>
-          <div><h2 style="color:#fff">$1.000.000 virtuales te esperan</h2><p class="muted">Comprá y vendé con precios reales de cierre y mirá qué tan buen inversor sos.</p></div></div>`}
-        <p class="xs" style="color:#9FC3C6">Plata virtual · precios reales de cierre de BYMA</p>
+    <div class="page-h"><div><h1>Hola, ${esc(myName())}</h1></div><span class="sim-tag"><i></i>Plata virtual</span></div>
+    ${nx ? `<div class="next-hero">
+      <div class="nh-ic">${icon(nx.ic)}</div>
+      <div style="flex:1;min-width:0"><span class="nh-lab">Tu próximo paso</span><h2>${nx.t}</h2><p>${nx.d}</p></div>
+      <button class="btn lg" data-step="${nx.id}">${nx.cta} ${icon("arrow")}</button>
+    </div>` : `<div class="next-hero"><div class="nh-ic">${icon("star")}</div><div style="flex:1"><span class="nh-lab">Camino completo</span><h2>¡Hiciste todos los pasos!</h2><p>Seguí practicando y mirá cómo te va en el ranking.</p></div><button class="btn lg" data-go="rank">Ver el ranking ${icon("arrow")}</button></div>`}
+    <div class="home-grid">
+      <div class="card">
+        <div class="between" style="margin-bottom:14px"><h3>Tu camino</h3><span class="small muted"><b>${done} de ${steps.length}</b> pasos</span></div>
+        <div class="bar" style="margin-bottom:16px"><span style="width:${done / steps.length * 100}%"></span></div>
+        <div class="steps-list">${steps.map((x, k) => `<button class="step-i ${x.done ? "done" : nx && nx.id === x.id ? "cur" : ""} ${x.lock ? "lock" : ""}" data-step="${x.id}" ${x.lock ? "disabled" : ""}>
+          <span class="st-n">${x.done ? icon("check", "ic") : k + 1}</span>
+          <span class="st-t"><b>${x.t}</b><span>${x.done ? "Hecho" : x.lock ? "Se desbloquea cuando completes los 6 niveles" : x.d}</span></span>
+          ${x.done || x.lock ? "" : icon("arrow", "ic")}</button>`).join("")}</div>
       </div>
-      <div class="card span-2" style="display:flex;flex-direction:column;justify-content:space-between">
-        <div style="color:#F27B1A">${icon("flame")}</div>
-        <div><div class="big-num">${S.streak} días de racha</div><p class="small muted">Entrá mañana para llegar a ${S.streak + 1}.</p></div>
-      </div>
-      <div class="card hover span-3">
-        <div class="row" style="margin:0 0 14px"><div class="icon-box">${icon(allDone() ? "star" : "play")}</div><div><b>${allDone() ? "¡Terminaste los 6 niveles!" : `Nivel ${current() + 1}: ${esc(lv.title)}`}</b><p class="small muted">${allDone() ? "Te espera el último paso." : `${lv.min} minutos · 3 tarjetas y 1 pregunta`}</p></div></div>
-        <button class="btn" data-go="${allDone() ? "leap" : "lesson"}">${allDone() ? "Dar el salto" : "Seguir aprendiendo"} ${icon("arrow")}</button>
-      </div>
-      <div class="card hover span-3" style="border-color:#BFE6D1">
-        <h3 style="margin:0 0 6px">${focus[1]}</h3><p class="small muted">${focus[2]}</p>
-        <button class="btn" style="margin-top:14px" data-go="${focus[3]}">${focus[4]}</button>
-      </div>
-      <div class="card span-6" style="background:var(--mint-50);border-color:#CDEBDB">
-        <div class="row" style="gap:14px"><div class="icon-box" style="background:#fff">${icon("bulb")}</div><div><p>${TIPS[(new Date().getDate()) % TIPS.length]}</p></div></div>
+      <div class="stack" style="gap:14px">
+        <button class="card mini-c" data-go="sim">
+          <span class="small muted">Tu cartera de práctica</span>
+          ${perf ? `<b class="big-num num" style="font-size:24px">${m2(totalValue())}</b><span class="small ${perf.ret >= 0 ? "up" : "down"}">${pc2(perf.ret)} desde que empezaste</span>` : `<b style="font-size:17px">$1.000.000 virtuales</b><span class="small muted">Todavía no hiciste tu primera compra</span>`}
+        </button>
+        <button class="card mini-c" data-go="rank">
+          <span class="small muted">Ranking</span>
+          ${me ? `<b style="font-size:20px">Estás ${me.pos}° de ${me.of}</b>` : `<b style="font-size:17px">${S.bk ? "Mirá en qué puesto estás" : "Comprá algo para entrar"}</b>`}
+          <span class="small muted">Gana quien mejor le va con su cartera</span>
+        </button>
+        <div class="card mini-c" style="cursor:default"><span class="small muted">Racha</span><b style="font-size:20px"><span style="color:#F27B1A">${icon("flame", "ic")}</span> ${S.streak} ${S.streak === 1 ? "día seguido" : "días seguidos"}</b><span class="small muted">Entrá mañana para llegar a ${S.streak + 1}</span></div>
       </div>
     </div>`;
 }
 
+/* ---------- Bienvenida: qué se puede hacer y por dónde arrancar ---------- */
+function welcome() {
+  const first = { miedo: "l1", estafa: "scam", poca: "buy" }[S.freno || "miedo"];
+  const st = journey().find(x => x.id === first);
+  const why = { miedo: "Como nos dijiste que te da miedo no entender, arrancá por lo básico:", estafa: "Como te preocupa caer en una estafa, arrancá por el detector:", poca: "Como pensás que con poca plata no vale la pena, probalo vos con plata virtual:" }[S.freno || "miedo"];
+  return `<div class="welcome">
+    <div class="l-wrap" style="max-width:960px">
+      <nav class="l-nav">${logo()}</nav>
+      <h1>¡Listo, ${esc(myName())}! Esto es lo que podés hacer</h1>
+      <div class="wl-grid">${[
+        ["learn", "Aprender", "6 niveles de 3 minutos, como un juego. Ganás puntos y estrellas.", "learn"],
+        ["sim", "Practicar", "Un simulador con $1.000.000 virtuales y precios reales de la bolsa.", "sim"],
+        ["shield", "Detectar estafas", "Pegás una oferta que te llegó y te decimos qué señales de alerta tiene.", "scam"],
+        ["chat", "Preguntar", "Lo que te da vergüenza preguntar en voz alta. Sin preguntas tontas.", "ask"],
+        ["league", "Competir", "Un ranking con quienes mejor manejan su cartera de práctica.", "rank"]
+      ].map(([ic, h, p]) => `<div class="wl-i"><div class="icon-box">${icon(ic)}</div><b>${h}</b><span>${p}</span></div>`).join("")}</div>
+      <div class="wl-start">
+        <div style="flex:1;min-width:0"><span class="nh-lab">Por dónde arrancar</span><p style="margin-top:4px">${why}</p><h2 style="margin-top:6px">${st.t}</h2><p class="small" style="color:#B9D3D5;margin-top:4px">${st.d}</p></div>
+        <div class="stack" style="gap:8px;min-width:220px"><button class="btn lg" data-act="welcomeGo" data-first="${first}">${st.cta} ${icon("arrow")}</button><button class="btn lg on-dark" data-act="welcomeHome">Ver el inicio</button></div>
+      </div>
+      <p class="small muted" style="margin:18px 0 40px">En el inicio siempre vas a ver tu próximo paso. Todo es con plata virtual: nada de lo que hagas acá mueve plata real.</p>
+    </div>
+  </div>`;
+}
+
+/* ---------- Ranking ----------
+   En claude.ai cada persona publica su resultado en la colección compartida "ranking" (solo puede escribir
+   el suyo) y todos ven la tabla. Como archivo o app se arma con las cuentas creadas en este dispositivo. */
+const rankName = () => { const n = (S.name || "").trim().split(/\s+/); return (n[0] || "Inversor").slice(0, 20) + (n[1] ? " " + n[1][0].toUpperCase() + "." : ""); };
+function myEntry() {
+  if (!S.bk || !S.bk.orders?.some(o => o.status === "Ejecutada")) return null;
+  const p = perfStats();
+  return { name: rankName(), ret: Math.round(p.ret * 1e5) / 1e5, score: p.days ? p.score : null, tier: p.tier, days: p.days };
+}
+let rankTimer = null, rankLast = "";
+function publishRank() {
+  clearTimeout(rankTimer);
+  rankTimer = setTimeout(async () => {
+    if (!STORE.db || !USER) return;
+    const ref = STORE.db.doc("ranking/" + STORE.uid), e = S.rankOff ? null : myEntry(), key = JSON.stringify(e);
+    if (key === rankLast) return;
+    rankLast = key;
+    try { if (e) await ref.set({ ...e, at: new Date().toISOString() }); else await ref.delete(); } catch (err) { rankLast = ""; }
+  }, 2500);
+}
+function entryOf(state) {
+  const keep = S;
+  try { S = Object.assign(fresh(), state); return myEntry(); } catch (e) { return null; } finally { S = keep; }
+}
+async function loadRanking() {
+  let rows = [], mode = "local";
+  if (STORE.db) {
+    try {
+      const snap = await STORE.db.collection("ranking").orderBy("ret", "desc").limit(200).get();
+      rows = snap.docs.filter(d => d.exists).map(d => ({ ...d.data(), me: d.id === STORE.uid }));
+      mode = "shared";
+    } catch (e) { rows = []; }
+  }
+  if (mode === "local") {
+    const accs = lsGet(ACCOUNTS_KEY, {});
+    Object.keys(accs).forEach(em => {
+      const isMe = USER && em === USER.email.toLowerCase();
+      const e = isMe ? (S.rankOff ? null : myEntry()) : entryOf(lsGet(keyFor(em), {}));
+      if (e) rows.push({ ...e, me: isMe });
+    });
+  } else if (!S.rankOff) {
+    const mine = myEntry(), i = rows.findIndex(r => r.me);
+    if (mine) { if (i >= 0) rows[i] = { ...mine, me: true }; else rows.push({ ...mine, me: true }); }
+    else if (i >= 0) rows.splice(i, 1);
+  }
+  rows.sort((a, b) => b.ret - a.ret || (b.score || 0) - (a.score || 0));
+  V.rank = { rows, mode, at: new Date() };
+  if (V.page === "rank" || V.page === "home") render();
+}
+function rankMe() {
+  if (!V.rank) { if (!V.rankLoading && USER) { V.rankLoading = true; setTimeout(() => loadRanking().finally(() => { V.rankLoading = false; }), 0); } return null; }
+  const i = V.rank.rows.findIndex(r => r.me);
+  return i < 0 ? null : { pos: i + 1, of: V.rank.rows.length };
+}
+function rank() {
+  if (!V.rank) { rankMe(); return `<div class="page-h"><div><h1>Ranking</h1></div></div><div class="card muted">Cargando el ranking…</div>`; }
+  const rows = V.rank.rows, examples = rows.length < 3;
+  const demo = [{ name: "Cami R.", ret: 0.0412, score: 78, tier: "Estratega", days: 18 }, { name: "Tomi G.", ret: 0.0187, score: 66, tier: "Prudente", days: 12 }, { name: "Juli P.", ret: -0.0095, score: 52, tier: "Aprendiz", days: 9 }];
+  const medal = k => k < 3 ? `<span class="rank r${k + 1}">${k + 1}</span>` : `<span class="rank">${k + 1}</span>`;
+  const row = (r, k, ex) => `<tr class="${r.me ? "me-row" : ""} ${ex ? "ex-row" : ""}"><td>${ex ? "" : medal(k)}</td><td><b>${esc(r.name)}</b>${r.me ? ' <span class="pill">Vos</span>' : ""}${ex ? ' <span class="pill grey">ejemplo</span>' : ""}</td>
+    <td class="r num"><b class="${r.ret >= 0 ? "up" : "down"}">${pc2(r.ret)}</b></td><td class="r">${r.score != null ? `${r.score} · ${esc(r.tier)}` : "Se calcula mañana"}</td><td class="r num">${r.days}</td></tr>`;
+  const mine = myEntry();
+  return `
+    <div class="page-h"><div><h1>Ranking</h1><p class="muted">Gana quien mejor le va con su cartera de práctica, desde el día en que empezó. Todo con plata virtual.</p></div>
+      <label class="toggle small"><input type="checkbox" data-act="rankToggle" ${S.rankOff ? "" : "checked"}><span class="sw"></span>Aparecer en el ranking</label></div>
+    ${!mine && !S.rankOff ? `<div class="callout" style="margin-bottom:14px">Para entrar al ranking hacé tu primera compra en el simulador. <button class="link" data-step="buy">Ir al simulador</button></div>` : ""}
+    <div class="card" style="padding:0;overflow:hidden">
+      <table class="bk-table rank-t"><thead><tr><th style="width:60px">Puesto</th><th>Nombre</th><th class="r">Rendimiento</th><th class="r">Nivel de inversor</th><th class="r">Días</th></tr></thead>
+      <tbody>${rows.map((r, k) => row(r, k)).join("")}${examples ? demo.map(r => row(r, 0, true)).join("") : ""}${!rows.length && !examples ? "" : ""}</tbody></table>
+    </div>
+    <p class="note" style="margin-top:10px">${V.rank.mode === "shared" ? `Personas que usan Sin Miedo en este link (${rows.length}). Se muestra el nombre y la inicial del apellido.` : `Cuentas creadas en este dispositivo (${rows.length}). En la versión online el ranking es con todas las personas que la usan.`}${examples ? " Las filas marcadas “ejemplo” muestran cómo se va a ver cuando se sume más gente." : ""} El rendimiento usa los precios de cierre y en vivo; no es una recomendación de inversión.</p>`;
+}
 /* ---------- 5. Aprender ---------- */
 function learn() {
   return `
@@ -1392,7 +1580,7 @@ function verdict(ans) {
 function scam() {
   const r = V.scam;
   return `
-    <div class="page-h"><div><h1>¿Es estafa?</h1></div></div>
+    <div class="page-h"><div><h1>Detector de estafas</h1><p class="muted">¿Te ofrecieron una inversión y no sabés si es trucha? Pegá el mensaje y te mostramos las señales de alerta.</p></div></div>
     <div class="card">
       <div class="field"><label for="scam-in">¿Qué te ofrecieron?</label>
         <textarea class="input" id="scam-in" rows="3" placeholder="Ej.: Me ofrecen 30% mensual garantizado por Instagram" style="resize:vertical">${esc(V.scamText || "")}</textarea></div>
@@ -2264,6 +2452,8 @@ document.addEventListener("click", e => {
   const b = e.target.closest("[data-q],[data-bkact],[data-bkview],[data-bktab],[data-sym],[data-range],[data-cstyle],[data-tkf],[data-cancel],[data-trade],[data-drclose],[data-drgo]");
   if (b && !b.disabled && (V.page === "sim" || b.closest("#drawer") || b.dataset.trade)) { bkClick(b, e); return; }
   if (b && b.dataset.q) { bkClick(b, e); return; }
+  const stp = e.target.closest("[data-step]");
+  if (stp && !stp.disabled) { modal(""); goStep(stp.dataset.step); return; }
   const el = e.target.closest("[data-go],[data-act],[data-diag],[data-lvl],[data-pick],[data-example],[data-sig],[data-ask],[data-scroll],[data-jump]");
   if (!el || el.disabled) return;
   const d = el.dataset;
@@ -2274,6 +2464,7 @@ document.addEventListener("click", e => {
     if (d.go === "diag") return go("diag", { step: 0 });
     if (d.go === "auth") return go("auth", { mode: d.mode || "signup" });
     if (d.go === "sim") { ensureBk(); return go("sim"); }
+    if (d.go === "rank") V.rank = null;
     return go(d.go);
   }
   if (d.diag) { S[DIAG[V.step || 0].key] = d.diag; save(); render(); return; }
@@ -2290,7 +2481,7 @@ document.addEventListener("click", e => {
     case "diagBack": V.step--; render(); break;
     case "diagNext":
       if ((V.step || 0) < DIAG.length - 1) { V.step = (V.step || 0) + 1; render(); }
-      else { S.started = true; save(); root.innerHTML = `<div class="diag" style="place-items:center;display:grid;background:var(--petrol-900);color:#fff;text-align:center"><div><div class="medal" style="animation:pop .4s">${icon("sparkle")}</div><h1>Armando tu camino…</h1><p style="color:#A9C7C9;margin-top:8px">Lo personalizamos según tus respuestas.</p></div></div>`; setTimeout(() => go("home"), 1100); }
+      else { S.started = true; save(); root.innerHTML = `<div class="diag" style="place-items:center;display:grid;background:var(--petrol-900);color:#fff;text-align:center"><div><div class="medal" style="animation:pop .4s">${icon("sparkle")}</div><h1>Armando tu camino…</h1><p style="color:#A9C7C9;margin-top:8px">Lo personalizamos según tus respuestas.</p></div></div>`; setTimeout(() => go(S.welcomed ? "home" : "welcome"), 1100); }
       break;
     case "lstep": V.step = Math.max(0, (V.step || 0) + +d.d); V.picked = null; render(); break;
     case "retryQ": V.picked = null; render(); break;
@@ -2307,6 +2498,9 @@ document.addEventListener("click", e => {
     case "mmenu": modal(`<div class="row" style="gap:12px"><div class="avatar" style="background:var(--mint);color:#062018;width:44px;height:44px;font-size:16px">${esc(myName()[0].toUpperCase())}</div><div style="min-width:0"><b>${esc(myName())}</b><div class="small muted" style="overflow:hidden;text-overflow:ellipsis">${esc(USER?.email || "")}</div></div></div>
       <p class="small muted" style="margin-top:12px">${savedLabel()}</p>
       <div class="stack" style="gap:8px;margin-top:14px"><button class="btn ghost block" data-act="map">${icon("map")}Mapa del prototipo</button><button class="btn ghost block" data-act="logout">${icon("back")}Cerrar sesión</button><button class="btn block" data-act="closeModal">Cerrar</button></div>`); break;
+    case "welcomeGo": S.welcomed = true; save(); goStep(d.first); break;
+    case "welcomeHome": S.welcomed = true; save(); go("home"); break;
+    case "rankToggle": S.rankOff = !el.checked; save(); V.rank = null; render(); break;
     case "aiStop": aiCtl?.abort(); break;
     case "chatReset": S.chat = null; save(); render(); break;
     case "reset": { const nm = S.name; S = fresh(); S.name = nm; save(); modal(""); go("diag", { step: 0 }); break; }
@@ -2323,7 +2517,7 @@ function gameClick(el) {
   const d = el.dataset;
   if (d.auth === "google") { if (V.page !== "auth") go("auth", { mode: "signup" }); googleAuth(); return; }
   if (d.act === "gdemoBack") { V.gdemo = false; render(); return; }
-  if (d.auth) { V.mode = d.auth; V.authEmail = document.getElementById("au-email")?.value || ""; render(); return; }
+  if (d.auth) { if (d.auth !== "reset") V.resetStep = null; V.mode = d.auth; V.authEmail = document.getElementById("au-email")?.value || ""; render(); return; }
   if (d.micro) { V.orb = true; V.micro = d.micro; V.microPick = null; renderOrb(); return; }
   if (d.mpick != null) {
     const m = MICRO.find(x => x.id === V.micro); V.microPick = +d.mpick;
@@ -2384,13 +2578,14 @@ document.getElementById("modal").addEventListener("click", e => { if (e.target.c
 
 function sendAsk(q) {
   q = q.trim(); if (!q || V.aiBusy) return;
+  S.asked = true;
   if (AI) { S.chat.push({ me: true, h: q }); askAI(q); return; }
   S.chat.push({ me: true, h: q }); V.typing = true; render(); scrollChat();
   setTimeout(() => { V.typing = false; S.chat.push({ me: false, h: answerFor(q) }); save(); render(); scrollChat(); }, 800);
 }
 function scrollChat() { const l = document.getElementById("chat-log"); if (l) l.scrollTop = l.scrollHeight; }
 
-document.addEventListener("submit", e => { if (e.target.id === "auth-form") { e.preventDefault(); submitAuth(); return; } if (e.target.id === "gdemo-form") { e.preventDefault(); submitGoogleDemo(); return; } if (e.target.id === "ask-form") { e.preventDefault(); const i = document.getElementById("ask-in"); sendAsk(i.value); } });
+document.addEventListener("submit", e => { if (e.target.id === "auth-form") { e.preventDefault(); submitAuth(); return; } if (e.target.id === "gdemo-form") { e.preventDefault(); submitGoogleDemo(); return; } if (e.target.id === "reset-form") { e.preventDefault(); submitReset(); return; } if (e.target.id === "ask-form") { e.preventDefault(); const i = document.getElementById("ask-in"); sendAsk(i.value); } });
 
 document.addEventListener("input", e => {
   const el = e.target;
@@ -2419,8 +2614,8 @@ window.addEventListener("resize", () => mountCharts());
 
 /* ---------- Mapa del prototipo (para presentar) ---------- */
 const SCREENS = [
-  ["landing", "Landing"], ["auth", "Registro (Google o email)"], ["diag", "Diagnóstico"], ["home", "Inicio"], ["learn", "Aprender"], ["lesson3", "Lección nivel 3"],
-  ["scam", "¿Es estafa?"], ["sim", "Simulador"], ["ask", "Preguntá sin vergüenza"], ["leap", "El salto"]
+  ["landing", "Landing"], ["auth", "Registro (Google o email)"], ["diag", "Diagnóstico"], ["welcome", "Bienvenida"], ["home", "Inicio"], ["learn", "Aprender"], ["lesson3", "Lección nivel 3"],
+  ["scam", "Detector de estafas"], ["sim", "Simulador"], ["ask", "Preguntá sin vergüenza"], ["rank", "Ranking"], ["leap", "El salto"]
 ];
 function showMap() {
   modal(`<h2>Mapa del prototipo</h2><p class="muted small" style="margin-top:4px">Saltá a cualquier pantalla. Atajo: tecla M.</p>

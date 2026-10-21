@@ -41,8 +41,8 @@ def main():
     rep("</style>", "  .m-top { display: none; }\n" + css + "</style>")
 
     # Barra superior con el nombre y un menú (mapa del prototipo y cerrar sesión).
-    rep('''  return `<div class="shell ${wide ? "wide" : ""}">
-    <aside class="side">''', '''  return `<div class="shell ${wide ? "wide" : ""}">
+    rep('''  return `<div class="shell ${wide ? "wide" : ""} ${norail ? "norail" : ""}">
+    <aside class="side">''', '''  return `<div class="shell ${wide ? "wide" : ""} ${norail ? "norail" : ""}">
     <header class="m-top">${logo()}<button class="m-me" data-act="mmenu" aria-label="Tu cuenta y opciones">${esc(myName())}<span class="avatar" style="background:var(--mint);color:#062018">${esc(myName()[0].toUpperCase())}</span></button></header>
     <aside class="side">''')
     rep('''    case "map": showMap(); break;''', '''    case "map": showMap(); break;

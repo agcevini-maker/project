@@ -113,6 +113,13 @@ create policy "cada uno actualiza lo suyo" on progreso for update using (auth.ui
 
 Antes de usarlo con usuarios reales (y menores de edad) hace falta que LBO revise la política de privacidad y el tratamiento de datos personales (Ley 25.326). El texto de los términos está marcado "a completar".
 
+### Primeros pasos, inicio y ranking
+
+- **Bienvenida:** después del diagnóstico, una pantalla muestra todo lo que se puede hacer y recomienda por dónde arrancar según el freno elegido.
+- **Inicio:** lo principal es "Tu próximo paso" y "Tu camino" (6 pasos: nivel 1, primera compra, detector, una pregunta, los 6 niveles y el salto). Las cuentas nuevas arrancan de cero y la racha cuenta los días seguidos reales.
+- **Ranking:** ordena por rendimiento de la cartera de práctica desde que cada persona empezó. En claude.ai cada persona publica su resultado en la colección compartida `ranking` (solo puede escribir el suyo, regla `ranking/{self}`) y todos ven la tabla; se puede dejar de aparecer. Como archivo o app se arma con las cuentas del dispositivo. Con menos de 3 personas se muestran filas marcadas "ejemplo".
+- **Contraseña:** "¿Te olvidaste la contraseña?" en Ingresar. Con Supabase manda el email de recuperación; en el prototipo local se crea una nueva en la misma pantalla (avisándolo). Se entra con email y contraseña, o con Google; el nombre es solo para saludar.
+
 ### Asistente con IA y progreso guardado
 
 - **Preguntá** responde cualquier pregunta con IA (Claude) cuando el prototipo se abre publicado en claude.ai (capacidad `sample`). Las instrucciones están en `AI_RULES`: voseo, respuestas cortas, nunca promete ganancias ni recomienda qué comprar, avisa que no tiene datos en vivo y no inventa datos de LBO. Como archivo suelto o app de escritorio usa las respuestas guardadas (`ANSWERS`).
