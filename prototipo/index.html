@@ -340,7 +340,9 @@
   .auth-side p { color: #B9D3D5; font-size: 17px; margin-top: 14px; max-width: 42ch; }
   .auth-side .ic { color: var(--mint); }
   .auth-main { display: grid; place-items: center; padding: 40px; }
-  .auth-card { width: 100%; max-width: 440px; padding: 32px; display: flex; flex-direction: column; gap: 14px; }
+  .auth-card { width: 100%; max-width: 420px; padding: 26px; display: flex; flex-direction: column; gap: 11px; }
+  .auth-card .field { gap: 4px; } .auth-card .input { padding: 10px 13px; } .auth-card .btn.lg { padding: 13px 22px; }
+  .auth-card .tabs.full { margin-bottom: 2px !important; } .auth-card .btn-google { padding: 11px 16px; }
   .btn-google { display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%; padding: 13px 16px; border-radius: 12px; border: 1.5px solid var(--line); background: #fff; font: inherit; font-weight: 700; font-size: 15.5px; color: var(--ink); cursor: pointer; transition: border-color .15s, background .15s; }
   .btn-google:hover { border-color: #B8C7C4; background: #F8FAF9; }
   .btn-google.on-dark { border-color: transparent; }
@@ -839,31 +841,37 @@ async function googleAuth() {
   }
   V.gdemo = true; render();
 }
-function googleSession(email, name) {
+function googleSession(email, name, pw) {
   email = email.trim().toLowerCase(); name = name.trim();
   const accs = lsGet(ACCOUNTS_KEY, {}), isNew = !accs[email];
   if (isNew) accs[email] = { name, google: true, created: new Date().toISOString() };
   else accs[email].google = true;
+  if (pw && !accs[email].pw) accs[email].pw = pw;
   lsSet(ACCOUNTS_KEY, accs);
   startSession({ email, name: accs[email].name || name }, isNew ? Object.assign(fresh(), { name }) : undefined);
   V.gdemo = false;
   go(S.started ? "home" : "diag", { step: 0 });
   toast(isNew ? `¡Bienvenido/a, ${S.name}!` : `Hola de nuevo, ${S.name}`);
 }
-function submitGoogleDemo() {
-  const name = document.getElementById("gd-name").value.trim(), email = document.getElementById("gd-email").value.trim().toLowerCase();
-  const known = lsGet(ACCOUNTS_KEY, {})[email];
-  if (!/^[^\s@]+@(gmail|googlemail)\.com$/.test(email)) { authMsg("Escribí tu Gmail (termina en @gmail.com)."); return; }
-  if (!name && !known) { authMsg("Contanos cómo te llamás."); return; }
-  googleSession(email, name || known.name);
+async function submitGoogleDemo() {
+  const email = document.getElementById("gd-email").value.trim().toLowerCase(), pw = document.getElementById("gd-pw").value;
+  const name = document.getElementById("gd-name")?.value.trim() || "", known = lsGet(ACCOUNTS_KEY, {})[email];
+  if (!/^[^\s@]+@(gmail|googlemail)\.com$/.test(email)) return authMsg("Escribí tu Gmail (termina en @gmail.com).");
+  if (pw.length < 8) return authMsg(known ? "Escribí tu contraseña." : "La contraseña tiene que tener al menos 8 caracteres.");
+  const h = await hashPw(email, pw);
+  if (known && known.pw && known.pw !== h) return authMsg("La contraseña no coincide. Si no te la acordás, volvé y tocá “¿Te olvidaste la contraseña?”.");
+  if (!known && !name) { V.gdNew = true; V.gdEmail = email; V.gdPw = pw; render(); return authMsg("OK:Es tu primera vez: contanos cómo te llamás."); }
+  V.gdNew = false; V.gdEmail = V.gdPw = "";
+  googleSession(email, name || known.name, h);
 }
 const G_LOGO = `<svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>`;
 function googleDemoCard() {
   return `<form class="card auth-card" id="gdemo-form" novalidate>
     <div class="row" style="gap:10px">${G_LOGO}<b style="font-size:18px">Continuar con Google</b></div>
-    <div class="callout amber" style="font-size:13.5px">Modo prototipo: en la app real acá se abre la ventana de Google para elegir tu cuenta. Todavía no está conectada, así que escribí tu Gmail para simular el ingreso.</div>
-    <div class="field"><label for="gd-email">Tu Gmail</label><input class="input" id="gd-email" type="email" autocomplete="email" placeholder="tunombre@gmail.com"></div>
-    <div class="field"><label for="gd-name">¿Cómo te llamás?</label><input class="input" id="gd-name" autocomplete="given-name" maxlength="30" placeholder="Tu nombre o apodo"></div>
+    <p class="xs faint">Prototipo: simulamos la ventana de Google.</p>
+    <div class="field"><label for="gd-email">Gmail</label><input class="input" id="gd-email" type="email" autocomplete="email" placeholder="tunombre@gmail.com" value="${esc(V.gdEmail || "")}"></div>
+    <div class="field"><label for="gd-pw">Contraseña</label><input class="input" id="gd-pw" type="password" autocomplete="current-password" placeholder="Tu contraseña" value="${esc(V.gdPw || "")}"></div>
+    ${V.gdNew ? `<div class="field"><label for="gd-name">¿Cómo te llamás?</label><input class="input" id="gd-name" autocomplete="given-name" maxlength="30" placeholder="Tu nombre o apodo"></div>` : ""}
     <div id="auth-msg" aria-live="polite"></div>
     <button class="btn block lg" type="submit">Continuar ${icon("arrow")}</button>
     <p class="xs faint" style="text-align:center">Al continuar aceptás los términos y la política de privacidad <span class="placeholder" style="padding:1px 6px">a completar</span></p>
@@ -915,24 +923,20 @@ function authPage() {
     <div class="auth-side">
       ${logo()}
       <h1>${signupMode ? "Creá tu cuenta y arrancá sin miedo" : "¡Qué bueno verte de nuevo!"}</h1>
-      <p>Tu progreso, tu racha, tu cartera de práctica y tu puntaje de inversor quedan guardados en tu cuenta.</p>
-      <div class="stack" style="gap:12px;margin-top:26px">${[["learn", "Aprendé a tu ritmo, con niveles y desafíos"], ["sim", "Practicá con $1.000.000 virtuales y precios reales"], ["shield", "Detectá estafas antes de caer en una"]].map(([ic, l]) => `<div class="row">${icon(ic)}<span>${l}</span></div>`).join("")}</div>
+      <p>Tu progreso y tu cartera de práctica quedan guardados en tu cuenta.</p>
     </div>
     <div class="auth-main">
       ${V.gdemo ? googleDemoCard() : V.mode === "reset" ? resetCard() : `<form class="card auth-card" id="auth-form" novalidate>
         <div class="tabs full" style="margin-bottom:8px"><button type="button" class="${signupMode ? "on" : ""}" data-auth="signup">Crear cuenta</button><button type="button" class="${signupMode ? "" : "on"}" data-auth="login">Ingresar</button></div>
         <button type="button" class="btn-google" data-auth="google">${G_LOGO}Continuar con Google</button>
-        <p class="xs faint" style="text-align:center;margin-top:-6px">Al continuar con Google aceptás los términos y la política de privacidad <span class="placeholder" style="padding:1px 6px">a completar</span></p>
         <div class="or-sep"><span>o con tu email</span></div>
-        ${signupMode ? "" : `<p class="small muted">Entrás con el <b>email</b> y la <b>contraseña</b> con los que creaste tu cuenta, o con Google. Tu nombre solo lo usamos para saludarte.</p>`}
         ${signupMode ? `<div class="field"><label for="au-name">¿Cómo te llamás?</label><input class="input" id="au-name" autocomplete="given-name" maxlength="30" placeholder="Tu nombre o apodo"></div>` : ""}
         <div class="field"><label for="au-email">Email</label><input class="input" id="au-email" type="email" autocomplete="email" placeholder="tu@email.com" value="${esc(V.authEmail || "")}"></div>
         <div class="field"><label for="au-pw">Contraseña</label><input class="input" id="au-pw" type="password" autocomplete="${signupMode ? "new-password" : "current-password"}" placeholder="${signupMode ? "Al menos 8 caracteres" : "Tu contraseña"}"></div>
-        ${signupMode ? `<label class="row small" style="align-items:flex-start;gap:10px;cursor:pointer"><input type="checkbox" id="au-terms" style="margin-top:3px;accent-color:var(--mint)"><span class="muted">Acepto los términos y la política de privacidad <span class="placeholder" style="padding:1px 6px">a completar</span></span></label>` : ""}
         ${signupMode ? "" : `<button type="button" class="link small" style="align-self:flex-end;margin-top:-6px" data-auth="reset">¿Te olvidaste la contraseña?</button>`}
         <div id="auth-msg" aria-live="polite"></div>
         <button class="btn block lg" type="submit" id="auth-submit">${signupMode ? "Crear mi cuenta" : "Ingresar"} ${icon("arrow")}</button>
-        <p class="xs faint" style="text-align:center">${cloudOn() ? "Tu cuenta y tu progreso se guardan de forma segura." : "Prototipo: las cuentas y el progreso se guardan en este dispositivo y navegador."}</p>
+        <p class="xs faint" style="text-align:center">Al continuar aceptás los términos y la política de privacidad <span class="placeholder" style="padding:1px 6px">a completar</span></p>
         <button type="button" class="link small" style="align-self:center" data-go="landing">Volver al inicio</button>
       </form>`}
     </div>
@@ -945,7 +949,6 @@ function authMsg(msg) {
 async function submitAuth() {
   const signupMode = V.mode !== "login";
   const email = document.getElementById("au-email").value, pw = document.getElementById("au-pw").value, btn = document.getElementById("auth-submit");
-  if (signupMode && !document.getElementById("au-terms").checked) { authMsg("Para crear la cuenta tenés que aceptar los términos."); return; }
   btn.disabled = true; authMsg("");
   const err = signupMode ? await signup(document.getElementById("au-name")?.value || "", email, pw) : await login(email, pw);
   btn.disabled = false;
@@ -2385,7 +2388,7 @@ function closeDrawer() {
 function gameClick(el) {
   const d = el.dataset;
   if (d.auth === "google") { if (V.page !== "auth") go("auth", { mode: "signup" }); googleAuth(); return; }
-  if (d.act === "gdemoBack") { V.gdemo = false; render(); return; }
+  if (d.act === "gdemoBack") { V.gdemo = false; V.gdNew = false; V.gdEmail = V.gdPw = ""; render(); return; }
   if (d.auth) { if (d.auth !== "reset") V.resetStep = null; V.mode = d.auth; V.authEmail = document.getElementById("au-email")?.value || ""; render(); return; }
   if (d.micro) { V.orb = true; V.micro = d.micro; V.microPick = null; renderOrb(); return; }
   if (d.mpick != null) {

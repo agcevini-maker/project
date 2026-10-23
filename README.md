@@ -92,7 +92,7 @@ Al comenzar, cada usuario entra con **"Continuar con Google"** (también desde l
 
 "Continuar con Google" funciona de tres maneras según `AUTH_CFG`:
 
-- **Sin configurar (por defecto):** modo prototipo. No abre Google: un aviso lo dice y se escribe el Gmail para simular el ingreso.
+- **Sin configurar (por defecto):** modo prototipo. No abre Google: se escribe el Gmail y una contraseña (la primera vez también el nombre) para simular el ingreso. La contraseña se pide siempre, igual que con email.
 - **`googleClientId`:** ingreso real con Google (Google Identity Services) y progreso guardado en el dispositivo. Requiere un ID de cliente OAuth creado en Google Cloud, con el dominio donde se publica en "Orígenes autorizados", y abrir el prototipo desde ese dominio (no como archivo suelto).
 - **Supabase:** activá Google como proveedor en Supabase (Authentication → Providers) y el progreso se guarda en la nube.
 

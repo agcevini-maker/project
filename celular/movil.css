@@ -119,13 +119,13 @@
   .diag-card { padding: 22px 18px !important; }
   /* Registro */
   .auth { grid-template-columns: minmax(0, 1fr); min-height: 0; }
-  .auth-side { padding: 22px max(16px, env(safe-area-inset-left, 0px)) 26px; }
-  .auth-side .logo { padding-bottom: 16px; }
-  .auth-side h1 { font-size: 28px; }
-  .auth-side p { font-size: 15px; }
+  .auth-side { padding: 14px max(16px, env(safe-area-inset-left, 0px)) 16px; }
+  .auth-side .logo { padding-bottom: 10px; } .auth-side .logo svg { width: 30px; height: 30px; }
+  .auth-side h1 { font-size: 22px; max-width: none; }
+  .auth-side p { display: none; }
   .auth-side .stack { display: none !important; }
-  .auth-main { padding: 18px max(16px, env(safe-area-inset-right, 0px)) 40px max(16px, env(safe-area-inset-left, 0px)); place-items: start center; }
-  .auth-card { padding: 22px 18px; }
+  .auth-main { padding: 12px max(12px, env(safe-area-inset-right, 0px)) 24px max(12px, env(safe-area-inset-left, 0px)); place-items: start center; }
+  .auth-card { padding: 18px 16px; gap: 10px; }
   /* Esfera, avisos y ventanas */
   .orb-wrap { right: max(14px, env(safe-area-inset-right, 0px)); bottom: calc(80px + env(safe-area-inset-bottom, 0px)); }
   .orb { width: 58px; height: 58px; }
