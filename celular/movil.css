@@ -1,4 +1,20 @@
 /* Versión para celular: se suma al estilo del prototipo al generar celular/index.html. */
+  /* La app siempre se muestra con ancho de celular, centrada si la pantalla es más ancha (compu, tablet o panel).
+     .phone es el marco: lo que es "fixed" (pestañas, panel de compra, esfera, ventanas) queda dentro de él,
+     y el que se desplaza es #root. */
+  html, body { height: 100%; overflow: hidden; }
+  body { background: #0B2A33; }
+  .phone { position: relative; height: 100%; max-width: 440px; margin: 0 auto; transform: translateZ(0); overflow: hidden; background: var(--bg); }
+  #root { height: 100%; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
+  @media (min-width: 480px) { .phone { box-shadow: 0 0 0 1px rgba(255,255,255,.08), 0 24px 70px rgba(0,0,0,.45); } }
+  /* Las reglas de pantallas angostas del prototipo dependen del ancho de la ventana: acá se aplican siempre. */
+  .l-hero-in, .frenos, .steps, .opt4, .opts, .home-grid { grid-template-columns: minmax(0, 1fr); }
+  .preview, .rail { display: none; }
+  .wl-grid { grid-template-columns: 1fr 1fr; }
+  .next-hero, .wl-start { flex-wrap: wrap; gap: 16px; padding: 22px 20px; }
+  .next-hero > div:nth-child(2), .wl-start > div:first-child { flex: 1 1 200px; }
+  .next-hero > .btn, .wl-start > .stack { width: 100%; min-width: 0 !important; }
+  .next-hero h2 { font-size: 22px; } .nh-ic { width: 52px; height: 52px; border-radius: 14px; }
   body { font-size: 15px; }
   h1 { font-size: 26px; } h2 { font-size: 20px; }
   .card { padding: 18px; }
@@ -74,7 +90,7 @@
   .perf { grid-template-columns: minmax(0, 1fr); gap: 16px; }
   .perf-left { border-right: 0; padding-right: 0; border-bottom: 1px solid var(--line); padding-bottom: 16px; }
   .perf-score b { font-size: 46px; }
-  .drawer { width: 100vw; }
+  .drawer { width: 100%; max-width: none; }
   .dr-head { padding: calc(16px + env(safe-area-inset-top, 0px)) 16px 14px; }
   .dr-body { padding: 16px 16px calc(28px + env(safe-area-inset-bottom, 0px)); }
   /* El salto */
@@ -114,7 +130,7 @@
   .orb-wrap { right: max(14px, env(safe-area-inset-right, 0px)); bottom: calc(80px + env(safe-area-inset-bottom, 0px)); }
   .orb { width: 58px; height: 58px; }
   .orb-bubble { bottom: 72px; font-size: 13.5px; padding: 8px 12px; }
-  .orb-panel { width: calc(100vw - 28px); max-height: 64vh; }
+  .orb-panel { width: min(calc(100vw - 28px), 412px); max-height: 64vh; }
   #toast { bottom: calc(86px + env(safe-area-inset-bottom, 0px)); width: max-content; max-width: calc(100vw - 32px); text-align: center; }
   #modal .bg { padding: 14px; align-items: end; }
   #modal .box { padding: 22px 18px; max-height: 88vh; overflow-y: auto; }

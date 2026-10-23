@@ -510,6 +510,22 @@
   @media (max-width: 1000px) { .l-hero-in, .frenos, .steps { grid-template-columns: 1fr; } .preview { display: none; } .opt4, .opts { grid-template-columns: 1fr; } }
   .m-top { display: none; }
 /* Versión para celular: se suma al estilo del prototipo al generar celular/index.html. */
+  /* La app siempre se muestra con ancho de celular, centrada si la pantalla es más ancha (compu, tablet o panel).
+     .phone es el marco: lo que es "fixed" (pestañas, panel de compra, esfera, ventanas) queda dentro de él,
+     y el que se desplaza es #root. */
+  html, body { height: 100%; overflow: hidden; }
+  body { background: #0B2A33; }
+  .phone { position: relative; height: 100%; max-width: 440px; margin: 0 auto; transform: translateZ(0); overflow: hidden; background: var(--bg); }
+  #root { height: 100%; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
+  @media (min-width: 480px) { .phone { box-shadow: 0 0 0 1px rgba(255,255,255,.08), 0 24px 70px rgba(0,0,0,.45); } }
+  /* Las reglas de pantallas angostas del prototipo dependen del ancho de la ventana: acá se aplican siempre. */
+  .l-hero-in, .frenos, .steps, .opt4, .opts, .home-grid { grid-template-columns: minmax(0, 1fr); }
+  .preview, .rail { display: none; }
+  .wl-grid { grid-template-columns: 1fr 1fr; }
+  .next-hero, .wl-start { flex-wrap: wrap; gap: 16px; padding: 22px 20px; }
+  .next-hero > div:nth-child(2), .wl-start > div:first-child { flex: 1 1 200px; }
+  .next-hero > .btn, .wl-start > .stack { width: 100%; min-width: 0 !important; }
+  .next-hero h2 { font-size: 22px; } .nh-ic { width: 52px; height: 52px; border-radius: 14px; }
   body { font-size: 15px; }
   h1 { font-size: 26px; } h2 { font-size: 20px; }
   .card { padding: 18px; }
@@ -585,7 +601,7 @@
   .perf { grid-template-columns: minmax(0, 1fr); gap: 16px; }
   .perf-left { border-right: 0; padding-right: 0; border-bottom: 1px solid var(--line); padding-bottom: 16px; }
   .perf-score b { font-size: 46px; }
-  .drawer { width: 100vw; }
+  .drawer { width: 100%; max-width: none; }
   .dr-head { padding: calc(16px + env(safe-area-inset-top, 0px)) 16px 14px; }
   .dr-body { padding: 16px 16px calc(28px + env(safe-area-inset-bottom, 0px)); }
   /* El salto */
@@ -625,7 +641,7 @@
   .orb-wrap { right: max(14px, env(safe-area-inset-right, 0px)); bottom: calc(80px + env(safe-area-inset-bottom, 0px)); }
   .orb { width: 58px; height: 58px; }
   .orb-bubble { bottom: 72px; font-size: 13.5px; padding: 8px 12px; }
-  .orb-panel { width: calc(100vw - 28px); max-height: 64vh; }
+  .orb-panel { width: min(calc(100vw - 28px), 412px); max-height: 64vh; }
   #toast { bottom: calc(86px + env(safe-area-inset-bottom, 0px)); width: max-content; max-width: calc(100vw - 32px); text-align: center; }
   #modal .bg { padding: 14px; align-items: end; }
   #modal .box { padding: 22px 18px; max-height: 88vh; overflow-y: auto; }
@@ -633,6 +649,7 @@
 </style>
 </head>
 <body>
+<div class="phone">
 <div id="root"></div>
 <div id="drawer"></div>
 <div id="orb"></div>
@@ -640,6 +657,7 @@
 <div id="tip" role="tooltip"></div>
 <div id="toast" role="status" aria-live="polite"></div>
 <canvas id="confetti"></canvas>
+</div>
 
 <script>
 // Precios reales: este bloque lo completa scripts/update_market.py (GitHub Actions, cada día hábil).
@@ -1167,7 +1185,7 @@ function gauss(r) { let u = 0, v = 0; while (!u) u = r(); while (!v) v = r(); re
    Render
    ================================================================= */
 const root = document.getElementById("root");
-function go(page, extra = {}) { if (!USER && !["landing", "auth"].includes(page)) { extra = { mode: "signup" }; page = "auth"; } V = { page, ...extra }; render(); const m = document.querySelector(".main"); if (m) m.scrollTop = 0; window.scrollTo(0, 0); }
+function go(page, extra = {}) { if (!USER && !["landing", "auth"].includes(page)) { extra = { mode: "signup" }; page = "auth"; } V = { page, ...extra }; render(); const m = document.getElementById("root"); if (m) m.scrollTop = 0; window.scrollTo(0, 0); }
 
 function render() {
   if (V.page === "landing") root.innerHTML = landing();
@@ -1183,7 +1201,7 @@ function render() {
 
 const NAV = [
   ["home", "Inicio", "home"], ["learn", "Aprender", "learn"], ["sim", "Simulador", "sim"],
-  ["scam", "Detector de estafas", "shield"], ["ask", "Preguntá", "chat"], ["rank", "Ranking", "league"]
+  ["scam", "Detector", "shield"], ["ask", "Preguntá", "chat"], ["rank", "Ranking", "league"]
 ];
 const NAV_OF = { lesson: "learn", leap: "learn" };
 
@@ -1766,9 +1784,9 @@ function liveRefresh(changed) {
   if (busy) { liveDirty = true; return; }
   liveDirty = false;
   if (V.drawer) renderDrawer(true);
-  const y = document.querySelector(".main")?.scrollTop || 0;
+  const y = document.getElementById("root")?.scrollTop || 0;
   render();
-  const m = document.querySelector(".main"); if (m) m.scrollTop = y;
+  const m = document.getElementById("root"); if (m) m.scrollTop = y;
   changed.forEach(([t, up]) => document.querySelectorAll(`[data-live="${t}"]`).forEach(el => { el.classList.remove("fl-up", "fl-dn"); void el.offsetWidth; el.classList.add(up ? "fl-up" : "fl-dn"); }));
 }
 document.addEventListener("focusout", () => { if (liveDirty) setTimeout(() => liveRefresh([]), 50); });
@@ -2543,7 +2561,7 @@ function bkClick(b, e) {
   if (d.drgo) { closeDrawer(); B.view = d.drgo; V.sym = null; save(); render(); return; }
   if (d.bkview) { B.view = d.bkview; V.sym = null; save(); render(); return; }
   if (d.bktab) { B.tab = d.bktab; save(); render(); return; }
-  if (d.sym) { V.sym = d.sym; V.tk = null; V.range = V.range || "1M"; render(); const m = document.querySelector(".main"); if (m) m.scrollTop = 0; return; }
+  if (d.sym) { V.sym = d.sym; V.tk = null; V.range = V.range || "1M"; render(); const m = document.getElementById("root"); if (m) m.scrollTop = 0; return; }
   if (d.range) { V.range = d.range; render(); return; }
   if (d.cstyle) { V.cstyle = d.cstyle; render(); return; }
   if (d.cancel) { const o = B.orders.find(x => x.id === +d.cancel); if (o && o.status === "Pendiente") { B.cash += o.reserved || 0; o.reserved = 0; o.status = "Cancelada"; save(); render(); } return; }

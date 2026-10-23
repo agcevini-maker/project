@@ -58,6 +58,16 @@ document.addEventListener("touchstart", e => { const el = e.target.closest?.(".t
     s = s.replace("Pasá el mouse por cualquier palabra subrayada", "Tocá cualquier palabra subrayada")
     s = s.replace("Pasá el mouse por las palabras subrayadas", "Tocá las palabras subrayadas")
 
+    # Todo dentro de un marco con ancho de celular; el que se desplaza es #root.
+    rep('<div id="root"></div>', '<div class="phone">\n<div id="root"></div>')
+    rep('<canvas id="confetti"></canvas>', '<canvas id="confetti"></canvas>\n</div>')
+    n = s.count('document.querySelector(".main")')
+    if n < 3:
+        problems.append("los desplazamientos de .main")
+    s = s.replace('document.querySelector(".main")', 'document.getElementById("root")')
+    # Pestañas: nombre corto para que entre en una línea.
+    rep('["scam", "Detector de estafas", "shield"]', '["scam", "Detector", "shield"]')
+
     # Gráficos: menos fechas cuando el ancho es chico, y sin pisar la última.
     rep("every = Math.ceil(n / 7);", "every = Math.ceil(n / Math.max(3, Math.min(7, Math.floor((W - L - R) / 72))));")
     rep("  const xEvery = Math.ceil(labels.length / 7);",
