@@ -65,20 +65,12 @@ document.addEventListener("touchstart", e => { const el = e.target.closest?.(".t
     if n < 3:
         problems.append("los desplazamientos de .main")
     s = s.replace('document.querySelector(".main")', 'document.getElementById("root")')
-    # Pestañas: nombre corto para que entre en una línea.
-    rep('["scam", "Detector de estafas", "shield"]', '["scam", "Detector", "shield"]')
-
     # Gráficos: menos fechas cuando el ancho es chico, y sin pisar la última.
     rep("every = Math.ceil(n / 7);", "every = Math.ceil(n / Math.max(3, Math.min(7, Math.floor((W - L - R) / 72))));")
     rep("  const xEvery = Math.ceil(labels.length / 7);",
         "  const xEvery = Math.ceil(labels.length / Math.max(3, Math.min(7, Math.floor((W - L - R) / 72))));")
     rep("${labels.map((l, i) => i % xEvery === 0 || i === n ?",
         "${labels.map((l, i) => (i % xEvery === 0 && n - i >= xEvery * 0.6) || i === n ?")
-
-    # Ficha del activo: el encabezado se acomoda en dos renglones.
-    rep('''      <div class="between" style="align-items:flex-start">
-        <div><div class="row" style="gap:10px"><h2>''', '''      <div class="between asset-top" style="align-items:flex-start">
-        <div><div class="row" style="gap:10px"><h2>''')
 
     if problems:
         print("No se pudo generar la versión para celular. Estos fragmentos del prototipo cambiaron:", file=sys.stderr)

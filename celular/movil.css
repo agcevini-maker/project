@@ -135,3 +135,13 @@
   #modal .bg { padding: 14px; align-items: end; }
   #modal .box { padding: 22px 18px; max-height: 88vh; overflow-y: auto; }
   #tip { max-width: calc(100vw - 24px); }
+  /* Simulador oscuro en el celular */
+  .shell.wide { background: var(--dk-bg); }
+  .dk { padding: 14px 0 40px; }
+  .dk-big { font-size: 42px; } .dk-hero { padding: 18px 0 12px; }
+  .dk-acts { gap: 18px; } .ra { width: 66px; height: 52px; }
+  .dk-card { border-radius: 20px; padding: 16px 16px; }
+  .cat { width: 128px; height: 148px; } .cat-ic { width: 50px; height: 50px; }
+  .dk-head h2 { font-size: 22px; } .as-name { font-size: 19px; }
+  .info-g { gap: 14px 16px; } .info-g b { font-size: 17px; }
+  .dk-promo h3 { font-size: 19px; }

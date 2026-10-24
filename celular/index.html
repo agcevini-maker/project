@@ -502,7 +502,7 @@
   .welcome .logo { color: var(--ink); } .welcome .logo small { color: var(--ink-3); }
   .btn.on-dark { background: transparent; color: #fff; border: 1.5px solid rgba(255,255,255,.35); }
   .btn.on-dark:hover { background: rgba(255,255,255,.08); box-shadow: none; }
-  .wl-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; }
+  .wl-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
   .wl-i { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 6px; }
   .wl-i b { font-size: 16px; margin-top: 6px; } .wl-i span { font-size: 13.5px; color: var(--ink-2); }
   .wl-start { display: flex; align-items: center; gap: 24px; margin-top: 20px; background: linear-gradient(135deg, var(--petrol-800), var(--petrol-700)); color: #fff; border-radius: 20px; padding: 26px 28px; }
@@ -512,6 +512,90 @@
   @media (max-width: 1000px) { .home-grid { grid-template-columns: minmax(0, 1fr); } .wl-grid { grid-template-columns: 1fr 1fr; } .next-hero, .wl-start { flex-wrap: wrap; } }
   @media (max-width: 1240px) { .shell { grid-template-columns: 232px minmax(0, 1fr); } .rail { display: none; } }
   @media (max-width: 1000px) { .l-hero-in, .frenos, .steps { grid-template-columns: 1fr; } .preview { display: none; } .opt4, .opts { grid-template-columns: 1fr; } }
+
+  /* ---------- Simulador oscuro, estilo app de inversiones ---------- */
+  :root { --dk-bg: #11181C; --dk-s1: #1B252A; --dk-s2: #243238; --dk-tx: #EEF4F3; --dk-mu: #8FA3A7; --dk-line: #2B3A40; --dk-up: #3DD68C; --dk-dn: #FF7B7B; }
+  .shell.wide .main { background: var(--dk-bg); }
+  .dk { color: var(--dk-tx); max-width: 760px; margin: 0 auto; padding: 22px 0 60px; }
+  .dk h2, .dk h3 { color: var(--dk-tx); }
+  .dk .up { color: var(--dk-up); } .dk .down { color: var(--dk-dn); }
+  .dk-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .dk .toggle { color: var(--dk-mu); } .dk .toggle .sw { background: #3A4A50; }
+  .mk-pill { display: inline-flex; gap: 8px; align-items: center; background: var(--dk-s1); border-radius: 99px; padding: 7px 14px; font-size: 12px; font-weight: 800; letter-spacing: .06em; color: var(--dk-mu); white-space: nowrap; }
+  .mk-pill i { width: 9px; height: 9px; border-radius: 50%; background: #7C8B8F; }
+  .mk-pill.on { color: #7EE2AE; } .mk-pill.on i { background: var(--dk-up); animation: livep 1.6s infinite; }
+  .dk-hero { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px; padding: 26px 0 18px; }
+  .dk-lab { color: var(--dk-mu); font-size: 15px; }
+  .dk-big { font-size: 56px; font-weight: 800; letter-spacing: -.02em; line-height: 1.05; }
+  .dk-big .dec { color: #5E6E73; }
+  .dk-chg { font-weight: 800; font-size: 16px; padding: 6px 14px; border-radius: 99px; }
+  .dk-chg.up { background: rgba(61,214,140,.16); } .dk-chg.down { background: rgba(255,107,107,.14); }
+  .dk-sub { color: var(--dk-mu); font-size: 13.5px; }
+  .dk-acts { display: flex; gap: 26px; margin-top: 14px; }
+  .dk-acts button { background: none; border: 0; color: var(--dk-tx); display: flex; flex-direction: column; align-items: center; gap: 8px; font-weight: 600; }
+  .ra { width: 74px; height: 56px; border-radius: 99px; background: var(--dk-s1); display: grid; place-items: center; color: #7EE2AE; transition: background .15s; }
+  .ra.ra-go { background: var(--mint); color: #062018; } .ra .ic { width: 26px; height: 26px; }
+  .dk-acts button:hover .ra:not(.ra-go) { background: var(--dk-s2); }
+  .dk-card { background: var(--dk-s1); border-radius: 24px; padding: 20px 22px; margin-top: 14px; border: 0; color: var(--dk-tx); display: block; width: 100%; text-align: left; }
+  .dk-link { background: none; border: 0; color: #7EE2AE; font-weight: 700; }
+  .dk-list { display: flex; flex-direction: column; }
+  .dk-row { display: flex; align-items: center; gap: 14px; background: none; border: 0; border-bottom: 1px solid var(--dk-line); padding: 14px 4px; color: var(--dk-tx); text-align: left; width: 100%; }
+  .dk-row:last-child { border-bottom: 0; } .dk-row:hover { background: rgba(255,255,255,.03); }
+  .dr-t { flex: 1; min-width: 0; display: flex; flex-direction: column; } .dr-t b { font-size: 17px; }
+  .dr-t span { color: var(--dk-mu); font-size: 13.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-transform: uppercase; }
+  .dr-p { display: flex; flex-direction: column; align-items: flex-end; font-variant-numeric: tabular-nums; } .dr-p b { font-size: 17px; }
+  .av { display: inline-grid; place-items: center; color: #fff; font-weight: 800; flex: none; letter-spacing: .02em; box-shadow: inset 0 0 0 1px rgba(255,255,255,.1); }
+  .dk-promo { background: var(--dk-s1); border-radius: 28px; padding: 26px 24px; margin-top: 14px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 18px; }
+  .promo-av { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; }
+  .dk-promo h3 { font-size: 22px; max-width: 24ch; }
+  .dk .btn, .drawer .btn { border-radius: 99px; }
+  .dk-level { display: flex; align-items: center; justify-content: space-between; cursor: pointer; } .dk-level b { display: block; font-size: 18px; margin-top: 2px; } .dk-level .ic { color: var(--dk-mu); }
+  .dk-h { margin: 26px 0 12px; color: var(--dk-mu) !important; font-size: 18px; font-weight: 600; }
+  .chips-t { display: grid; grid-auto-flow: column; grid-template-rows: repeat(3, auto); gap: 10px; overflow-x: auto; padding-bottom: 6px; scrollbar-width: none; justify-content: start; }
+  .chips-t::-webkit-scrollbar, .cats::-webkit-scrollbar { display: none; }
+  .chip-t { display: flex; align-items: center; gap: 10px; background: var(--dk-s1); border: 0; border-radius: 99px; padding: 6px 18px 6px 6px; color: var(--dk-tx); white-space: nowrap; }
+  .chip-t .av { border-radius: 50% !important; } .chip-t b { font-size: 16px; } .chip-t:hover { background: var(--dk-s2); }
+  .dk-head { display: flex; align-items: center; gap: 12px; padding: 4px 0 12px; } .dk-head h2 { font-size: 26px; }
+  .dk-back { width: 42px; height: 42px; border-radius: 12px; background: none; border: 0; color: #7EE2AE; font-size: 22px; display: grid; place-items: center; }
+  .dk-back:hover { background: var(--dk-s1); } .dk-back .ic { width: 24px; height: 24px; }
+  .dk-search { display: flex; align-items: center; gap: 12px; border: 1.5px solid #3A4A50; border-radius: 18px; padding: 14px 18px; color: var(--dk-mu); }
+  .dk-search input { background: none; border: 0; outline: 0; color: var(--dk-tx); font-size: 17px; flex: 1; min-width: 0; } .dk-search:focus-within { border-color: var(--mint); }
+  .cats { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 6px; scrollbar-width: none; }
+  .cat { flex: none; width: 150px; height: 168px; border-radius: 24px; background: linear-gradient(160deg, #22343B, #162126); border: 1.5px solid transparent; color: var(--dk-tx); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 10px; }
+  .cat.on { border-color: var(--mint); } .cat b { font-size: 16px; } .cat > span:last-child { color: var(--dk-mu); font-size: 13.5px; }
+  .cat-ic { width: 58px; height: 58px; border-radius: 50%; background: rgba(255,255,255,.06); display: grid; place-items: center; color: #7EE2AE; margin-bottom: 8px; } .cat-ic .ic { width: 26px; height: 26px; }
+  .as-name { text-transform: uppercase; font-size: 22px; letter-spacing: .01em; margin-top: 10px; }
+  .dk-buy { margin-top: 12px; font-size: 18px !important; padding: 16px !important; }
+  .dk .dk-sell { background: var(--dk-s2); color: var(--dk-tx); }
+  .info-g { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 24px; margin-top: 16px; }
+  .info-g span { display: block; color: var(--dk-mu); font-size: 14.5px; } .info-g b { font-size: 19px; }
+  .dk-note { color: var(--dk-mu); font-size: 12px; margin-top: 26px; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; } .dk-note .ic { width: 14px; height: 14px; }
+  .dk .tabs { background: var(--dk-s2); } .dk .tabs button { color: var(--dk-mu); } .dk .tabs button.on { background: var(--dk-s1); color: var(--dk-tx); box-shadow: none; }
+  .dk .card { background: var(--dk-s1); border-color: transparent; color: var(--dk-tx); box-shadow: none; border-radius: 24px; }
+  .dk .muted, .dk .faint, .dk .note { color: var(--dk-mu) !important; }
+  .dk th { color: var(--dk-mu); border-bottom-color: var(--dk-line); background: transparent; } .dk td { border-bottom-color: var(--dk-line); }
+  .dk tbody tr:hover td, .dk .bk-table tbody tr.click:hover { background: rgba(255,255,255,.03); }
+  .dk .explain, .drawer .explain { background: rgba(43,182,115,.08); border-color: rgba(126,226,174,.3); color: #BFEBD3; }
+  .dk .chg.up, .drawer .chg.up { background: rgba(61,214,140,.16); color: var(--dk-up); } .dk .chg.down, .drawer .chg.down { background: rgba(255,107,107,.14); color: var(--dk-dn); }
+  .dk .btn.ghost, .drawer .btn.ghost { background: transparent; color: var(--dk-tx); border-color: #3A4A50; }
+  .dk .chart text { fill: #8FA3A7; } .dk .chart [stroke="#E6EEEC"] { stroke: #2B3A40; } .dk .chart [stroke="#fff"] { stroke: #1B252A; }
+  .dk svg text[fill="#0F2229"] { fill: #EEF4F3; } .dk svg text[fill="#7A8C91"] { fill: #8FA3A7; } .dk .legend { color: var(--dk-mu); }
+  .dk .risk-bar i { background: #fff; box-shadow: 0 0 0 2px var(--dk-s1); } .dk .perf-left { border-right-color: var(--dk-line); }
+  .dk .kv-card { background: var(--dk-s2); }
+  .dk .pill, .drawer .pill { background: rgba(43,182,115,.16); color: #7EE2AE; } .dk .pill.grey { background: var(--dk-s2); color: var(--dk-mu); }
+  .dk .pill.amber { background: rgba(227,162,26,.16); color: #F5C55A; } .dk .pill.red { background: rgba(255,107,107,.14); color: #FF9C9C; }
+  .dk .qbtn, .drawer .qbtn { background: var(--dk-s2); color: var(--dk-mu); } .dk .term { border-bottom-color: #7EE2AE; }
+  .dk .callout { background: var(--dk-s2); color: var(--dk-tx); }
+  .drawer { background: var(--dk-bg); color: var(--dk-tx); } .drawer .dr-head { border-bottom-color: var(--dk-line); }
+  .drawer .muted, .drawer .faint { color: var(--dk-mu) !important; } .drawer h2, .drawer h3 { color: var(--dk-tx); }
+  .drawer .dr-x { background: var(--dk-s1); border-color: var(--dk-line); color: var(--dk-tx); }
+  .drawer .seg2, .drawer .tabs { background: var(--dk-s1); } .drawer .seg2 button, .drawer .tabs button { color: var(--dk-mu); }
+  .drawer .tabs button.on { background: var(--dk-s2); color: var(--dk-tx); box-shadow: none; }
+  .drawer .seg2 button.on.buy { background: var(--mint); color: #062018; } .drawer .seg2 button.on.sell { background: #E05555; color: #fff; }
+  .drawer .input { background: var(--dk-s1); border-color: #3A4A50; color: var(--dk-tx); }
+  .drawer .sum { background: var(--dk-s1); } .drawer .sum > div { border-top-color: var(--dk-line); } .drawer .sum > div span { color: var(--dk-mu); } .drawer .sum .tot span { color: var(--dk-tx); }
+  .drawer .field label, .drawer label { color: var(--dk-mu); } .drawer .callout { background: var(--dk-s1); color: var(--dk-tx); }
+  .drawer .up { color: var(--dk-up); } .drawer .down { color: var(--dk-dn); }
   .m-top { display: none; }
 /* Versión para celular: se suma al estilo del prototipo al generar celular/index.html. */
   /* La app siempre se muestra con ancho de celular, centrada si la pantalla es más ancha (compu, tablet o panel).
@@ -650,6 +734,16 @@
   #modal .bg { padding: 14px; align-items: end; }
   #modal .box { padding: 22px 18px; max-height: 88vh; overflow-y: auto; }
   #tip { max-width: calc(100vw - 24px); }
+  /* Simulador oscuro en el celular */
+  .shell.wide { background: var(--dk-bg); }
+  .dk { padding: 14px 0 40px; }
+  .dk-big { font-size: 42px; } .dk-hero { padding: 18px 0 12px; }
+  .dk-acts { gap: 18px; } .ra { width: 66px; height: 52px; }
+  .dk-card { border-radius: 20px; padding: 16px 16px; }
+  .cat { width: 128px; height: 148px; } .cat-ic { width: 50px; height: 50px; }
+  .dk-head h2 { font-size: 22px; } .as-name { font-size: 19px; }
+  .info-g { gap: 14px 16px; } .info-g b { font-size: 17px; }
+  .dk-promo h3 { font-size: 19px; }
 </style>
 </head>
 <body>
@@ -744,7 +838,7 @@ const FRENOS = {
     solve: "Niveles de 3 minutos y cada palabra rara explicada con un ejemplo de todos los días." },
   estafa: { name: "¿Esto es inversión o estafa?", short: "¿Y si es una estafa?", icon: "alert",
     real: "Las promesas de “ganancia garantizada” circulan por Instagram, TikTok y grupos de WhatsApp, y no siempre es fácil darse cuenta.",
-    solve: "Un detector con semáforo y un nivel entero para aprender a reconocer las señales de alerta." },
+    solve: "Un nivel entero para aprender a reconocer las señales de alerta, y una IA para consultar cualquier oferta que te llegue." },
   poca: { name: "Con lo poco que tengo no vale la pena", short: "Tengo poca plata", icon: "coins",
     real: "Hay opciones que se empiezan con montos chicos. Y con inflación, dejar la plata quieta también tiene un costo.",
     solve: "Practicás con $1.000.000 virtuales y precios reales antes de poner un peso." }
@@ -771,6 +865,9 @@ const TIPS = [
    Íconos (trazos simples)
    ================================================================= */
 const IC = {
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  search: '<circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/>',
   home: '<path d="M3 11 12 4l9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/>',
   learn: '<path d="M3 7.5 12 4l9 3.5-9 3.5L3 7.5Z"/><path d="M7 9.5V14c0 1.7 2.2 3 5 3s5-1.3 5-3V9.5"/>',
   sim: '<path d="M4 19V5"/><path d="M4 19h16"/><path d="m7 15 4-4 3 3 5-6"/>',
@@ -1206,7 +1303,7 @@ function render() {
 
 const NAV = [
   ["home", "Inicio", "home"], ["learn", "Aprender", "learn"], ["sim", "Simulador", "sim"],
-  ["scam", "Detector", "shield"], ["ask", "Preguntá", "chat"], ["rank", "Ranking", "league"]
+  ["ask", "Preguntá", "chat"], ["rank", "Ranking", "league"]
 ];
 const NAV_OF = { lesson: "learn", leap: "learn" };
 
@@ -1218,7 +1315,7 @@ function logo(light = true) {
 
 function shell() {
   const active = NAV_OF[V.page] || V.page;
-  const pages = { home, learn, lesson, sim, scam, ask, leap, rank };
+  const pages = { home, learn, lesson, sim, ask, leap, rank };
   const wide = V.page === "sim";
   const norail = V.page === "home";
   return `<div class="shell ${wide ? "wide" : ""} ${norail ? "norail" : ""}">
@@ -1288,9 +1385,9 @@ function landing() {
               <div class="bar"><span style="width:64%"></span></div>
             </div>
             <div class="card" style="right:0;top:150px;width:300px">
-              <span class="eyebrow">¿Es estafa?</span>
-              <div class="row" style="margin-top:10px"><div style="width:16px;height:16px;border-radius:50%;background:#F05252;box-shadow:0 0 14px rgba(240,82,82,.7)"></div><b>Alto riesgo de estafa</b></div>
-              <p class="xs muted" style="margin-top:8px">“30% mensual garantizado por Instagram”: 3 señales de alerta.</p>
+              <span class="eyebrow">Preguntá sin vergüenza</span>
+              <p class="small" style="margin-top:10px;background:var(--petrol-800);color:#fff;border-radius:12px 12px 4px 12px;padding:8px 12px;margin-left:auto;width:max-content">¿Qué es un CEDEAR?</p>
+              <p class="xs muted" style="margin-top:8px">Es una forma de invertir en empresas de afuera, como Apple, pagando en pesos…</p>
             </div>
             <div class="card" style="left:30px;top:300px;width:340px">
               <div class="between"><span class="eyebrow">Aprender</span><span class="xs faint">+50 XP por nivel</span></div>
@@ -1319,7 +1416,7 @@ function landing() {
         <h2>De cero a tu primera inversión, a tu ritmo</h2>
         <div class="steps">${[
           ["Aprendé", "6 niveles cortos, estilo juego. Cada palabra rara viene explicada."],
-          ["Detectá estafas", "Pegá cualquier oferta que te llegue y mirá el semáforo."],
+          ["Preguntá sin vergüenza", "Lo que no entiendas, preguntalo: te responden en criollo."],
           ["Practicá con precios reales", "Un broker de práctica con $1.000.000 virtuales: cada día ves qué tan buen inversor sos."],
           ["Dá el salto", "Tu primera inversión real en LBO, arrancando con poco."]
         ].map(([h, p], k) => `<div><div class="step-n">${k + 1}</div><h3>${h}</h3><p class="muted small" style="margin-top:6px">${p}</p></div>`).join("")}</div>
@@ -1370,7 +1467,6 @@ function journey() {
   return [
     { id: "l1", t: "Hacé el nivel 1", d: "Por qué la plata guardada pierde valor · 3 minutos", done: S.done.includes(0), ic: "learn", cta: "Empezar el nivel 1" },
     { id: "buy", t: "Hacé tu primera compra de práctica", d: "Tenés $1.000.000 virtuales y precios reales", done: bought, ic: "sim", cta: "Ir al simulador" },
-    { id: "scam", t: "Revisá una oferta en el detector de estafas", d: "Pegá un mensaje que te llegó y mirá el semáforo", done: S.scams > 0, ic: "shield", cta: "Abrir el detector" },
     { id: "ask", t: "Hacé una pregunta sin vergüenza", d: "Lo que quieras: te respondemos en criollo", done: !!S.asked, ic: "chat", cta: "Hacer una pregunta" },
     { id: "all", t: "Completá los 6 niveles", d: `Vas ${S.done.length} de 6 · cada uno dura 3 o 4 minutos`, done: allDone(), ic: "star", cta: `Seguir con el nivel ${current() + 1}` },
     { id: "leap", t: "Dá el salto", d: "Tu primera inversión real en LBO, arrancando con poco", done: false, ic: "rocket", cta: "Dar el salto", lock: !allDone() }
@@ -1421,9 +1517,9 @@ function home() {
 
 /* ---------- Bienvenida: qué se puede hacer y por dónde arrancar ---------- */
 function welcome() {
-  const first = { miedo: "l1", estafa: "scam", poca: "buy" }[S.freno || "miedo"];
+  const first = { miedo: "l1", estafa: "l1", poca: "buy" }[S.freno || "miedo"];
   const st = journey().find(x => x.id === first);
-  const why = { miedo: "Como nos dijiste que te da miedo no entender, arrancá por lo básico:", estafa: "Como te preocupa caer en una estafa, arrancá por el detector:", poca: "Como pensás que con poca plata no vale la pena, probalo vos con plata virtual:" }[S.freno || "miedo"];
+  const why = { miedo: "Como nos dijiste que te da miedo no entender, arrancá por lo básico:", estafa: "Como te preocupa caer en una estafa, arrancá por lo básico (en el nivel 3 aprendés a reconocerlas):", poca: "Como pensás que con poca plata no vale la pena, probalo vos con plata virtual:" }[S.freno || "miedo"];
   return `<div class="welcome">
     <div class="l-wrap" style="max-width:960px">
       <nav class="l-nav">${logo()}</nav>
@@ -1431,7 +1527,6 @@ function welcome() {
       <div class="wl-grid">${[
         ["learn", "Aprender", "6 niveles de 3 minutos, como un juego. Ganás puntos y estrellas.", "learn"],
         ["sim", "Practicar", "Un simulador con $1.000.000 virtuales y precios reales de la bolsa.", "sim"],
-        ["shield", "Detectar estafas", "Pegás una oferta que te llegó y te decimos qué señales de alerta tiene.", "scam"],
         ["chat", "Preguntar", "Lo que te da vergüenza preguntar en voz alta. Sin preguntas tontas.", "ask"],
         ["league", "Competir", "Un ranking con quienes mejor manejan su cartera de práctica.", "rank"]
       ].map(([ic, h, p]) => `<div class="wl-i"><div class="icon-box">${icon(ic)}</div><b>${h}</b><span>${p}</span></div>`).join("")}</div>
@@ -1826,7 +1921,7 @@ function marketStatus() {
 
 /* ---------- Estado del broker ---------- */
 function ensureBk() {
-  if (!S.bk || S.bk.v !== 2) S.bk = { v: 2, cash: BROKER_CFG.startCash, hold: {}, orders: [], nextId: 10231, start: MD.asOf, lastSeen: MD.asOf, explain: true, view: "quotes", tab: "fci" };
+  if (!S.bk || S.bk.v !== 2) S.bk = { v: 2, cash: BROKER_CFG.startCash, hold: {}, orders: [], nextId: 10231, start: MD.asOf, lastSeen: MD.asOf, explain: true, view: "home", tab: "all" };
   return S.bk;
 }
 const units = (a, qty, px) => qty * px / a.per;
@@ -1918,32 +2013,77 @@ function perfStats() {
 }
 
 /* ---------- Vistas del simulador ---------- */
-function sim() {
-  const B = ensureBk(), ms = marketStatus();
-  const tot = totalValue(), res = tot - BROKER_CFG.startCash, perf = perfStats();
-  return `
-    <div class="practice-strip ${LIVE_STATE === "on" ? "live" : ""}">${priceNote()}</div>
-    <div class="bk-head">
-      <div><h1>Tu broker de práctica</h1></div>
-      <div class="bk-controls">
-        <div class="mkt ${ms.open ? "open" : ""}"><i></i><div><b>Mercado ${ms.label}</b><span class="xs faint">Hoy ${ms.time} hs · ${LIVE_STATE === "on" ? (ms.open ? "Cotizaciones en vivo, se actualizan cada 20 segundos" : "Últimos precios operados") : `Precios al cierre del ${fmtDate(MD.asOf)} · se actualizan cada día hábil`}</span></div></div>
-        <label class="toggle small"><input type="checkbox" data-bk="explain" ${B.explain ? "checked" : ""}><span class="sw"></span>Modo explicado</label>
-      </div>
-    </div>
-    <div class="bk-bar">
-      <div class="bk-kpis">
-        <div><span class="xs faint">${t("saldo", "Saldo disponible")}</span><b class="num">${m2(B.cash)}</b></div>
-        <div><span class="xs faint">Valor total</span><b class="num">${m2(tot)}</b></div>
-        <div><span class="xs faint">Resultado total</span><b class="num ${res >= 0 ? "up" : "down"}">${m2(res)} (${pc2(res / BROKER_CFG.startCash)})</b></div>
-        <div><span class="xs faint">Empezaste el</span><b>${fmtDateLong(B.start)} · ${perf.days} ${perf.days === 1 ? "día" : "días"}</b></div>
-      </div>
-      <button class="score-chip" data-bkview="port"><span class="xs">Tu nivel de inversor</span><b>${perf.days ? `${perf.tier} · ${perf.score}/100` : "Se calcula mañana"}</b></button>
-    </div>
-    ${ex(LIVE_STATE === "on" ? "Los precios son los de BYMA: con el mercado abierto (de 11 a 17 hs) se mueven en vivo y tu cartera cambia con ellos. Comprás y vendés con plata virtual a las puntas reales." : "Acá no se adelanta el tiempo: cada día hábil, después del cierre, entran los precios reales y tu cartera cambia sola. Volvé mañana para ver cómo te fue.")}
-    <div class="tabs bk-tabs">${[["quotes", "Cotizaciones"], ["port", "Mi cartera"], ["hist", "Historial"]].map(([k, l]) => `<button class="${B.view === k ? "on" : ""}" data-bkview="${k}">${l}</button>`).join("")}</div>
-    ${V.sym ? assetView(V.sym) : B.view === "port" ? portView(perf) : B.view === "hist" ? histView() : quotesView()}`;
+/* ---------- Simulador con estilo de app de inversiones: oscuro, precio grande al centro, filas con ícono ---------- */
+const tkLabel = a => a.t === "LECAP" && MD.lecap ? MD.lecap : a.t;
+const avatar = (a, size = 56) => `<span class="av" style="width:${size}px;height:${size}px;border-radius:${Math.round(size * .28)}px;background:${CLASSES[a.cls].color};font-size:${Math.max(10, Math.round(size * (tkLabel(a).length > 4 ? .22 : .3)))}px">${esc(tkLabel(a).slice(0, 5))}</span>`;
+const moneyBig = n => { const t = m2(n), i = t.lastIndexOf(","); return i < 0 ? t : `${t.slice(0, i)}<span class="dec">${t.slice(i)}</span>`; };
+function mkPill() {
+  const ms = marketStatus(), live = LIVE_STATE === "on" && ms.open;
+  return `<div class="mk-pill ${live ? "on" : ""}"><i></i>${live ? "EN VIVO" : ms.open ? "MERCADO ABIERTO" : "MERCADO CERRADO"}</div>`;
 }
-
+function tickerChips(list) {
+  return `<div class="chips-t">${list.map(a => { const v = dayVar(a.t); return `<button class="chip-t" data-sym="${a.t}">${avatar(a, 34)}<b>${tkLabel(a)}</b><span class="${v >= 0 ? "up" : "down"}">${pc2(v)}</span></button>`; }).join("")}</div>`;
+}
+function dkHead(title, back = "home", x = false) {
+  return `<div class="dk-head"><button class="dk-back" data-bkview="${back}" aria-label="Volver">${x ? "✕" : icon("back")}</button><h2>${title}</h2><span style="flex:1"></span>${mkPill()}</div>`;
+}
+function sim() {
+  const B = ensureBk(), perf = perfStats();
+  const view = V.sym ? "asset" : B.view === "quotes" ? "explore" : B.view || "home";
+  const body = view === "asset" ? assetView(V.sym)
+    : view === "explore" ? exploreView()
+    : view === "port" ? `${dkHead("Mi cartera")}${portView(perf)}`
+    : view === "hist" ? `${dkHead("Historial")}${histView()}`
+    : simHome(perf);
+  return `<div class="dk">${body}<p class="dk-note">${priceNote()}</p></div>`;
+}
+function simHome(perf) {
+  const B = S.bk, tot = totalValue(), res = tot - BROKER_CFG.startCash, hv = holdValue();
+  const rows = Object.entries(B.hold).map(([k, h]) => { const a = A(k), val = units(a, h.qty, last(k)); return { a, h, val, r: val / h.cost - 1 }; }).sort((x, y) => y.val - x.val);
+  const moved = assets().slice().sort((x, y) => Math.abs(dayVar(y.t)) - Math.abs(dayVar(x.t)));
+  return `
+    <div class="dk-top">${mkPill()}<label class="toggle small"><input type="checkbox" data-bk="explain" ${B.explain ? "checked" : ""}><span class="sw"></span>Modo explicado</label></div>
+    <div class="dk-hero">
+      <span class="dk-lab">Valor de tu cuenta · plata virtual</span>
+      <div class="dk-big num">${moneyBig(tot)}</div>
+      <span class="dk-chg ${res >= 0 ? "up" : "down"}">${pc2(res / BROKER_CFG.startCash)} desde que empezaste</span>
+      <p class="dk-sub">Disponible ${m2(B.cash)} · Invertido ${m2(hv)}</p>
+      <div class="dk-acts">
+        <button data-bkview="explore"><span class="ra ra-go">${icon("plus")}</span>Invertir</button>
+        <button data-bkview="port"><span class="ra">${icon("sim")}</span>Mi cartera</button>
+        <button data-bkview="hist"><span class="ra">${icon("clock")}</span>Historial</button>
+      </div>
+    </div>
+    ${ex("Tenés $1.000.000 virtuales para practicar. Tocá “Invertir” para elegir qué comprar. Los precios son reales: tu cartera sube o baja como en el mercado.")}
+    ${rows.length ? `<div class="dk-card"><div class="between"><h3>Tu cartera</h3><button class="dk-link" data-bkview="port">Ver detalle</button></div>
+      <div class="dk-list">${rows.map(({ a, h, val, r }) => `<button class="dk-row" data-sym="${a.t}">${avatar(a, 44)}<span class="dr-t"><b>${tkLabel(a)}</b><span>${qtyF(a, h.qty)} ${a.unit}</span></span><span class="dr-p"><b class="num">${m2(val)}</b><span class="${r >= 0 ? "up" : "down"}">${pc2(r)}</span></span></button>`).join("")}</div></div>`
+    : `<div class="dk-promo">
+        <div class="promo-av">${moved.slice(0, 5).map((a, k) => `<span>${avatar(a, k === 2 ? 62 : 44)}</span>`).join("")}</div>
+        <h3>Comprá tu primera acción, bono o CEDEAR con plata virtual</h3>
+        <button class="btn lg" data-bkview="explore">Empezar a invertir</button>
+      </div>`}
+    <button class="dk-card dk-level" data-bkview="port"><span><span class="dk-lab">Tu nivel de inversor</span><b>${perf.days ? `${perf.score}/100 · ${perf.tier}` : "Se calcula mañana"}</b></span>${icon("arrow", "ic")}</button>
+    <h3 class="dk-h">Los que más se movieron hoy</h3>
+    ${tickerChips(moved)}`;
+}
+function exploreRows() {
+  const qy = (V.q || "").trim().toLowerCase(), tab = S.bk.tab || "all";
+  const list = assets().filter(a => (tab === "all" || a.cls === tab) && (!qy || tkLabel(a).toLowerCase().includes(qy) || a.name.toLowerCase().includes(qy)));
+  return list.length ? list.map(a => { const v = dayVar(a.t); return `<button class="dk-row" data-sym="${a.t}">${avatar(a, 48)}<span class="dr-t"><b>${tkLabel(a)}</b><span>${esc(a.name)}</span></span><span class="dr-p"><b class="num" data-live="${a.t}">${m2(last(a.t))}</b><span class="${v >= 0 ? "up" : "down"}">${pc2(v)}</span></span></button>`; }).join("")
+    : `<p class="dk-sub" style="padding:20px 4px">No encontramos nada con “${esc(V.q)}”.</p>`;
+}
+function exploreView() {
+  const tab = S.bk.tab || "all", all = assets();
+  const cats = [["all", "Todas", all.length, "sparkle"]].concat(TAB_ORDER.filter(k => all.some(a => a.cls === k)).map(k => [k, CLASSES[k].name, all.filter(a => a.cls === k).length, { fci: "drop", ars: "doc", usd: "doc", cedear: "globe", accion: "building" }[k] || "sim"]));
+  return `
+    ${dkHead("Explorar")}
+    <label class="dk-search">${icon("search")}<input id="bk-q" placeholder="Buscar por nombre o ticker" value="${esc(V.q || "")}" autocomplete="off"></label>
+    ${ex("Acá están todas las opciones para practicar. Tocá una para ver su precio, su gráfico y comprarla.")}
+    <h3 class="dk-h">Categorías</h3>
+    <div class="cats">${cats.map(([k, l, n, ic]) => `<button class="cat ${tab === k ? "on" : ""}" data-bktab="${k}"><span class="cat-ic">${icon(ic)}</span><b>${l}</b><span>${n} ${n === 1 ? "opción" : "opciones"}</span></button>`).join("")}</div>
+    <h3 class="dk-h">${tab === "all" ? "Todas" : CLASSES[tab].name}</h3>
+    <div class="dk-list" id="ex-list">${exploreRows()}</div>`;
+}
 function spark5(t) {
   const p = MD.close[t].slice(-6).filter(v => v != null);
   const min = Math.min(...p), max = Math.max(...p), sp = max - min || 1;
@@ -1992,34 +2132,43 @@ function riskMeter(a) {
 const RANGES = { "1S": 5, "1M": 21, "6M": 126, "1A": 250, "Desde que empezaste": -1 };
 function assetView(tk) {
   const a = A(tk), B = S.bk, r = V.range || "1M", hasOhlc = !!MD.ohlc[tk], style = hasOhlc ? (V.cstyle || "line") : "line";
-  const v = dayVar(tk), k = ohlcAt(tk, lastI()), h = B.hold[tk];
-  const year = MD.close[tk].slice(-251).filter(x => x != null);
+  const v = dayVar(tk), k = ohlcAt(tk, lastI()), h = B.hold[tk], fci = a.cls === "fci";
+  const vol = LIVE[tk]?.v || k?.[4];
+  const upd = LIVE[tk] ? `Actualizado hoy ${liveTime().slice(0, 5)}` : `Cierre del ${fmtDate(MD.asOf)}`;
+  const info = [
+    [`Volumen ${q("volumen")}`, vol ? Math.round(vol).toLocaleString("es-AR") : "—"],
+    ["Cierre anterior", m2(prevClose(tk))],
+    ["Apertura", k ? m2(k[0]) : "—"], ["Precio máximo", k ? m2(k[1]) : "—"],
+    ["Precio mínimo", k ? m2(k[2]) : "—"],
+    [fci ? "Monto mínimo" : "Mínimo para comprar", fci ? "$1.000" : a.per === 100 ? `100 ${t("vn", "VN")}` : `1 ${a.unit.replace(/s$/, "")}`]
+  ];
+  const related = assets().filter(x => x.cls === a.cls && x.t !== tk);
   return `
-    <button class="link small" data-bkview="quotes" style="margin:12px 0">${icon("back", "ic")} Volver a cotizaciones</button>
-    <div class="card">
-      <div class="between asset-top" style="align-items:flex-start">
-        <div><div class="row" style="gap:10px"><h2>${a.t === "LECAP" && MD.lecap ? MD.lecap : a.t}</h2><span class="pill" style="background:${CLASSES[a.cls].color}1a;color:${CLASSES[a.cls].color}">${CLASSES[a.cls].name}</span></div>
-          <p class="muted">${a.name}${a.per === 100 ? " · precio cada 100 " + t("vn", "VN") : ""}</p></div>
-        <div class="row" style="gap:18px;align-items:center">
-          <div style="text-align:right"><div class="big-num num" data-live="${tk}">${m2(last(tk))}</div><span class="chg ${v >= 0 ? "up" : "down"}">${pc2(v)} en el día</span><div class="xs faint" style="margin-top:4px">${LIVE[tk] ? `${marketStatus().open ? "En vivo" : "Último operado"} · ${liveTime()}` : `Cierre del ${fmtDate(MD.asOf)}`}</div></div>
-          <div class="stack" style="gap:8px"><button class="btn" data-trade="${tk}" data-side="buy">${a.cls === "fci" ? "Suscribir" : "Comprar"}</button><button class="btn dark" data-trade="${tk}" data-side="sell" ${h ? "" : "disabled"}>${a.cls === "fci" ? "Rescatar" : "Vender"}</button></div>
-        </div>
-      </div>
-      <div class="between" style="margin:16px 0 6px">
+    <div class="dk-head"><button class="dk-back" data-bkview="${B.lastList || "explore"}" aria-label="Cerrar">✕</button><span style="flex:1"></span>${mkPill()}</div>
+    <div class="dk-hero">
+      ${avatar(a, 76)}
+      <h2 class="as-name">${esc(a.name)}</h2>
+      <span class="dk-lab">${CLASSES[a.cls].name}${a.per === 100 ? " · precio cada 100 VN" : ""}</span>
+      <div class="dk-big num" data-live="${tk}">${moneyBig(last(tk))}</div>
+      <span class="dk-chg ${v >= 0 ? "up" : "down"}">${pc2(v)} hoy</span>
+      <button class="btn lg block dk-buy" data-trade="${tk}" data-side="buy">${fci ? "Suscribir" : "Comprar"}</button>
+      ${h ? `<button class="btn lg block dk-sell" data-trade="${tk}" data-side="sell">${fci ? "Rescatar" : "Vender"} · tenés ${qtyF(a, h.qty)} ${a.unit}</button>` : ""}
+    </div>
+    <div class="dk-card">
+      <div class="between" style="margin-bottom:8px;flex-wrap:wrap;gap:8px">
         <div class="tabs">${Object.keys(RANGES).map(x => `<button class="${r === x ? "on" : ""}" data-range="${x}">${x}</button>`).join("")}</div>
         ${hasOhlc ? `<div class="tabs"><button class="${style === "line" ? "on" : ""}" data-cstyle="line">Línea</button><button class="${style === "candle" ? "on" : ""}" data-cstyle="candle">Velas</button></div>` : ""}
       </div>
       <div id="chart-asset"></div>
       ${ex("Cada punto es el precio de cierre real de un día. En velas, cada vela muestra la apertura, el cierre, el máximo y el mínimo del día.")}
     </div>
-    <div class="grid" style="grid-template-columns:repeat(4,1fr);margin-top:14px">${[
-      ["Máximo del día", k ? m2(k[1]) : "—"], ["Mínimo del día", k ? m2(k[2]) : "—"], [`Volumen ${q("volumen")}`, k && k[4] ? big(k[4], false) : "—"], ["Rango 12 meses", `${big(Math.min(...year))} – ${big(Math.max(...year))}`]
-    ].map(([l, val]) => `<div class="card kv-card"><span class="xs faint">${l}</span><b class="num">${val}</b></div>`).join("")}</div>
-    <div class="grid" style="grid-template-columns:1fr 1fr;margin-top:14px;align-items:start">
-      <div class="card"><p style="font-size:16px">${a.simple}</p>${a.ccl ? `<p class="small muted" style="margin-top:8px">Cotiza en pesos y se mueve con la empresa y con el ${t("ccl", "dólar CCL")}.</p>` : ""}
-        ${h ? `<div class="callout" style="margin-top:12px;font-size:14px">Tenés <b>${qtyF(a, h.qty)} ${a.unit}</b> · valorizado ${m2(units(a, h.qty, last(tk)))}</div>` : ""}</div>
-      ${riskMeter(a)}
-    </div>`;
+    <div class="dk-card">
+      <div class="between"><h3>Información</h3><span class="dk-sub">${upd}</span></div>
+      <div class="info-g">${info.map(([l, val]) => `<div><span>${l}</span><b class="num">${val}</b></div>`).join("")}</div>
+    </div>
+    <div class="dk-card"><h3>En simple</h3><p style="margin-top:6px">${a.simple}</p>${a.ccl ? `<p class="dk-sub" style="margin-top:8px">Cotiza en pesos y se mueve con la empresa y con el ${t("ccl", "dólar CCL")}.</p>` : ""}</div>
+    ${riskMeter(a)}
+    ${related.length ? `<h3 class="dk-h">${CLASSES[a.cls].name} relacionados</h3>${tickerChips(related)}` : ""}`;
 }
 
 /* ---------- Drawer lateral de compra y venta ---------- */
@@ -2351,7 +2500,7 @@ function leap() {
       <span class="pill" style="background:rgba(43,182,115,.18);color:#7EE2AE">Camino completo</span>
       <h1 style="font-size:42px;margin-top:14px">¡Ya podés dar el salto!</h1>
       <p style="color:#B9D3D5;font-size:18px;margin:10px auto 0;max-width:52ch">Aprendiste, detectaste estafas y practicaste sin arriesgar nada. Ahora podés hacer tu primera inversión real, arrancando con poco.</p>
-      <div class="stats4">${[["6/6", "niveles completos"], [S.scams, "ofertas revisadas"], [S.streak, "días de racha"], [S.xp || 0, "XP ganados"]].map(([b, d]) => `<div><b>${b}</b><span class="small" style="color:#B9D3D5">${d}</span></div>`).join("")}</div>
+      <div class="stats4">${[["6/6", "niveles completos"], [Object.keys(S.bk?.hold || {}).length, "inversiones de práctica"], [S.streak, "días de racha"], [S.xp || 0, "XP ganados"]].map(([b, d]) => `<div><b>${b}</b><span class="small" style="color:#B9D3D5">${d}</span></div>`).join("")}</div>
     </div>
     <div class="grid" style="grid-template-columns:1.3fr 1fr;margin-top:18px;align-items:start">
       <div class="card">
@@ -2562,9 +2711,9 @@ function bkClick(b, e) {
   if (d.trade) { e.stopPropagation(); V.tk = newTicket(d.trade, d.side || "buy"); V.drawer = true; V.drIn = false; renderDrawer(); setTimeout(() => { V.drIn = true; document.querySelector(".drawer")?.classList.add("in"); document.querySelector(".drawer input, .drawer button")?.focus(); }, 20); return; }
   if (d.drclose) { closeDrawer(); return; }
   if (d.drgo) { closeDrawer(); B.view = d.drgo; V.sym = null; save(); render(); return; }
-  if (d.bkview) { B.view = d.bkview; V.sym = null; save(); render(); return; }
+  if (d.bkview) { B.view = d.bkview; V.sym = null; save(); render(); const m = document.getElementById("root"); if (m) m.scrollTop = 0; return; }
   if (d.bktab) { B.tab = d.bktab; save(); render(); return; }
-  if (d.sym) { V.sym = d.sym; V.tk = null; V.range = V.range || "1M"; render(); const m = document.getElementById("root"); if (m) m.scrollTop = 0; return; }
+  if (d.sym) { if (!V.sym) B.lastList = B.view === "quotes" ? "explore" : B.view || "home"; V.sym = d.sym; V.tk = null; V.range = V.range || "1M"; render(); const m = document.getElementById("root"); if (m) m.scrollTop = 0; return; }
   if (d.range) { V.range = d.range; render(); return; }
   if (d.cstyle) { V.cstyle = d.cstyle; render(); return; }
   if (d.cancel) { const o = B.orders.find(x => x.id === +d.cancel); if (o && o.status === "Pendiente") { B.cash += o.reserved || 0; o.reserved = 0; o.status = "Cancelada"; save(); render(); } return; }
@@ -2611,6 +2760,7 @@ document.addEventListener("submit", e => { if (e.target.id === "auth-form") { e.
 document.addEventListener("input", e => {
   const el = e.target;
   if (el.dataset.bind) { S[el.dataset.bind] = el.value; save(); return; }
+  if (el.id === "bk-q") { V.q = el.value; const l = document.getElementById("ex-list"); if (l) l.innerHTML = exploreRows(); return; }
   if (el.dataset.bk === "explain") { S.bk.explain = el.checked; save(); render(); return; }
   if (el.dataset.tkin && V.tk) {
     const raw = el.value.trim(), v = parseFloat(raw.includes(",") ? raw.replace(/\./g, "").replace(",", ".") : raw.replace(/[^0-9.]/g, ""));
@@ -2636,7 +2786,7 @@ window.addEventListener("resize", () => mountCharts());
 /* ---------- Mapa del prototipo (para presentar) ---------- */
 const SCREENS = [
   ["landing", "Landing"], ["auth", "Registro (Google o email)"], ["diag", "Diagnóstico"], ["welcome", "Bienvenida"], ["home", "Inicio"], ["learn", "Aprender"], ["lesson3", "Lección nivel 3"],
-  ["scam", "Detector de estafas"], ["sim", "Simulador"], ["ask", "Preguntá sin vergüenza"], ["rank", "Ranking"], ["leap", "El salto"]
+  ["sim", "Simulador"], ["ask", "Preguntá sin vergüenza"], ["rank", "Ranking"], ["leap", "El salto"]
 ];
 function showMap() {
   modal(`<h2>Mapa del prototipo</h2><p class="muted small" style="margin-top:4px">Saltá a cualquier pantalla. Atajo: tecla M.</p>
