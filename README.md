@@ -122,7 +122,7 @@ Antes de usarlo con usuarios reales (y menores de edad) hace falta que LBO revis
 
 ### Asistente con IA y progreso guardado
 
-- **Preguntá** responde cualquier pregunta con IA (Claude) cuando el prototipo se abre publicado en claude.ai (capacidad `sample`). Las instrucciones están en `AI_RULES`: voseo, respuestas cortas, nunca promete ganancias ni recomienda qué comprar, avisa que no tiene datos en vivo y no inventa datos de LBO. Como archivo suelto o app de escritorio usa las respuestas guardadas (`ANSWERS`).
+- **Preguntá** (dentro de la esfera flotante, pestaña "Preguntá") responde cualquier pregunta con IA (Claude) cuando el prototipo se abre publicado en claude.ai (capacidad `sample`). Las instrucciones están en `AI_RULES`: voseo, respuestas cortas, nunca promete ganancias ni recomienda qué comprar, avisa que no tiene datos en vivo y no inventa datos de LBO. Como archivo suelto o app de escritorio usa las respuestas guardadas (`ANSWERS`).
 - **Progreso:** siempre se guarda en el navegador. En claude.ai además se guarda en la base privada de cada persona (capacidad `db`, `data/users/<id>`), así vuelve aunque se borre el navegador o se entre desde otro dispositivo. La barra lateral muestra dónde quedó guardado.
 
 ### Aprender (más lúdico)
