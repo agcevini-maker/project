@@ -145,3 +145,6 @@
   .dk-head h2 { font-size: 22px; } .as-name { font-size: 19px; }
   .info-g { gap: 14px 16px; } .info-g b { font-size: 17px; }
   .dk-promo h3 { font-size: 19px; }
+  .onb-g { grid-template-columns: minmax(0, 1fr); gap: 8px; } .onb-i { flex-direction: row; align-items: center; gap: 12px; padding: 12px; } .onb-i b { margin: 0; min-width: 70px; }
+  .onb-final { padding: 20px 16px !important; } .onb-final h1 { font-size: 24px; } .onb-cta { padding: 18px 16px; } .onb-cta h2 { font-size: 19px; }
+  .guide { padding: 14px 14px; } .guide b { font-size: 16px; padding-right: 70px; }

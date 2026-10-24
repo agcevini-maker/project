@@ -658,6 +658,30 @@
   .op-chat .msg { max-width: 88%; font-size: 14.5px; padding: 11px 13px; }
   .op-foot { padding: 12px 18px 14px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 8px; }
   .op-sug { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; } .op-sug .chip { white-space: nowrap; flex: none; font-size: 13px; padding: 6px 12px; }
+
+  /* Onboarding de 3 pasos */
+  .onb-final h1 { font-size: 30px; }
+  .onb-g { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 18px; }
+  .onb-i { background: var(--card-2); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 6px; }
+  .onb-i b { font-size: 16px; margin-top: 4px; } .onb-i span { font-size: 13.5px; color: var(--ink-2); }
+  .onb-cta { margin-top: 18px; background: linear-gradient(135deg, var(--petrol-800), var(--petrol-700)); border-radius: 18px; padding: 22px; color: #fff; }
+  .onb-cta h2 { color: #fff; font-size: 22px; margin-top: 6px; } .onb-cta > p:first-child { color: #CFE3E4; }
+  /* Guía de la primera inversión */
+  .guide { position: relative; background: linear-gradient(135deg, rgba(43,182,115,.18), rgba(43,182,115,.06)); border: 1px solid rgba(126,226,174,.35); border-radius: 20px; padding: 16px 18px; margin: 4px 0 16px; color: var(--dk-tx); display: flex; flex-direction: column; gap: 4px; }
+  .guide b { font-size: 17px; } .guide p { color: #BFD6D3; font-size: 14px; max-width: 60ch; }
+  .g-n { font-size: 12px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: #7EE2AE; }
+  .g-steps { display: flex; gap: 6px; margin-bottom: 8px; } .g-steps i { flex: 1; height: 5px; border-radius: 99px; background: rgba(255,255,255,.12); }
+  .g-steps i.done { background: #7EE2AE; } .g-steps i.on { background: var(--mint); box-shadow: 0 0 10px rgba(43,182,115,.7); }
+  .g-skip { position: absolute; top: 12px; right: 14px; background: none; border: 0; color: var(--dk-mu); font-size: 12.5px; font-weight: 600; }
+  .g-skip:hover { color: var(--dk-tx); }
+  .coach { position: relative; animation: coach 1.6s ease-in-out infinite; border-radius: 99px; }
+  .dk-row.coach { border-radius: 16px; background: rgba(43,182,115,.08); }
+  @keyframes coach { 0%, 100% { box-shadow: 0 0 0 0 rgba(43,182,115,.0); } 50% { box-shadow: 0 0 0 6px rgba(43,182,115,.35); } }
+  @media (prefers-reduced-motion: reduce) { .coach { animation: none; box-shadow: 0 0 0 4px rgba(43,182,115,.4); } }
+  .g-tag { display: inline-block; vertical-align: 2px; margin-left: 6px; text-transform: none; font-size: 11px; font-weight: 800; color: #062018; background: var(--mint); border-radius: 99px; padding: 1px 8px; }
+  .dk-row { position: relative; }
+  .dk-next { display: flex; flex-direction: column; gap: 4px; cursor: pointer; } .dk-next b { font-size: 18px; } .dk-next .bar { margin-top: 8px; background: rgba(255,255,255,.1); }
+  .splash { min-height: 100%; display: grid; place-content: center; justify-items: center; gap: 18px; background: var(--petrol-900); }
   .m-top { display: none; }
 /* Versión para celular: se suma al estilo del prototipo al generar celular/index.html. */
   /* La app siempre se muestra con ancho de celular, centrada si la pantalla es más ancha (compu, tablet o panel).
@@ -806,6 +830,9 @@
   .dk-head h2 { font-size: 22px; } .as-name { font-size: 19px; }
   .info-g { gap: 14px 16px; } .info-g b { font-size: 17px; }
   .dk-promo h3 { font-size: 19px; }
+  .onb-g { grid-template-columns: minmax(0, 1fr); gap: 8px; } .onb-i { flex-direction: row; align-items: center; gap: 12px; padding: 12px; } .onb-i b { margin: 0; min-width: 70px; }
+  .onb-final { padding: 20px 16px !important; } .onb-final h1 { font-size: 24px; } .onb-cta { padding: 18px 16px; } .onb-cta h2 { font-size: 19px; }
+  .guide { padding: 14px 14px; } .guide b { font-size: 16px; padding-right: 70px; }
 </style>
 </head>
 <body>
@@ -1109,12 +1136,12 @@ async function initAuth() {
       await loadScript("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js");
       SB = window.supabase.createClient(AUTH_CFG.supabaseUrl, AUTH_CFG.supabaseAnonKey);
       const { data } = await SB.auth.getSession();
-      if (data.session) { await cloudLoad(data.session.user); V = { page: S.started ? "home" : "diag", step: 0 }; render(); }
+      if (data.session) { await cloudLoad(data.session.user); V = { page: S.started ? "sim" : "diag", step: 0 }; render(); }
     } catch (e) { toast("No se pudo conectar con el servidor de cuentas."); }
     return;
   }
   const ses = lsGet(SESSION_KEY, null);
-  if (ses && lsGet(ACCOUNTS_KEY, {})[ses.email]) { startSession(ses); V = { page: S.started ? "home" : "diag", step: 0 }; }
+  if (ses && lsGet(ACCOUNTS_KEY, {})[ses.email]) { startSession(ses); V = { page: S.started ? "sim" : "diag", step: 0 }; }
 }
 
 /* ---------- Continuar con Google ---------- */
@@ -1373,7 +1400,7 @@ function gauss(r) { let u = 0, v = 0; while (!u) u = r(); while (!v) v = r(); re
    Render
    ================================================================= */
 const root = document.getElementById("root");
-function go(page, extra = {}) { if (!USER && !["landing", "auth"].includes(page)) { extra = { mode: "signup" }; page = "auth"; } V = { page, ...extra }; render(); const m = document.getElementById("root"); if (m) m.scrollTop = 0; window.scrollTo(0, 0); }
+function go(page, extra = {}) { if (page === "home") page = "sim"; if (page === "welcome") { page = "diag"; extra = { step: ONB_STEPS - 1 }; } if (!USER && !["landing", "auth"].includes(page)) { extra = { mode: "signup" }; page = "auth"; } V = { page, ...extra }; render(); const m = document.getElementById("root"); if (m) m.scrollTop = 0; window.scrollTo(0, 0); }
 
 function render() {
   if (V.page === "landing") root.innerHTML = landing();
@@ -1388,8 +1415,7 @@ function render() {
 }
 
 const NAV = [
-  ["home", "Inicio", "home"], ["learn", "Aprender", "learn"], ["sim", "Simulador", "sim"],
-  ["rank", "Ranking", "league"]
+  ["sim", "Inicio", "home"], ["learn", "Aprender", "learn"], ["rank", "Ranking", "league"]
 ];
 const NAV_OF = { lesson: "learn", leap: "learn" };
 
@@ -1526,20 +1552,23 @@ const DIAG = [
   { key: "exp", q: "¿Alguna vez invertiste?", sub: "", opts: [["nunca", "Nunca", "Arranco de cero", "sparkle"], ["poco", "Alguna vez, poquito", "Probé algo, pero no entendí mucho", "coins"], ["si", "Sí, a veces", "Quiero hacerlo mejor", "sim"]] },
   { key: "freno", q: "¿Qué te frena más?", sub: "", opts: [["miedo", "Me da miedo, no entiendo nada", "Las palabras técnicas me espantan", "shield-q"], ["estafa", "¿Es inversión o estafa?", "No sé en quién confiar", "alert"], ["poca", "Tengo poca plata", "Creo que no vale la pena", "coins"]] }
 ];
+const ONB_STEPS = 3; // dos preguntas y "así funciona"
 function diag() {
-  const step = V.step || 0, d = DIAG[step], val = S[d.key];
+  const step = V.step || 0, d = DIAG[step], val = d ? S[d.key] : null;
+  const top = `<div class="diag-top"><div class="l-wrap" style="max-width:840px"><nav class="l-nav">${logo()}<button class="navlink" style="color:#CFE3E4" data-go="landing">Salir</button></nav>
+      <div class="seg-progress">${Array.from({ length: ONB_STEPS }, (_, k) => `<span class="${k <= step ? "on" : ""}"></span>`).join("")}</div>
+      <p style="color:#A9C7C9;margin:14px 0 4px" class="small">Paso ${step + 1} de ${ONB_STEPS}</p>
+    </div></div>`;
+  if (!d) return `<div class="diag">${top}<div class="l-wrap" style="max-width:840px;width:100%">${onbFinal()}</div></div>`;
   return `<div class="diag">
-    <div class="diag-top"><div class="l-wrap" style="max-width:840px"><nav class="l-nav">${logo()}<button class="navlink" style="color:#CFE3E4" data-go="landing">Salir</button></nav>
-      <div class="seg-progress">${DIAG.map((_, k) => `<span class="${k <= step ? "on" : ""}"></span>`).join("")}</div>
-      <p style="color:#A9C7C9;margin:14px 0 4px" class="small">Pregunta ${step + 1} de ${DIAG.length}</p>
-    </div></div>
+    ${top}
     <div class="l-wrap" style="max-width:840px;width:100%">
       <div class="card diag-card" style="padding:36px">
         <h1>${d.q}</h1>${d.sub ? `<p class="muted" style="margin-top:6px">${d.sub}</p>` : ""}
         <div class="opts">${d.opts.map(([v, title, sub, ic]) => `<button class="opt ${val === v ? "sel" : ""}" data-diag="${v}"><div class="icon-box">${icon(ic)}</div><div><div class="t">${title}</div>${sub ? `<div class="small muted">${sub}</div>` : ""}</div></button>`).join("")}</div>
         <div class="between" style="margin-top:28px">
           ${step > 0 ? `<button class="btn ghost" data-act="diagBack">${icon("back")}Atrás</button>` : "<span></span>"}
-          <button class="btn" data-act="diagNext" ${val ? "" : "disabled"}>${step === DIAG.length - 1 ? "Armar mi camino" : "Siguiente"} ${icon("arrow")}</button>
+          <button class="btn" data-act="diagNext" ${val ? "" : "disabled"}>Siguiente ${icon("arrow")}</button>
         </div>
       </div>
     </div>
@@ -1551,8 +1580,8 @@ function diag() {
 function journey() {
   const bought = !!S.bk?.orders?.some(o => o.status === "Ejecutada");
   return [
+    { id: "buy", t: "Hacé tu primera inversión", d: "Guiada paso a paso, con $1.000.000 virtuales", done: bought, ic: "sim", cta: "Empezar" },
     { id: "l1", t: "Hacé el nivel 1", d: "Por qué la plata guardada pierde valor · 3 minutos", done: S.done.includes(0), ic: "learn", cta: "Empezar el nivel 1" },
-    { id: "buy", t: "Hacé tu primera compra de práctica", d: "Tenés $1.000.000 virtuales y precios reales", done: bought, ic: "sim", cta: "Ir al simulador" },
     { id: "ask", t: "Hacé una pregunta sin vergüenza", d: "Lo que quieras: te respondemos en criollo", done: !!S.asked, ic: "chat", cta: "Hacer una pregunta" },
     { id: "all", t: "Completá los 6 niveles", d: `Vas ${S.done.length} de 6 · cada uno dura 3 o 4 minutos`, done: allDone(), ic: "star", cta: `Seguir con el nivel ${current() + 1}` },
     { id: "leap", t: "Dá el salto", d: "Tu primera inversión real en LBO, arrancando con poco", done: false, ic: "rocket", cta: "Dar el salto", lock: !allDone() }
@@ -1564,7 +1593,7 @@ function goStep(id) {
   if (id === "ask") { V.orb = true; V.orbTab = "ask"; V.micro = null; renderOrb(); setTimeout(() => document.getElementById("ask-in")?.focus(), 50); return; }
   if (id === "l1") return go("lesson", { lvl: 0, step: 0 });
   if (id === "all") return go("lesson", { lvl: current(), step: 0 });
-  if (id === "buy") { ensureBk(); return go("sim"); }
+  if (id === "buy") { ensureBk(); S.guideOff = false; S.bk.view = "home"; return go("sim"); }
   if (id === "leap") return go(allDone() ? "leap" : "learn");
   go(id);
 }
@@ -1602,29 +1631,26 @@ function home() {
     </div>`;
 }
 
-/* ---------- Bienvenida: qué se puede hacer y por dónde arrancar ---------- */
-function welcome() {
-  const first = { miedo: "l1", estafa: "l1", poca: "buy" }[S.freno || "miedo"];
-  const st = journey().find(x => x.id === first);
-  const why = { miedo: "Como nos dijiste que te da miedo no entender, arrancá por lo básico:", estafa: "Como te preocupa caer en una estafa, arrancá por lo básico (en el nivel 3 aprendés a reconocerlas):", poca: "Como pensás que con poca plata no vale la pena, probalo vos con plata virtual:" }[S.freno || "miedo"];
-  return `<div class="welcome">
-    <div class="l-wrap" style="max-width:960px">
-      <nav class="l-nav">${logo()}</nav>
-      <h1>¡Listo, ${esc(myName())}! Esto es lo que podés hacer</h1>
-      <div class="wl-grid">${[
-        ["learn", "Aprender", "6 niveles de 3 minutos, como un juego. Ganás puntos y estrellas.", "learn"],
-        ["sim", "Practicar", "Un simulador con $1.000.000 virtuales y precios reales de la bolsa.", "sim"],
-        ["chat", "Preguntar", "Lo que te da vergüenza preguntar en voz alta. Sin preguntas tontas.", "ask"],
-        ["league", "Competir", "Un ranking con quienes mejor manejan su cartera de práctica.", "rank"]
-      ].map(([ic, h, p]) => `<div class="wl-i"><div class="icon-box">${icon(ic)}</div><b>${h}</b><span>${p}</span></div>`).join("")}</div>
-      <div class="wl-start">
-        <div style="flex:1;min-width:0"><p>${why}</p><h2 style="margin-top:6px">${st.t}</h2><p class="small" style="color:#B9D3D5;margin-top:4px">${st.d}</p></div>
-        <div class="stack" style="gap:8px;min-width:220px"><button class="btn lg" data-act="welcomeGo" data-first="${first}">${st.cta} ${icon("arrow")}</button><button class="btn lg on-dark" data-act="welcomeHome">Ver el inicio</button></div>
-      </div>
-      <div style="height:40px"></div>
+/* ---------- Paso 3 del onboarding: qué se puede hacer y por dónde arrancar ---------- */
+function onbFinal() {
+  const why = { miedo: "Nos dijiste que te da miedo no entender: por eso te vamos a guiar paso a paso.", estafa: "Te preocupa caer en una estafa: practicar acá, con plata virtual, es la forma segura de empezar.", poca: "Pensás que con poca plata no vale la pena: probalo vos, con plata virtual y precios reales." }[S.freno || "miedo"];
+  return `<div class="card diag-card onb-final" style="padding:32px">
+    <h1>¡Listo, ${esc(myName())}! Así funciona Sin Miedo</h1>
+    <div class="onb-g">${[
+      ["sim", "Practicá", "Tenés $1.000.000 virtuales para invertir con precios reales."],
+      ["learn", "Aprendé", "Niveles de 3 minutos, como un juego."],
+      ["chat", "Preguntá", "La esfera responde lo que quieras, sin vergüenza."]
+    ].map(([ic, h, p]) => `<div class="onb-i"><div class="icon-box">${icon(ic)}</div><b>${h}</b><span>${p}</span></div>`).join("")}</div>
+    <div class="onb-cta">
+      <p>${why}</p>
+      <h2>Hacé tu primera inversión, guiada paso a paso</h2>
+      <p class="small" style="color:#B9D3D5">Te mostramos qué tocar en cada pantalla. Es con plata virtual: no arriesgás nada.</p>
+      <div class="row" style="flex-wrap:wrap;margin-top:14px"><button class="btn lg" data-act="onbStart">Empezar ${icon("arrow")}</button><button class="btn lg on-dark" data-act="onbLearn">Prefiero aprender primero</button></div>
     </div>
+    <div style="margin-top:18px"><button class="btn ghost" data-act="diagBack">${icon("back")}Atrás</button></div>
   </div>`;
 }
+function welcome() { V.step = ONB_STEPS - 1; return diag(); }
 
 /* ---------- Ranking ----------
    En claude.ai cada persona publica su resultado en la colección compartida "ranking" (solo puede escribir
@@ -1673,7 +1699,7 @@ async function loadRanking() {
   }
   rows.sort((a, b) => b.ret - a.ret || (b.score || 0) - (a.score || 0));
   V.rank = { rows, mode, at: new Date() };
-  if (V.page === "rank" || V.page === "home") render();
+  if (V.page === "rank" || V.page === "sim") render();
 }
 function rankMe() {
   if (!V.rank) { if (!V.rankLoading && USER) { V.rankLoading = true; setTimeout(() => loadRanking().finally(() => { V.rankLoading = false; }), 0); } return null; }
@@ -2114,6 +2140,27 @@ function tickerChips(list) {
 function dkHead(title, back = "home", x = false) {
   return `<div class="dk-head"><button class="dk-back" data-bkview="${back}" aria-label="Volver">${x ? "✕" : icon("back")}</button><h2>${title}</h2><span style="flex:1"></span>${mkPill()}</div>`;
 }
+/* Guía de la primera inversión: según la pantalla, un cartel dice qué hacer y se resalta qué tocar. */
+const firstDone = () => !!S.bk?.orders?.some(o => o.side === "buy" && o.status === "Ejecutada");
+function guideStep() {
+  if (!S.bk || S.guideOff || firstDone()) return 0;
+  if (V.drawer && V.tk && V.tk.side === "buy") return 4;
+  if (V.sym) return 3;
+  return (S.bk.view === "explore" || S.bk.view === "quotes") ? 2 : 1;
+}
+const GUIDE = {
+  1: ["Tocá “Invertir”", "Ahí ves todo lo que podés comprar: fondos, bonos, CEDEARs y acciones."],
+  2: ["Elegí qué comprar", "Si es tu primera vez, te sugerimos el Fondo Money Market: es de riesgo bajo y lo podés rescatar cuando quieras."],
+  3: ["Mirá el precio y el riesgo, y tocá “Comprar”", "Antes de invertir, fijate cuánto se movió el precio y qué tan riesgoso es."],
+  4: ["Elegí cuánto invertir y confirmá", "Para tu primera vez, dejá la orden “a mercado”: se ejecuta al instante. Tocá “Revisar orden”, mirá los costos y confirmá."]
+};
+function guideBox(n) {
+  if (!n) return "";
+  const [t, p] = GUIDE[n];
+  return `<div class="guide"><div class="g-steps">${[1, 2, 3, 4].map(k => `<i class="${k < n ? "done" : k === n ? "on" : ""}"></i>`).join("")}</div>
+    <span class="g-n">Tu primera inversión · paso ${n} de 4</span><b>${t}</b><p>${p}</p>
+    <button class="g-skip" data-act="guideOff">Saltar la guía</button></div>`;
+}
 function sim() {
   const B = ensureBk(), perf = perfStats();
   const view = V.sym ? "asset" : B.view === "quotes" ? "explore" : B.view || "home";
@@ -2129,6 +2176,7 @@ function simHome(perf) {
   const rows = Object.entries(B.hold).map(([k, h]) => { const a = A(k), val = units(a, h.qty, last(k)); return { a, h, val, r: val / h.cost - 1 }; }).sort((x, y) => y.val - x.val);
   const moved = assets().slice().sort((x, y) => Math.abs(dayVar(y.t)) - Math.abs(dayVar(x.t)));
   return `
+    ${guideBox(guideStep())}
     <div class="dk-top">${mkPill()}<label class="toggle small"><input type="checkbox" data-bk="explain" ${B.explain ? "checked" : ""}><span class="sw"></span>Modo explicado</label></div>
     <div class="dk-hero">
       <span class="dk-lab">Valor de tu cuenta · plata virtual</span>
@@ -2136,7 +2184,7 @@ function simHome(perf) {
       <span class="dk-chg ${res >= 0 ? "up" : "down"}">${pc2(res / BROKER_CFG.startCash)} desde que empezaste</span>
       <p class="dk-sub">Disponible ${m2(B.cash)} · Invertido ${m2(hv)}</p>
       <div class="dk-acts">
-        <button data-bkview="explore"><span class="ra ra-go">${icon("plus")}</span>Invertir</button>
+        <button data-bkview="explore" class="${guideStep() === 1 ? "coach" : ""}"><span class="ra ra-go">${icon("plus")}</span>Invertir</button>
         <button data-bkview="port"><span class="ra">${icon("sim")}</span>Mi cartera</button>
         <button data-bkview="hist"><span class="ra">${icon("clock")}</span>Historial</button>
       </div>
@@ -2144,11 +2192,12 @@ function simHome(perf) {
     ${ex("Tenés $1.000.000 virtuales para practicar. Tocá “Invertir” para elegir qué comprar. Los precios son reales: tu cartera sube o baja como en el mercado.")}
     ${rows.length ? `<div class="dk-card"><div class="between"><h3>Tu cartera</h3><button class="dk-link" data-bkview="port">Ver detalle</button></div>
       <div class="dk-list">${rows.map(({ a, h, val, r }) => `<button class="dk-row" data-sym="${a.t}">${avatar(a, 44)}<span class="dr-t"><b>${tkLabel(a)}</b><span>${qtyF(a, h.qty)} ${a.unit}</span></span><span class="dr-p"><b class="num">${m2(val)}</b><span class="${r >= 0 ? "up" : "down"}">${pc2(r)}</span></span></button>`).join("")}</div></div>`
-    : `<div class="dk-promo">
+    : guideStep() ? "" : `<div class="dk-promo">
         <div class="promo-av">${moved.slice(0, 5).map((a, k) => `<span>${avatar(a, k === 2 ? 62 : 44)}</span>`).join("")}</div>
         <h3>Comprá tu primera acción, bono o CEDEAR con plata virtual</h3>
         <button class="btn lg" data-bkview="explore">Empezar a invertir</button>
       </div>`}
+    ${firstDone() && nextStep() ? (() => { const nx = nextStep(), st = journey(), dn = st.filter(x => x.done).length; return `<button class="dk-card dk-next" data-step="${nx.id}"><span class="dk-lab">Tu próximo paso · ${dn} de ${st.length}</span><b>${nx.t}</b><span class="dk-sub">${nx.d}</span><span class="bar"><span style="width:${dn / st.length * 100}%"></span></span></button>`; })() : ""}
     <button class="dk-card dk-level" data-bkview="port"><span><span class="dk-lab">Tu nivel de inversor</span><b>${perf.days ? `${perf.score}/100 · ${perf.tier}` : "Se calcula mañana"}</b></span>${icon("arrow", "ic")}</button>
     <h3 class="dk-h">Los que más se movieron hoy</h3>
     ${tickerChips(moved)}`;
@@ -2156,7 +2205,8 @@ function simHome(perf) {
 function exploreRows() {
   const qy = (V.q || "").trim().toLowerCase(), tab = S.bk.tab || "all";
   const list = assets().filter(a => (tab === "all" || a.cls === tab) && (!qy || tkLabel(a).toLowerCase().includes(qy) || a.name.toLowerCase().includes(qy)));
-  return list.length ? list.map(a => { const v = dayVar(a.t); return `<button class="dk-row" data-sym="${a.t}">${avatar(a, 48)}<span class="dr-t"><b>${tkLabel(a)}</b><span>${esc(a.name)}</span></span><span class="dr-p"><b class="num" data-live="${a.t}">${m2(last(a.t))}</b><span class="${v >= 0 ? "up" : "down"}">${pc2(v)}</span></span></button>`; }).join("")
+  const sug = guideStep() === 2 ? (assets().find(a => a.cls === "fci") || {}).t : null;
+  return list.length ? list.map(a => { const v = dayVar(a.t); return `<button class="dk-row ${a.t === sug ? "coach" : ""}" data-sym="${a.t}">${avatar(a, 48)}<span class="dr-t"><b>${tkLabel(a)}${a.t === sug ? ' <span class="g-tag">Sugerido</span>' : ""}</b><span>${esc(a.name)}</span></span><span class="dr-p"><b class="num" data-live="${a.t}">${m2(last(a.t))}</b><span class="${v >= 0 ? "up" : "down"}">${pc2(v)}</span></span></button>`; }).join("")
     : `<p class="dk-sub" style="padding:20px 4px">No encontramos nada con “${esc(V.q)}”.</p>`;
 }
 function exploreView() {
@@ -2164,6 +2214,7 @@ function exploreView() {
   const cats = [["all", "Todas", all.length, "sparkle"]].concat(TAB_ORDER.filter(k => all.some(a => a.cls === k)).map(k => [k, CLASSES[k].name, all.filter(a => a.cls === k).length, { fci: "drop", ars: "doc", usd: "doc", cedear: "globe", accion: "building" }[k] || "sim"]));
   return `
     ${dkHead("Explorar")}
+    ${guideBox(guideStep())}
     <label class="dk-search">${icon("search")}<input id="bk-q" placeholder="Buscar por nombre o ticker" value="${esc(V.q || "")}" autocomplete="off"></label>
     ${ex("Acá están todas las opciones para practicar. Tocá una para ver su precio, su gráfico y comprarla.")}
     <h3 class="dk-h">Categorías</h3>
@@ -2232,13 +2283,14 @@ function assetView(tk) {
   const related = assets().filter(x => x.cls === a.cls && x.t !== tk);
   return `
     <div class="dk-head"><button class="dk-back" data-bkview="${B.lastList || "explore"}" aria-label="Cerrar">✕</button><span style="flex:1"></span>${mkPill()}</div>
+    ${guideBox(guideStep())}
     <div class="dk-hero">
       ${avatar(a, 76)}
       <h2 class="as-name">${esc(a.name)}</h2>
       <span class="dk-lab">${CLASSES[a.cls].name}${a.per === 100 ? " · precio cada 100 VN" : ""}</span>
       <div class="dk-big num" data-live="${tk}">${moneyBig(last(tk))}</div>
       <span class="dk-chg ${v >= 0 ? "up" : "down"}">${pc2(v)} hoy</span>
-      <button class="btn lg block dk-buy" data-trade="${tk}" data-side="buy">${fci ? "Suscribir" : "Comprar"}</button>
+      <button class="btn lg block dk-buy ${guideStep() === 3 ? "coach" : ""}" data-trade="${tk}" data-side="buy">${fci ? "Suscribir" : "Comprar"}</button>
       ${h ? `<button class="btn lg block dk-sell" data-trade="${tk}" data-side="sell">${fci ? "Rescatar" : "Vender"} · tenés ${qtyF(a, h.qty)} ${a.unit}</button>` : ""}
     </div>
     <div class="dk-card">
@@ -2297,14 +2349,14 @@ function ticket(tk) {
       <div class="row"><button class="btn ghost" style="flex:1" data-drgo="port">Ver mi cartera</button><button class="btn" style="flex:1" data-bkact="newTicket">Nueva orden</button></div>
     </div>`;
   }
-  const c = calc(o);
-  if (o.step === "review") return `<div class="ticket">
+  const c = calc(o), g = guideStep();
+  if (o.step === "review") return `<div class="ticket">${g ? guideBox(4) : ""}
     <h2>${o.side === "buy" ? (fci ? "Suscribir" : "Comprar") : (fci ? "Rescatar" : "Vender")} ${a.t === "LECAP" && MD.lecap ? MD.lecap : a.t}</h2>
     ${ex("Siempre revisá el total: incluye los costos de la operación.")}
     ${summary(o, c)}
-    <div class="row"><button class="btn ghost" style="flex:1" data-bkact="edit">Modificar</button><button class="btn ${o.side === "sell" ? "dark" : ""}" style="flex:1" data-bkact="confirm" ${c.err ? "disabled" : ""}>Confirmar</button></div>
+    <div class="row"><button class="btn ghost" style="flex:1" data-bkact="edit">Modificar</button><button class="btn ${o.side === "sell" ? "dark" : ""} ${g ? "coach" : ""}" style="flex:1" data-bkact="confirm" ${c.err ? "disabled" : ""}>Confirmar</button></div>
   </div>`;
-  return `<div class="ticket">
+  return `<div class="ticket">${g ? guideBox(4) : ""}
     <div class="seg2"><button class="${o.side === "buy" ? "on buy" : ""}" data-tkf="side" data-v="buy">${fci ? "Suscribir" : "Comprar"}</button><button class="${o.side === "sell" ? "on sell" : ""}" data-tkf="side" data-v="sell">${fci ? "Rescatar" : "Vender"}</button></div>
     ${ex("Acá le decís al broker qué querés hacer: comprar o vender, cuánto y a qué precio.")}
     ${fci ? "" : `<div class="field"><label>Tipo de orden <span class="faint xs">· a mercado ${q("mercado")} · limitada ${q("limitada")}</span></label><div class="tabs full"><button class="${o.type === "mkt" ? "on" : ""}" data-tkf="type" data-v="mkt">A mercado</button><button class="${o.type === "lim" ? "on" : ""}" data-tkf="type" data-v="lim">Limitada</button></div></div>`}
@@ -2314,7 +2366,7 @@ function ticket(tk) {
       ${o.side === "sell" ? `<span class="xs faint">Tenés ${qtyF(a, S.bk.hold[tk]?.qty || 0)} ${a.unit}.</span>` : ""}</div>
     ${fci ? `<p class="xs faint">Los FCI de liquidez se suscriben y rescatan en el día.</p>` : `<div class="field"><label>Plazo de liquidación <span class="faint xs">· CI ${q("ci")} · 24 hs ${q("h24")}</span></label><div class="tabs full"><button class="${o.plazo === "CI" ? "on" : ""}" data-tkf="plazo" data-v="CI">Contado inmediato</button><button class="${o.plazo === "24" ? "on" : ""}" data-tkf="plazo" data-v="24">24 hs</button></div></div>`}
     <div id="tk-sum">${summary(o, c)}</div>
-    <button class="btn block ${o.side === "sell" ? "dark" : ""}" id="tk-review" data-bkact="review" ${c.err ? "disabled" : ""}>Revisar orden</button>
+    <button class="btn block ${o.side === "sell" ? "dark" : ""} ${g ? "coach" : ""}" id="tk-review" data-bkact="review" ${c.err ? "disabled" : ""}>Revisar orden</button>
     <p class="xs faint">${o.type === "mkt" ? "Se ejecuta al último precio real disponible (cierre del " + fmtDate(MD.asOf) + ")." : "Queda pendiente hasta que un cierre real llegue a tu precio."}</p>
   </div>`;
 }
@@ -2341,9 +2393,22 @@ function placeOrder() {
   B.orders.unshift(rec);
   const cur = o.side === "buy" ? askPx(o.t) : bidPx(o.t);
   if (o.type === "mkt" || (o.side === "buy" ? cur <= rec.limit : cur >= rec.limit)) fill(rec, cur, MD.asOf, ms.time);
+  const wasGuided = guideStep() > 0;
   save();
   V.tk = { ...o, step: "done", result: rec };
   render();
+  if (rec.side === "buy" && rec.status === "Ejecutada" && !S.firstCelebrated) {
+    S.firstCelebrated = true; save();
+    const a = A(rec.t);
+    setTimeout(() => {
+      closeDrawer(); confetti();
+      modal(`<div class="medal" style="width:76px;height:76px">${icon("rocket")}</div>
+        <h2 style="text-align:center">¡Hiciste tu primera inversión!</h2>
+        <p class="muted" style="text-align:center;margin:8px 0 6px">Compraste ${qtyF(a, rec.qty)} ${a.unit} de ${tkLabel(a)} por ${m2(rec.total)} con plata virtual. Desde ahora tu cartera se mueve con el mercado.</p>
+        <p class="small muted" style="text-align:center;margin-bottom:16px">${wasGuided ? "Ya sabés hacerlo: la próxima vas solo." : "Volvé mañana para ver cómo le fue."}</p>
+        <div class="stack" style="gap:8px"><button class="btn block" data-act="closeModal" data-bkview="port">Ver mi cartera</button><button class="btn ghost block" data-step="l1">Aprender por qué conviene invertir (nivel 1)</button></div>`);
+    }, 900);
+  }
 }
 
 function donut(parts) {
@@ -2720,7 +2785,7 @@ document.addEventListener("click", e => {
     if (d.go === "lesson") return go("lesson", { lvl: current(), step: 0 });
     if (d.go === "diag") return go("diag", { step: 0 });
     if (d.go === "auth") return go("auth", { mode: d.mode || "signup" });
-    if (d.go === "sim") { ensureBk(); return go("sim"); }
+    if (d.go === "sim" || d.go === "home") { ensureBk(); S.bk.view = "home"; return go("sim"); }
     if (d.go === "rank") V.rank = null;
     return go(d.go);
   }
@@ -2737,8 +2802,8 @@ document.addEventListener("click", e => {
   switch (d.act) {
     case "diagBack": V.step--; render(); break;
     case "diagNext":
-      if ((V.step || 0) < DIAG.length - 1) { V.step = (V.step || 0) + 1; render(); }
-      else { S.started = true; save(); root.innerHTML = `<div class="diag" style="place-items:center;display:grid;background:var(--petrol-900);color:#fff;text-align:center"><div><div class="medal" style="animation:pop .4s">${icon("sparkle")}</div><h1>Armando tu camino…</h1><p style="color:#A9C7C9;margin-top:8px">Lo personalizamos según tus respuestas.</p></div></div>`; setTimeout(() => go(S.welcomed ? "home" : "welcome"), 1100); }
+      if ((V.step || 0) < DIAG.length) { V.step = (V.step || 0) + 1; render(); }
+      else { S.started = true; save(); root.innerHTML = `<div class="diag" style="place-items:center;display:grid;background:var(--petrol-900);color:#fff;text-align:center"><div><div class="medal" style="animation:pop .4s">${icon("sparkle")}</div><h1>Armando tu camino…</h1><p style="color:#A9C7C9;margin-top:8px">Lo personalizamos según tus respuestas.</p></div></div>`; setTimeout(() => go("sim"), 1100); }
       break;
     case "lstep": V.step = Math.max(0, (V.step || 0) + +d.d); V.picked = null; render(); break;
     case "retryQ": V.picked = null; render(); break;
@@ -2755,8 +2820,10 @@ document.addEventListener("click", e => {
     case "mmenu": modal(`<div class="row" style="gap:12px"><div class="avatar" style="background:var(--mint);color:#062018;width:44px;height:44px;font-size:16px">${esc(myName()[0].toUpperCase())}</div><div style="min-width:0"><b>${esc(myName())}</b><div class="small muted" style="overflow:hidden;text-overflow:ellipsis">${esc(USER?.email || "")}</div></div></div>
       <p class="small muted" style="margin-top:12px">${savedLabel()}</p>
       <div class="stack" style="gap:8px;margin-top:14px"><button class="btn ghost block" data-act="map">${icon("map")}Mapa del prototipo</button><button class="btn ghost block" data-act="logout">${icon("back")}Cerrar sesión</button><button class="btn block" data-act="closeModal">Cerrar</button></div>`); break;
-    case "welcomeGo": S.welcomed = true; save(); goStep(d.first); break;
-    case "welcomeHome": S.welcomed = true; save(); go("home"); break;
+    case "welcomeGo": case "onbStart": S.started = true; S.welcomed = true; S.guideOff = false; save(); ensureBk(); go("sim"); break;
+    case "welcomeHome": S.started = true; S.welcomed = true; save(); go("sim"); break;
+    case "onbLearn": S.started = true; S.welcomed = true; save(); go("lesson", { lvl: 0, step: 0 }); break;
+    case "guideOff": S.guideOff = true; save(); render(); renderDrawer(true); break;
     case "rankToggle": S.rankOff = !el.checked; save(); V.rank = null; render(); break;
     case "aiStop": aiCtl?.abort(); break;
     case "chatReset": S.chat = null; save(); render(); break;
@@ -2799,7 +2866,7 @@ function bkClick(b, e) {
   if (d.trade) { e.stopPropagation(); V.tk = newTicket(d.trade, d.side || "buy"); V.drawer = true; V.drIn = false; renderDrawer(); setTimeout(() => { V.drIn = true; document.querySelector(".drawer")?.classList.add("in"); document.querySelector(".drawer input, .drawer button")?.focus(); }, 20); return; }
   if (d.drclose) { closeDrawer(); return; }
   if (d.drgo) { closeDrawer(); B.view = d.drgo; V.sym = null; save(); render(); return; }
-  if (d.bkview) { B.view = d.bkview; V.sym = null; save(); render(); const m = document.getElementById("root"); if (m) m.scrollTop = 0; return; }
+  if (d.bkview) { modal(""); B.view = d.bkview; V.sym = null; save(); render(); const m = document.getElementById("root"); if (m) m.scrollTop = 0; return; }
   if (d.bktab) { B.tab = d.bktab; save(); render(); return; }
   if (d.sym) { if (!V.sym) B.lastList = B.view === "quotes" ? "explore" : B.view || "home"; V.sym = d.sym; V.tk = null; V.range = V.range || "1M"; render(); const m = document.getElementById("root"); if (m) m.scrollTop = 0; return; }
   if (d.range) { V.range = d.range; render(); return; }
@@ -2905,7 +2972,8 @@ function jump(id) {
 }
 
 (async () => {
-  render();
+  // En claude.ai se espera a la cuenta guardada antes de mostrar algo, para no mostrar la portada de más.
+  if (window.claude?.use) root.innerHTML = `<div class="splash">${logo()}<span class="typing"><i></i><i></i><i></i></span></div>`; else render();
   await initStore();
   await initAuth();
   if (USER && S.bk) processNewDays();

@@ -113,6 +113,12 @@ create policy "cada uno actualiza lo suyo" on progreso for update using (auth.ui
 
 Antes de usarlo con usuarios reales (y menores de edad) hace falta que LBO revise la política de privacidad y el tratamiento de datos personales (Ley 25.326). El texto de los términos está marcado "a completar".
 
+### Onboarding, inicio y primera inversión guiada
+
+- **Onboarding en 3 pasos:** dos preguntas (experiencia y qué te frena) y una pantalla de "así funciona" con el botón para empezar la primera inversión guiada (o aprender primero).
+- **El inicio es el simulador.** El menú queda en Inicio, Aprender y Ranking; "Preguntá" está en la esfera.
+- **Guía de la primera inversión:** hasta la primera compra, cada pantalla muestra un cartel "paso N de 4" y resalta qué tocar: Invertir → elegir (sugiere el Fondo Money Market) → Comprar → monto, revisar y confirmar. Al ejecutarse la compra hay un festejo con los próximos pasos. Se puede saltar con "Saltar la guía" (`S.guideOff`).
+
 ### Primeros pasos, inicio y ranking
 
 - **Bienvenida:** después del diagnóstico, una pantalla muestra todo lo que se puede hacer y recomienda por dónde arrancar según el freno elegido.
