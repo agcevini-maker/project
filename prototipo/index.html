@@ -1332,16 +1332,52 @@ const root = document.getElementById("root");
 function go(page, extra = {}) { if (page === "home") page = "sim"; if (page === "welcome") { page = "diag"; extra = { step: ONB_STEPS - 1 }; } if (!USER && !["landing", "auth"].includes(page)) { extra = { mode: "signup" }; page = "auth"; } V = { page, ...extra }; render(); const m = document.querySelector(".main"); if (m) m.scrollTop = 0; window.scrollTo(0, 0); }
 
 function render() {
-  if (V.page === "landing") root.innerHTML = landing();
-  else if (V.page === "auth") root.innerHTML = authPage();
-  else if (V.page === "diag") root.innerHTML = diag();
-  else if (V.page === "welcome") root.innerHTML = welcome();
-  else root.innerHTML = shell();
-  hideTip();
-  mountCharts();
-  renderDrawer();
-  renderOrb();
+  try {
+    if (V.page === "landing") root.innerHTML = landing();
+    else if (V.page === "auth") root.innerHTML = authPage();
+    else if (V.page === "diag") root.innerHTML = diag();
+    else if (V.page === "welcome") root.innerHTML = welcome();
+    else root.innerHTML = shell();
+    hideTip();
+    mountCharts();
+    renderDrawer();
+    renderOrb();
+  } catch (e) { recover(e); }
 }
+/* Red de seguridad: si una pantalla falla al dibujarse, nunca queda la pantalla en negro.
+   Se cierra lo que estaba abierto (panel de compra, ventana, esfera) y se vuelve al inicio, con un aviso.
+   El progreso no se toca: ya está guardado. */
+let recovering = false, lastRecover = 0;
+function recover(err) {
+  console.error("Sin Miedo: se recuperó de un error", err);
+  if (recovering) return;
+  recovering = true;
+  try {
+    V.drawer = false; V.drIn = false; V.orb = false;
+    document.getElementById("modal").innerHTML = "";
+    const dr = document.getElementById("drawer"); if (dr) dr.innerHTML = "";
+    const again = Date.now() - lastRecover < 4000; lastRecover = Date.now();
+    if (S.bk) S.bk.view = "home";
+    // Se prueba el inicio y, si también falla, Aprender; solo si nada se puede mostrar queda el botón para recargar.
+    const tries = USER ? (again ? ["learn"] : ["sim", "learn"]) : ["landing"];
+    let shown = false;
+    for (const pg of tries) {
+      try { V = { page: pg }; root.innerHTML = pg === "landing" ? landing() : shell(); mountCharts(); renderOrb(); shown = true; break; } catch (e2) {}
+    }
+    if (!shown) {
+      root.innerHTML = `<div class="splash" style="flex-direction:column;gap:14px;text-align:center;padding:24px">${logo()}<p style="color:var(--dk-tx);max-width:34ch">Algo falló al mostrar esta pantalla. Tu progreso está guardado.</p><button class="btn" onclick="location.reload()">Volver a cargar</button></div>`;
+    }
+    toast("Algo falló al mostrar esa pantalla y te trajimos acá. Tu progreso está guardado.");
+  } finally { recovering = false; }
+}
+// Errores fuera del dibujo (un clic, una actualización de precios): si dejaron la pantalla vacía o tapada, se recupera.
+function screenBroken() {
+  const txt = (root.innerText || "").trim().length;
+  const dr = document.querySelector(".drawer");
+  return txt < 20 || (V.drawer && (!dr || !dr.querySelector(".dr-body")?.children.length));
+}
+window.addEventListener("error", e => { if (e.error && screenBroken()) recover(e.error); });
+window.addEventListener("unhandledrejection", e => { if (screenBroken()) recover(e.reason); });
 
 const NAV = [
   ["sim", "Inicio", "home"], ["learn", "Aprender", "learn"], ["rank", "Ranking", "league"]
@@ -1992,7 +2028,8 @@ function costs(a, gross) {
 const pendingSellQty = t => S.bk.orders.filter(o => o.status === "Pendiente" && o.side === "sell" && o.t === t).reduce((s, o) => s + o.qty, 0);
 function calc(o) {
   const a = A(o.t), px = o.type === "lim" ? (+o.limit || 0) : (o.side === "buy" ? askPx(o.t) : bidPx(o.t));
-  let qty = o.mode === "monto" ? (a.cls === "fci" ? (+o.amount || 0) / px : Math.floor((+o.amount || 0) * a.per / px)) : (+o.qty || 0);
+  let qty = !(px > 0) ? 0 : o.mode === "monto" ? (a.cls === "fci" ? (+o.amount || 0) / px : Math.floor((+o.amount || 0) * a.per / px)) : (+o.qty || 0);
+  if (!Number.isFinite(qty) || qty < 0) qty = 0;
   if (a.cls !== "fci") qty = Math.floor(qty);
   const gross = units(a, qty, px), c = costs(a, gross), fees = c.com + c.der + c.iva;
   const total = o.side === "buy" ? gross + fees : gross - fees;
@@ -2275,7 +2312,21 @@ function drawer() {
     <div class="dr-body">${ticket(tk)}</div>
   </aside>`;
 }
-function renderDrawer() { const el = document.getElementById("drawer"); if (!el) return; const sc = el.querySelector(".dr-body")?.scrollTop; el.innerHTML = drawer(); if (sc) { const b = el.querySelector(".dr-body"); if (b) b.scrollTop = sc; } }
+function renderDrawer() {
+  const el = document.getElementById("drawer"); if (!el) return;
+  const sc = el.querySelector(".dr-body")?.scrollTop;
+  let html;
+  try { html = drawer(); }
+  catch (e) {
+    // Si el panel de compra no se puede armar, se cierra en vez de dejar el fondo oscuro sin panel.
+    console.error("Sin Miedo: no se pudo mostrar el panel de compra", e);
+    V.drawer = false; V.drIn = false; el.innerHTML = "";
+    toast("No se pudo abrir la compra. Probá de nuevo.");
+    return;
+  }
+  el.innerHTML = html;
+  if (sc) { const b = el.querySelector(".dr-body"); if (b) b.scrollTop = sc; }
+}
 function ticket(tk) {
   const o = V.tk, a = A(tk), fci = a.cls === "fci";
   if (o.step === "done") {
@@ -2804,10 +2855,24 @@ document.addEventListener("click", e => {
   }
 });
 
+let drawerSeq = 0;
 function closeDrawer() {
-  const d = document.querySelector(".drawer"); if (!d) { V.drawer = false; return; }
+  const d = document.querySelector(".drawer"); if (!d) { V.drawer = false; renderDrawer(); return; }
   V.drIn = false; d.classList.remove("in"); document.querySelector(".dr-bg")?.classList.add("out");
-  setTimeout(() => { V.drawer = false; renderDrawer(); }, 220);
+  // Si mientras se cierra se abre otro panel, este cierre ya no lo toca.
+  const seq = ++drawerSeq;
+  setTimeout(() => { if (seq !== drawerSeq || V.drIn) return; V.drawer = false; renderDrawer(); }, 220);
+}
+function openDrawer(t, side) {
+  drawerSeq++;
+  V.tk = newTicket(t, side || "buy"); V.drawer = true; V.drIn = false; renderDrawer();
+  if (!V.drawer) return;
+  // Se desliza a la vista; si por algo no se pudo animar, igual queda visible.
+  requestAnimationFrame(() => setTimeout(() => {
+    V.drIn = true;
+    const d = document.querySelector(".drawer"); if (!d) { V.drawer = false; renderDrawer(); return; }
+    d.classList.add("in"); document.querySelector(".drawer input, .drawer button")?.focus({ preventScroll: true });
+  }, 20));
 }
 function gameClick(el) {
   const d = el.dataset;
@@ -2835,7 +2900,7 @@ function gameClick(el) {
 function bkClick(b, e) {
   const d = b.dataset, B = S.bk;
   if (d.q) { e.stopPropagation(); const x = TERMS[d.q]; modal(`<h2>${x[0]}</h2><p style="margin:10px 0;font-size:16px">${x[1]}</p><div class="callout" style="font-size:14px">Ejemplo: ${x[2]}</div><button class="btn block" style="margin-top:16px" data-act="closeModal">Entendido</button>`); return; }
-  if (d.trade) { e.stopPropagation(); V.tk = newTicket(d.trade, d.side || "buy"); V.drawer = true; V.drIn = false; renderDrawer(); setTimeout(() => { V.drIn = true; document.querySelector(".drawer")?.classList.add("in"); document.querySelector(".drawer input, .drawer button")?.focus(); }, 20); return; }
+  if (d.trade) { e.stopPropagation(); openDrawer(d.trade, d.side); return; }
   if (d.drclose) { closeDrawer(); return; }
   if (d.drgo) { closeDrawer(); B.view = d.drgo; V.sym = null; save(); render(); return; }
   if (d.bkview) { modal(""); B.view = d.bkview; V.sym = null; save(); render(); const m = document.querySelector(".main"); if (m) m.scrollTop = 0; return; }
