@@ -18,6 +18,48 @@ async function getJSON(url, ms = 6000) {
   return v;
 }
 
+// Yahoo rechaza (429) los pedidos anónimos desde servidores en la nube. Como hace la librería yfinance,
+// primero se pide una cookie (fc.yahoo.com) y un "crumb", y con eso se consultan todos los tickers juntos.
+let ysess = null;
+async function yahooSession(force) {
+  if (ysess && !force && Date.now() - ysess.at < 30 * 60_000) return ysess;
+  const r1 = await fetch("https://fc.yahoo.com/", { headers: { "User-Agent": UA }, redirect: "manual", signal: AbortSignal.timeout(6000) }).catch(() => null);
+  const raw = r1?.headers?.getSetCookie ? r1.headers.getSetCookie() : [r1?.headers?.get("set-cookie") || ""];
+  const cookie = raw.map(c => String(c).split(";")[0]).filter(c => c.includes("=")).join("; ");
+  if (!cookie) throw new Error("Yahoo no dio cookie");
+  const r2 = await fetch("https://query1.finance.yahoo.com/v1/test/getcrumb", { headers: { "User-Agent": UA, Cookie: cookie }, signal: AbortSignal.timeout(6000) });
+  const crumb = (await r2.text()).trim();
+  if (!r2.ok || !crumb || crumb.length > 40 || /[<{\s]/.test(crumb)) throw new Error("Yahoo no dio crumb (" + r2.status + ")");
+  ysess = { cookie, crumb, at: Date.now() };
+  return ysess;
+}
+
+export async function yahooQuotes(list) {
+  const key = "yq:" + list.join(",");
+  const hit = cache.get(key);
+  if (hit && Date.now() - hit.at < 15_000) return hit.v;
+  for (const retry of [false, true]) {
+    try {
+      const { cookie, crumb } = await yahooSession(retry);
+      const syms = list.map(t => t + ".BA").join(",");
+      const r = await fetch(`https://query1.finance.yahoo.com/v7/finance/quote?symbols=${encodeURIComponent(syms)}&crumb=${encodeURIComponent(crumb)}`, { headers: { "User-Agent": UA, Cookie: cookie, Accept: "application/json" }, signal: AbortSignal.timeout(6000) });
+      if (r.status === 401 || r.status === 403 || r.status === 429) { ysess = null; continue; }
+      if (!r.ok) throw new Error("Yahoo " + r.status);
+      const j = await r.json(), out = {};
+      (j?.quoteResponse?.result || []).forEach(x => {
+        const t = String(x.symbol || "").replace(/\.BA$/, ""), c = +x.regularMarketPrice;
+        if (!(c > 0)) return;
+        const prev = +x.regularMarketPreviousClose;
+        out[t] = { c, prev: prev > 0 ? prev : null, v: +x.regularMarketVolume || 0, bid: +x.bid || 0, ask: +x.ask || 0, time: x.regularMarketTime ? new Date((typeof x.regularMarketTime === "number" ? x.regularMarketTime * 1000 : x.regularMarketTime)).toISOString() : null, cur: x.currency || "ARS" };
+      });
+      cache.set(key, { at: Date.now(), v: out });
+      return out;
+    } catch (e) { if (retry) console.error("yahoo:", e.message); ysess = null; }
+  }
+  return {};
+}
+
+// Respaldo: el gráfico de un ticker (a veces Yahoo lo deja leer sin sesión).
 export async function yahooQuote(sym) {
   for (const host of ["query1", "query2"]) {
     try {
@@ -38,7 +80,11 @@ async function data912() {
 }
 
 export async function quotes(list) {
-  const [yh, bym] = await Promise.all([Promise.all(list.map(yahooQuote)), data912()]);
+  const [yq, bym] = await Promise.all([yahooQuotes(list), data912()]);
+  const missing = list.filter(t => !yq[t]);
+  const extra = missing.length && missing.length <= 5 ? await Promise.all(missing.map(yahooQuote)) : [];
+  missing.forEach((t, i) => { if (extra[i]) yq[t] = extra[i]; });
+  const yh = list.map(t => yq[t] || null);
   const q = {}, src = { yahoo: 0, data912: 0 };
   list.forEach((t, i) => {
     const y = yh[i], d = bym[t];
@@ -55,7 +101,7 @@ export async function quotes(list) {
     }
     if (!row) return;
     // Puntas de BYMA solo si tienen sentido con el último precio.
-    const bid = +d?.px_bid || 0, ask = +d?.px_ask || 0;
+    const bid = +d?.px_bid || (row.src === "yahoo" ? y.bid : 0) || 0, ask = +d?.px_ask || (row.src === "yahoo" ? y.ask : 0) || 0;
     row.bid = bid > 0 && bid <= row.c * 1.02 && bid >= row.c * 0.9 ? bid : 0;
     row.ask = ask > 0 && ask >= row.c * 0.98 && ask <= row.c * 1.1 ? ask : 0;
     if (row.bid && row.ask && row.bid > row.ask) row.bid = row.ask = 0;
