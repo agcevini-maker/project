@@ -27,7 +27,7 @@ En Vercel la app tiene **cuentas reales**: el progreso queda guardado en una bas
 | `api/auth.js` | crear cuenta, ingresar, Google, salir, recuperar la contraseña por email y borrar la cuenta. Contraseñas con scrypt y sesiones de 90 días. Frena los intentos repetidos |
 | `api/progress.js` | guarda y devuelve el progreso de cada cuenta. Si otro dispositivo guardó algo más nuevo, no lo pisa y la app trae lo nuevo |
 | `api/ranking.js` | ranking de todas las cuentas por rendimiento. Muestra nombre e inicial del apellido; los emails nunca salen del servidor |
-| `api/quotes.js` | último precio y variación del día de **Yahoo Finance** (tickers `.BA` de BYMA), con puntas y respaldo de data912. Se comparte 15 segundos en la CDN de Vercel |
+| `api/quotes.js` | último precio y variación del día de **Yahoo Finance** (tickers `.BA` de BYMA), con puntas y respaldo de data912 (BYMA). Se comparte 15 segundos en la CDN de Vercel. Para ver qué fuente se usó: `/api/quotes?s=GGAL` → `src` |
 | `api/ask.js` | Preguntá con IA (Claude), con las reglas de `api/_lib/rules.js`. Pide sesión y limita la cantidad de preguntas por persona |
 | `api/health.js` | le dice a la app qué está activo |
 
@@ -66,6 +66,7 @@ En `prototipo/index.html` poné la dirección del proyecto en `API_BASE` (por ej
 ### Antes de abrirla al público
 
 - **Datos personales y menores (Ley 25.326):** la app guarda nombre, email y progreso. LBO tiene que revisar y completar los términos y la política de privacidad (están marcados "a completar") y definir el consentimiento para menores. Cada persona puede borrar su cuenta (`POST /api/auth` con `action: "delete"`).
+- **Yahoo desde servidores:** Yahoo suele responder 429 ("demasiados pedidos") a servidores en la nube; desde GitHub Actions lo hace siempre. Si pasa en Vercel, la app usa sola los precios de BYMA (data912), que también son reales, y la nota de precios no dice "vía Yahoo Finance". El workflow "Pruebas de la versión web" muestra qué responde cada fuente.
 - **Términos de uso de los datos de mercado:** Yahoo Finance y data912 no tienen una API oficial con licencia para uso comercial. Para una app pública de LBO conviene reemplazarlas por un proveedor con licencia (por ejemplo, el feed de BYMA). El cambio es solo en `api/quotes.js`.
 - **Ranking:** el rendimiento lo calcula la app con la cartera de práctica y el servidor controla que los números sean razonables. Una persona con conocimientos técnicos podría mandar un resultado falso: para premios reales habría que calcularlo en el servidor.
 - **IA:** cada pregunta tiene costo en la cuenta de Anthropic. Hay un límite de 15 preguntas cada 10 minutos y 120 por día por persona (`api/ask.js`).
