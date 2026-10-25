@@ -2,3 +2,6 @@
 !desktop/icon.png
 desktop/dist/
 node_modules/
+public/
+.vercel/
+.env*.local

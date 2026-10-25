@@ -1,0 +1,24 @@
+name: Pruebas de la versión web
+
+on:
+  push:
+    paths: ["api/**", "scripts/build_vercel.mjs", "scripts/check_quotes.mjs", "tests/**", "package.json", "package-lock.json", "prototipo/index.html", "vercel.json", ".github/workflows/pruebas.yml"]
+  workflow_dispatch:
+
+jobs:
+  pruebas:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Pruebas de las funciones del servidor
+        run: npm test
+      - name: Armar public/ como en Vercel
+        run: npm run build
+      - name: Cotizaciones reales de Yahoo Finance (informativo)
+        run: node scripts/check_quotes.mjs
+        continue-on-error: true

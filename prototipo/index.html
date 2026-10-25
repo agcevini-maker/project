@@ -857,13 +857,67 @@ const myName = () => S.name.trim() || "Agus";
 /* =================================================================
    Cuentas: cada persona se registra con su email y tiene su propio progreso
    ================================================================= */
-// Para cuentas reales (en la nube) completá los datos de un proyecto de Supabase (con Google activado como proveedor).
-// googleClientId: ID de cliente OAuth de Google, para "Continuar con Google" sin Supabase (cuentas en este dispositivo).
-// Vacíos = modo prototipo: las cuentas y el progreso se guardan en este dispositivo y Google se simula.
-const AUTH_CFG = { supabaseUrl: "", supabaseAnonKey: "", googleClientId: "" };
-const ACCOUNTS_KEY = "sinmiedo-cuentas.v1", SESSION_KEY = "sinmiedo-sesion.v1";
-const cloudOn = () => !!(AUTH_CFG.supabaseUrl && AUTH_CFG.supabaseAnonKey);
+// Tres formas de guardar, según dónde se abra la app:
+// 1) Publicada en Vercel (o con API_BASE apuntando ahí): cuentas reales en el servidor (carpeta api/), el progreso
+//    se guarda en la base de datos y se abre desde cualquier dispositivo, y el ranking es entre todas las cuentas.
+// 2) En claude.ai: además del navegador, se guarda en la base de datos privada de cada persona (capacidad "db").
+// 3) Archivo suelto o app de escritorio sin servidor: cuentas y progreso en este dispositivo.
+// googleClientId: ID de cliente OAuth de Google para "Continuar con Google" sin servidor (en el servidor va en GOOGLE_CLIENT_ID).
+const AUTH_CFG = { googleClientId: "" };
+// Vacío = la API del mismo sitio. Para que la app de escritorio o la de Android usen las cuentas de Vercel,
+// poné la dirección del proyecto, por ejemplo "https://sin-miedo.vercel.app".
+const API_BASE = "";
+const ACCOUNTS_KEY = "sinmiedo-cuentas.v1", SESSION_KEY = "sinmiedo-sesion.v1", TOKEN_KEY = "sinmiedo-token.v1";
 const keyFor = email => "sinmiedo-progreso.v2:" + email.toLowerCase();
+/* ---------- Servidor (Vercel) ---------- */
+const API = { on: false, accounts: false, ai: false, google: "", mail: false, at: null, timer: null, busy: false, again: false };
+const apiURL = p => API_BASE.replace(/\/$/, "") + "/api/" + p;
+const getToken = () => { try { return localStorage.getItem(TOKEN_KEY) || ""; } catch (e) { return ""; } };
+const setToken = t => { try { t ? localStorage.setItem(TOKEN_KEY, t) : localStorage.removeItem(TOKEN_KEY); } catch (e) {} };
+async function api(path, { method = "GET", body, timeout = 12000, keepalive = false } = {}) {
+  const headers = {}, t = getToken();
+  if (t) headers.Authorization = "Bearer " + t;
+  if (body !== undefined) headers["Content-Type"] = "application/json";
+  try {
+    const r = await fetch(apiURL(path), { method, headers, body: body === undefined ? undefined : JSON.stringify(body), cache: "no-store", keepalive, signal: AbortSignal.timeout ? AbortSignal.timeout(timeout) : undefined });
+    const data = await r.json().catch(() => ({}));
+    return { ok: r.ok && data.ok !== false, status: r.status, data };
+  } catch (e) { return { ok: false, status: 0, data: { error: "No hay conexión con el servidor. Revisá tu internet y probá de nuevo." } }; }
+}
+async function initAPI() {
+  if (!API_BASE && (!/^https?:$/.test(location.protocol) || window.claude?.use)) return;
+  const r = await api("health", { timeout: 5000 });
+  if (!r.ok) return;
+  Object.assign(API, { on: true, accounts: !!r.data.accounts, ai: !!r.data.ai, google: r.data.google || "", mail: !!r.data.mail });
+}
+// Guarda el progreso en el servidor (un rato después del último cambio, para no mandar de más).
+function cloudSave(now) {
+  if (!API.accounts || !USER) return;
+  clearTimeout(API.timer);
+  if (now) return pushProgress();
+  API.timer = setTimeout(pushProgress, 1500);
+}
+async function pushProgress(keepalive) {
+  if (!USER || !getToken()) return;
+  if (API.busy) { API.again = true; return; }
+  API.busy = true; API.dirty = false;
+  const email = USER.email;
+  const r = await api("progress", { method: "PUT", body: { state: S, base: API.at, rank: S.rankOff ? null : myEntry() }, keepalive, timeout: 15000 });
+  API.busy = false;
+  if (!USER || USER.email !== email) return;
+  if (r.ok) { API.at = r.data.savedAt; STORE.status = "cloud"; lsSet(SESSION_KEY, { email, name: USER.name, at: API.at }); }
+  else if (r.status === 409 && r.data.state) {
+    // Otro dispositivo guardó algo más nuevo: se trae eso para no pisarlo.
+    API.at = r.data.savedAt; S = Object.assign(fresh(), r.data.state);
+    try { localStorage.setItem(keyFor(email), JSON.stringify(S)); } catch (e) {}
+    STORE.status = "cloud"; render(); toast("Trajimos tu progreso más nuevo, guardado desde otro dispositivo.");
+  } else if (r.status === 401) { toast("Tu sesión venció. Volvé a ingresar: tu progreso quedó guardado en este dispositivo."); setToken(""); USER = null; S = fresh(); lsDel(SESSION_KEY); go("auth", { mode: "login" }); return; }
+  else { STORE.status = "error"; API.dirty = true; }
+  renderSaved();
+  if (API.again) { API.again = false; pushProgress(); }
+}
+window.addEventListener("online", () => { if (API.dirty) pushProgress(); });
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden" && API.timer && USER) { clearTimeout(API.timer); API.timer = null; pushProgress(true); } });
 /* Guardado del progreso. Siempre en este navegador (localStorage). Abierto en claude.ai, además se guarda
    en la base de datos privada de cada persona (capacidad "db", carpeta data/users/<id>), así el progreso
    sigue ahí al volver, desde cualquier dispositivo. */
@@ -903,9 +957,9 @@ const lsGet = (k, def) => {
 };
 const lsSet = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} cloudPut(k, v); };
 const lsDel = k => { try { localStorage.removeItem(k); } catch (e) {} if (STORE.db) { const id = docKey(k); delete STORE.cache[id]; STORE.db.collection("data/users/" + STORE.uid).doc(id).delete().catch(() => {}); } };
-const googleReady = () => cloudOn() || !!(AUTH_CFG.googleClientId && location.protocol.startsWith("http"));
+const googleId = () => API.on ? API.google : location.protocol.startsWith("http") ? AUTH_CFG.googleClientId : "";
 const validEmail = e => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e);
-let USER = null, SB = null, cloudTimer = null;
+let USER = null;
 
 async function hashPw(email, pw) {
   try {
@@ -923,19 +977,25 @@ function startSession(user, state) {
   // Racha real: suma un día si entraste ayer, se reinicia si pasó más de un día.
   const hoy = new Date().toISOString().slice(0, 10), ayer = new Date(Date.now() - 864e5).toISOString().slice(0, 10);
   if (S.lastDay !== hoy) { S.streak = S.lastDay === ayer ? (S.streak || 0) + 1 : 1; S.lastDay = hoy; }
-  lsSet(SESSION_KEY, { email: user.email, name: user.name });
+  lsSet(SESSION_KEY, { email: user.email, name: user.name, at: API.at });
   save();
+}
+// Abre la sesión que devolvió el servidor. Si la cuenta todavía no tenía nada guardado en el servidor
+// pero sí en este dispositivo, se usa lo del dispositivo (y se sube): así no se pierde el progreso anterior.
+function openServerSession(d) {
+  setToken(d.token); API.at = d.savedAt || null; STORE.status = "cloud"; V.rank = null;
+  startSession({ email: d.user.email, name: d.user.name }, d.state || undefined);
+  cloudSave(true);
 }
 async function signup(name, email, pw) {
   email = email.trim().toLowerCase(); name = name.trim();
   if (!name) return "Contanos cómo te llamás.";
   if (!validEmail(email)) return "Revisá el email: parece que tiene un error.";
   if (pw.length < 8) return "La contraseña tiene que tener al menos 8 caracteres.";
-  if (cloudOn()) {
-    const { data, error } = await SB.auth.signUp({ email, password: pw, options: { data: { name } } });
-    if (error) return error.message;
-    if (!data.session) return "OK:Te mandamos un email para confirmar tu cuenta. Confirmalo y después ingresá.";
-    startSession({ email, name, id: data.user.id }); return "";
+  if (API.accounts) {
+    const r = await api("auth", { method: "POST", body: { action: "signup", name, email, password: pw } });
+    if (!r.ok) return r.data.error || "No se pudo crear la cuenta. Probá de nuevo.";
+    openServerSession(r.data); S.name = S.name || name; return "";
   }
   const accs = lsGet(ACCOUNTS_KEY, {});
   if (accs[email]) return accs[email].pw ? "Ya hay una cuenta con ese email en este dispositivo. Ingresá con tu contraseña." : "Esa cuenta se creó con Google. Tocá “Continuar con Google”.";
@@ -947,10 +1007,10 @@ async function signup(name, email, pw) {
 async function login(email, pw) {
   email = email.trim().toLowerCase();
   if (!validEmail(email)) return "Revisá el email.";
-  if (cloudOn()) {
-    const { data, error } = await SB.auth.signInWithPassword({ email, password: pw });
-    if (error) return "El email o la contraseña no coinciden.";
-    await cloudLoad(data.user); return "";
+  if (API.accounts) {
+    const r = await api("auth", { method: "POST", body: { action: "login", email, password: pw } });
+    if (!r.ok) return r.data.error || "No se pudo ingresar. Probá de nuevo.";
+    openServerSession(r.data); return "";
   }
   const acc = lsGet(ACCOUNTS_KEY, {})[email];
   if (acc && !acc.pw) return "Esa cuenta se creó con Google. Tocá “Continuar con Google”.";
@@ -959,28 +1019,29 @@ async function login(email, pw) {
   return "";
 }
 async function logout() {
-  if (cloudOn() && SB) await SB.auth.signOut();
-  USER = null; S = fresh();
+  if (API.accounts && getToken()) { clearTimeout(API.timer); if (USER) await pushProgress(); api("auth", { method: "POST", body: { action: "logout" } }); setToken(""); }
+  USER = null; S = fresh(); API.at = null; V.rank = null;
   lsDel(SESSION_KEY);
   go("landing");
 }
-async function cloudLoad(user) {
-  const { data } = await SB.from("progreso").select("data").eq("user_id", user.id).maybeSingle();
-  startSession({ email: user.email, name: user.user_metadata?.name || (user.user_metadata?.full_name || "").split(" ")[0], id: user.id }, data?.data || null);
-}
-function cloudSave() {
-  if (!cloudOn() || !SB || !USER?.id) return;
-  clearTimeout(cloudTimer);
-  cloudTimer = setTimeout(() => SB.from("progreso").upsert({ user_id: USER.id, data: S, updated_at: new Date().toISOString() }), 1200);
-}
 async function initAuth() {
-  if (cloudOn()) {
-    try {
-      await loadScript("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js");
-      SB = window.supabase.createClient(AUTH_CFG.supabaseUrl, AUTH_CFG.supabaseAnonKey);
-      const { data } = await SB.auth.getSession();
-      if (data.session) { await cloudLoad(data.session.user); V = { page: S.started ? "sim" : "diag", step: 0 }; render(); }
-    } catch (e) { toast("No se pudo conectar con el servidor de cuentas."); }
+  const resetTk = new URLSearchParams(location.search).get("reset");
+  if (resetTk && API.accounts) {
+    history.replaceState(null, "", location.pathname + location.hash);
+    V = { page: "auth", mode: "reset", resetStep: "pw", resetToken: resetTk };
+    return;
+  }
+  if (API.accounts) {
+    if (!getToken()) return;
+    const r = await api("progress");
+    if (r.ok) { API.at = r.data.savedAt; STORE.status = "cloud"; startSession(r.data.user, r.data.state || undefined); }
+    else if (r.status === 401) { setToken(""); lsDel(SESSION_KEY); return; }
+    else {
+      // Sin conexión: se abre con lo guardado en este dispositivo y se sube cuando vuelva internet.
+      const ses = lsGet(SESSION_KEY, null); if (!ses) return;
+      API.at = ses.at || null; STORE.status = "error"; startSession(ses); API.dirty = true;
+    }
+    V = { page: S.started ? "sim" : "diag", step: 0 };
     return;
   }
   const ses = lsGet(SESSION_KEY, null);
@@ -989,19 +1050,23 @@ async function initAuth() {
 
 /* ---------- Continuar con Google ---------- */
 async function googleAuth() {
-  if (cloudOn()) {
-    if (!SB) { authMsg("No se pudo conectar con el servidor de cuentas."); return; }
-    const { error } = await SB.auth.signInWithOAuth({ provider: "google", options: { redirectTo: location.href.split("#")[0] } });
-    if (error) authMsg(error.message);
-    return;
-  }
-  if (googleReady()) {
+  const cid = googleId();
+  if (cid) {
     try {
       if (!window.google?.accounts?.oauth2) await loadScript("https://accounts.google.com/gsi/client");
       window.google.accounts.oauth2.initTokenClient({
-        client_id: AUTH_CFG.googleClientId, scope: "openid email profile",
+        client_id: cid, scope: "openid email profile",
         callback: async r => {
           if (r.error) { authMsg("No se pudo ingresar con Google."); return; }
+          if (API.on) {
+            authMsg("OK:Entrando…");
+            const x = await api("auth", { method: "POST", body: { action: "google", accessToken: r.access_token } });
+            if (!x.ok) { authMsg(x.data.error || "No se pudo ingresar con Google."); return; }
+            openServerSession(x.data); V.gdemo = false;
+            go(S.started ? "home" : "diag", { step: 0 });
+            toast(x.data.isNew ? `¡Bienvenido/a, ${S.name}!` : `Hola de nuevo, ${S.name}`);
+            return;
+          }
           try {
             const u = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", { headers: { Authorization: "Bearer " + r.access_token } }).then(x => x.json());
             if (!u.email) throw new Error("sin email");
@@ -1029,19 +1094,28 @@ function googleSession(email, name, pw) {
 async function submitGoogleDemo() {
   const btn = document.querySelector("#gdemo-form button[type=submit]");
   const email = document.getElementById("gd-email").value.trim().toLowerCase(), pw = document.getElementById("gd-pw").value;
-  const nameEl = document.getElementById("gd-name"), name = nameEl.value.trim(), known = lsGet(ACCOUNTS_KEY, {})[email];
+  const nameEl = document.getElementById("gd-name"), name = nameEl.value.trim(), known = !API.accounts && lsGet(ACCOUNTS_KEY, {})[email];
   document.querySelectorAll("#gdemo-form .input").forEach(x => x.classList.remove("bad"));
   const fail = (id, msg) => { const el = document.getElementById(id); el.classList.add("bad"); el.focus(); el.scrollIntoView({ block: "center", behavior: "smooth" }); authMsg(msg); };
+  const idle = () => { btn.disabled = false; btn.innerHTML = `Continuar ${icon("arrow")}`; };
   if (!/^[^\s@]+@(gmail|googlemail)\.com$/.test(email)) return fail("gd-email", "Escribí tu Gmail (termina en @gmail.com).");
   if (pw.length < 8) return fail("gd-pw", known ? "Escribí tu contraseña." : "La contraseña tiene que tener al menos 8 caracteres.");
-  if (!known && !name) return fail("gd-name", "Es tu primera vez: contanos cómo te llamás.");
+  if (!API.accounts && !known && !name) return fail("gd-name", "Es tu primera vez: contanos cómo te llamás.");
   btn.disabled = true; btn.textContent = "Entrando…"; authMsg("");
+  if (API.accounts) {
+    const r = await api("auth", { method: "POST", body: { action: "gdemo", email, password: pw, name } });
+    if (!r.ok) { idle(); return fail({ email: "gd-email", name: "gd-name" }[r.data.field] || "gd-pw", r.data.error || "Algo falló al entrar. Probá de nuevo."); }
+    openServerSession(r.data); V.gdemo = false;
+    go(S.started ? "home" : "diag", { step: 0 });
+    toast(r.data.isNew ? `¡Bienvenido/a, ${S.name}!` : `Hola de nuevo, ${S.name}`);
+    return;
+  }
   try {
     const h = await hashPw(email, pw);
-    if (known && known.pw && known.pw !== h) { btn.disabled = false; btn.innerHTML = `Continuar ${icon("arrow")}`; return fail("gd-pw", "La contraseña no coincide. Si no te la acordás, volvé y tocá “¿Te olvidaste la contraseña?”."); }
+    if (known && known.pw && known.pw !== h) { idle(); return fail("gd-pw", "La contraseña no coincide. Si no te la acordás, volvé y tocá “¿Te olvidaste la contraseña?”."); }
     googleSession(email, name || known.name, h);
   } catch (e) {
-    btn.disabled = false; btn.innerHTML = `Continuar ${icon("arrow")}`;
+    idle();
     authMsg("Algo falló al entrar. Probá de nuevo.");
   }
 }
@@ -1061,36 +1135,48 @@ function googleDemoCard() {
 }
 
 function resetCard() {
-  const pwStep = V.resetStep === "pw";
+  const pwStep = V.resetStep === "pw", byMail = API.accounts;
   return `<form class="card auth-card" id="reset-form" novalidate>
     <h2>Recuperar tu contraseña</h2>
-    ${pwStep ? `<p class="small muted">Cuenta: <b>${esc(V.resetEmail)}</b></p>
-      <div class="callout amber" style="font-size:13.5px">En la app real te mandamos un link a tu email para crear una contraseña nueva. En este prototipo la creás directamente acá.</div>
+    ${pwStep ? `${V.resetEmail ? `<p class="small muted">Cuenta: <b>${esc(V.resetEmail)}</b></p>` : `<p class="small muted">Creá tu contraseña nueva.</p>`}
+      ${byMail ? "" : `<div class="callout amber" style="font-size:13.5px">En la app real te mandamos un link a tu email para crear una contraseña nueva. En este prototipo la creás directamente acá.</div>`}
       <div class="field"><label for="rs-pw">Contraseña nueva</label><input class="input" id="rs-pw" type="password" autocomplete="new-password" placeholder="Al menos 8 caracteres"></div>
       <div class="field"><label for="rs-pw2">Repetila</label><input class="input" id="rs-pw2" type="password" autocomplete="new-password"></div>`
     : `<p class="small muted">Escribí el email con el que creaste tu cuenta.</p>
       <div class="field"><label for="rs-email">Email</label><input class="input" id="rs-email" type="email" autocomplete="email" placeholder="tu@email.com" value="${esc(V.authEmail || "")}"></div>`}
     <div id="auth-msg" aria-live="polite"></div>
-    <button class="btn block lg" type="submit">${pwStep ? "Guardar y entrar" : cloudOn() ? "Mandarme el link" : "Seguir"} ${icon("arrow")}</button>
+    <button class="btn block lg" type="submit">${pwStep ? "Guardar y entrar" : byMail ? "Mandarme el link" : "Seguir"} ${icon("arrow")}</button>
     <button type="button" class="link small" style="align-self:center" data-auth="login">Volver a ingresar</button>
   </form>`;
 }
 async function submitReset() {
+  const btn = document.querySelector("#reset-form button[type=submit]");
   if (V.resetStep === "pw") {
     const a = document.getElementById("rs-pw").value, b = document.getElementById("rs-pw2").value;
     if (a.length < 8) return authMsg("La contraseña tiene que tener al menos 8 caracteres.");
     if (a !== b) return authMsg("Las dos contraseñas no coinciden.");
-    const accs = lsGet(ACCOUNTS_KEY, {}), em = V.resetEmail;
-    accs[em].pw = await hashPw(em, a); lsSet(ACCOUNTS_KEY, accs);
-    startSession({ email: em, name: accs[em].name }); V.resetStep = null;
+    if (API.accounts) {
+      btn.disabled = true;
+      const r = await api("auth", { method: "POST", body: { action: "reset", token: V.resetToken, password: a } });
+      btn.disabled = false;
+      if (!r.ok) return authMsg(r.data.error || "No se pudo cambiar la contraseña.");
+      openServerSession(r.data);
+    } else {
+      const accs = lsGet(ACCOUNTS_KEY, {}), em = V.resetEmail;
+      accs[em].pw = await hashPw(em, a); lsSet(ACCOUNTS_KEY, accs);
+      startSession({ email: em, name: accs[em].name });
+    }
+    V.resetStep = null; V.resetToken = null;
     go(S.started ? "home" : "diag", { step: 0 }); toast("Listo: cambiaste tu contraseña.");
     return;
   }
   const em = document.getElementById("rs-email").value.trim().toLowerCase();
   if (!validEmail(em)) return authMsg("Revisá el email: parece que tiene un error.");
-  if (cloudOn()) {
-    const { error } = await SB.auth.resetPasswordForEmail(em, { redirectTo: location.href.split("#")[0] });
-    return authMsg(error ? error.message : "OK:Si hay una cuenta con ese email, te llega un link para crear una contraseña nueva. Revisá también el correo no deseado.");
+  if (API.accounts) {
+    btn.disabled = true;
+    const r = await api("auth", { method: "POST", body: { action: "resetRequest", email: em, returnTo: location.href } });
+    btn.disabled = false;
+    return authMsg(r.ok ? "OK:" + r.data.message : r.data.error || "No se pudo mandar el link. Probá de nuevo.");
   }
   const acc = lsGet(ACCOUNTS_KEY, {})[em];
   if (!acc) return authMsg("No encontramos una cuenta con ese email en este dispositivo. ¿La creaste con otro email?");
@@ -1507,7 +1593,7 @@ let rankTimer = null, rankLast = "";
 function publishRank() {
   clearTimeout(rankTimer);
   rankTimer = setTimeout(async () => {
-    if (!STORE.db || !USER) return;
+    if (!STORE.db || !USER || API.accounts) return;
     const ref = STORE.db.doc("ranking/" + STORE.uid), e = S.rankOff ? null : myEntry(), key = JSON.stringify(e);
     if (key === rankLast) return;
     rankLast = key;
@@ -1520,7 +1606,11 @@ function entryOf(state) {
 }
 async function loadRanking() {
   let rows = [], mode = "local";
-  if (STORE.db) {
+  if (API.accounts) {
+    const r = await api("ranking");
+    if (r.ok) { rows = r.data.rows.concat(r.data.mine ? [r.data.mine] : []); mode = "shared"; V.rankTotal = r.data.total; }
+    else { V.rank = { rows: [], mode: "error", at: new Date() }; if (V.page === "rank" || V.page === "sim") render(); return; }
+  } else if (STORE.db) {
     try {
       const snap = await STORE.db.collection("ranking").orderBy("ret", "desc").limit(200).get();
       rows = snap.docs.filter(d => d.exists).map(d => ({ ...d.data(), me: d.id === STORE.uid }));
@@ -1536,24 +1626,24 @@ async function loadRanking() {
     });
   } else if (!S.rankOff) {
     const mine = myEntry(), i = rows.findIndex(r => r.me);
-    if (mine) { if (i >= 0) rows[i] = { ...mine, me: true }; else rows.push({ ...mine, me: true }); }
+    if (mine) { if (i >= 0) rows[i] = { ...rows[i], ...mine, me: true }; else rows.push({ ...mine, me: true }); }
     else if (i >= 0) rows.splice(i, 1);
   }
-  rows.sort((a, b) => b.ret - a.ret || (b.score || 0) - (a.score || 0));
+  rows.sort((a, b) => (a.pos || 0) - (b.pos || 0) || b.ret - a.ret || (b.score || 0) - (a.score || 0));
   V.rank = { rows, mode, at: new Date() };
   if (V.page === "rank" || V.page === "sim") render();
 }
 function rankMe() {
   if (!V.rank) { if (!V.rankLoading && USER) { V.rankLoading = true; setTimeout(() => loadRanking().finally(() => { V.rankLoading = false; }), 0); } return null; }
   const i = V.rank.rows.findIndex(r => r.me);
-  return i < 0 ? null : { pos: i + 1, of: V.rank.rows.length };
+  return i < 0 ? null : { pos: V.rank.rows[i].pos || i + 1, of: Math.max(V.rankTotal || 0, V.rank.rows.length) };
 }
 function rank() {
   if (!V.rank) { rankMe(); return `<div class="page-h"><div><h1>Ranking</h1></div></div><div class="card muted">Cargando el ranking…</div>`; }
   const rows = V.rank.rows, examples = rows.length < 3;
   const demo = [{ name: "Cami R.", ret: 0.0412, score: 78, tier: "Estratega", days: 18 }, { name: "Tomi G.", ret: 0.0187, score: 66, tier: "Prudente", days: 12 }, { name: "Juli P.", ret: -0.0095, score: 52, tier: "Aprendiz", days: 9 }];
   const medal = k => k < 3 ? `<span class="rank r${k + 1}">${k + 1}</span>` : `<span class="rank">${k + 1}</span>`;
-  const row = (r, k, ex) => `<tr class="${r.me ? "me-row" : ""} ${ex ? "ex-row" : ""}"><td>${ex ? "" : medal(k)}</td><td><b>${esc(r.name)}</b>${r.me ? ' <span class="pill">Vos</span>' : ""}${ex ? ' <span class="pill grey">ejemplo</span>' : ""}</td>
+  const row = (r, k, ex) => `<tr class="${r.me ? "me-row" : ""} ${ex ? "ex-row" : ""}"><td>${ex ? "" : medal(r.pos ? r.pos - 1 : k)}</td><td><b>${esc(r.name)}</b>${r.me ? ' <span class="pill">Vos</span>' : ""}${ex ? ' <span class="pill grey">ejemplo</span>' : ""}</td>
     <td class="r num"><b class="${r.ret >= 0 ? "up" : "down"}">${pc2(r.ret)}</b></td><td class="r">${r.score != null ? `${r.score} · ${esc(r.tier)}` : "Se calcula mañana"}</td><td class="r num">${r.days}</td></tr>`;
   const mine = myEntry();
   return `
@@ -1564,7 +1654,7 @@ function rank() {
       <table class="bk-table rank-t"><thead><tr><th style="width:60px">Puesto</th><th>Nombre</th><th class="r">Rendimiento</th><th class="r">Nivel de inversor</th><th class="r">Días</th></tr></thead>
       <tbody>${rows.map((r, k) => row(r, k)).join("")}${examples ? demo.map(r => row(r, 0, true)).join("") : ""}${!rows.length && !examples ? "" : ""}</tbody></table>
     </div>
-    <p class="note" style="margin-top:10px">Gana quien mejor le va con su cartera de práctica desde el día en que empezó, con plata virtual. ${V.rank.mode === "shared" ? `Personas que usan Sin Miedo en este link (${rows.length}). Se muestra el nombre y la inicial del apellido.` : `Cuentas creadas en este dispositivo (${rows.length}). En la versión online el ranking es con todas las personas que la usan.`}${examples ? " Las filas marcadas “ejemplo” muestran cómo se va a ver cuando se sume más gente." : ""} El rendimiento usa los precios de cierre y en vivo; no es una recomendación de inversión.</p>`;
+    <p class="note" style="margin-top:10px">Gana quien mejor le va con su cartera de práctica desde el día en que empezó, con plata virtual. ${V.rank.mode === "error" ? "No se pudo cargar el ranking. Probá de nuevo en un rato. " : V.rank.mode === "shared" ? `${API.accounts ? `Todas las personas que usan Sin Miedo (${Math.max(V.rankTotal || 0, rows.length)})` : `Personas que usan Sin Miedo en este link (${rows.length})`}. Se muestra el nombre y la inicial del apellido.` : `Cuentas creadas en este dispositivo (${rows.length}). En la versión online el ranking es con todas las personas que la usan.`}${examples ? " Las filas marcadas “ejemplo” muestran cómo se va a ver cuando se sume más gente." : ""} El rendimiento usa los precios de cierre y en vivo; no es una recomendación de inversión.</p>`;
 }
 /* ---------- 5. Aprender ---------- */
 function learn() {
@@ -1804,14 +1894,27 @@ async function pollLive() {
   clearTimeout(liveTimer);
   const list = assets().filter(a => LIVE_SRC[a.cls]), files = [...new Set(list.map(a => LIVE_SRC[a.cls]))];
   const before = {}; Object.keys(LIVE).forEach(k => before[k] = LIVE[k].c);
+  const code = a => a.t === "LECAP" && MD.lecap ? MD.lecap : a.t;
+  // Un precio muy lejos del último cierre es un dato con otra unidad o con error: no se usa.
+  const sane = (a, c) => { const ref = closeAt(a.t, lastI()); return c > 0 && (!ref || Math.abs(c / ref - 1) < 0.5); };
   try {
-    const rows = (await Promise.all(files.map(f => fetch("https://data912.com/live/" + f, { cache: "no-store" }).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })))).flat();
-    const bySym = {}; rows.forEach(r => { if (r && r.symbol) bySym[r.symbol] = r; });
     let n = 0;
-    list.forEach(a => {
-      const r = bySym[a.t === "LECAP" && MD.lecap ? MD.lecap : a.t];
-      if (r && +r.c > 0) { LIVE[a.t] = { c: +r.c, bid: +r.px_bid || 0, ask: +r.px_ask || 0, pct: +r.pct_change || 0, v: +r.v || 0 }; n++; }
-    });
+    if (API.on) {
+      // En Vercel: Yahoo Finance (último precio y variación) + puntas de BYMA, a través de api/quotes.
+      const r = await api("quotes?s=" + encodeURIComponent(list.map(code).join(",")), { timeout: 10000 });
+      if (r.ok) list.forEach(a => {
+        const q = r.data.quotes[code(a)];
+        if (q && sane(a, +q.c)) { LIVE[a.t] = { c: +q.c, bid: +q.bid || 0, ask: +q.ask || 0, pct: +q.pct || 0, v: +q.v || 0, src: q.src }; n++; }
+      });
+    }
+    if (!n) {
+      const rows = (await Promise.all(files.map(f => fetch("https://data912.com/live/" + f, { cache: "no-store" }).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })))).flat();
+      const bySym = {}; rows.forEach(r => { if (r && r.symbol) bySym[r.symbol] = r; });
+      list.forEach(a => {
+        const r = bySym[code(a)];
+        if (r && sane(a, +r.c)) { LIVE[a.t] = { c: +r.c, bid: +r.px_bid || 0, ask: +r.px_ask || 0, pct: +r.pct_change || 0, v: +r.v || 0, src: "data912" }; n++; }
+      });
+    }
     if (n) { LIVE_AT = new Date(); LIVE_STATE = "on"; liveFails = 0; } else throw new Error("sin datos");
   } catch (e) { liveFails++; if (!Object.keys(LIVE).length) LIVE_STATE = "fail"; }
   const changed = Object.keys(LIVE).filter(k => before[k] !== undefined && before[k] !== LIVE[k].c).map(k => [k, LIVE[k].c > before[k]]);
@@ -1843,9 +1946,10 @@ function liveRefresh(changed) {
   changed.forEach(([t, up]) => document.querySelectorAll(`[data-live="${t}"]`).forEach(el => { el.classList.remove("fl-up", "fl-dn"); void el.offsetWidth; el.classList.add(up ? "fl-up" : "fl-dn"); }));
 }
 document.addEventListener("focusout", () => { if (liveDirty) setTimeout(() => liveRefresh([]), 50); });
+const liveSrc = () => Object.values(LIVE).some(q => q.src === "yahoo") ? " vía Yahoo Finance" : "";
 const liveTime = () => LIVE_AT ? LIVE_AT.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23" }) : "";
 function priceNote() {
-  if (LIVE_STATE === "on") return marketStatus().open ? `<span class="live-dot"></span><b>EN VIVO</b> · Cotizaciones de BYMA actualizadas a las ${liveTime()} (pueden tener unos minutos de demora) · Plata virtual` : `<b>MERCADO CERRADO</b> · Últimos precios operados en BYMA (actualizado ${liveTime()}) · Plata virtual`;
+  if (LIVE_STATE === "on") return marketStatus().open ? `<span class="live-dot"></span><b>EN VIVO</b> · Cotizaciones de BYMA${liveSrc()} actualizadas a las ${liveTime()} (pueden tener unos minutos de demora) · Plata virtual` : `<b>MERCADO CERRADO</b> · Últimos precios operados en BYMA${liveSrc()} (actualizado ${liveTime()}) · Plata virtual`;
   return `${icon("alert", "ic")}<b>MODO PRÁCTICA</b> · Plata virtual · ${MD.real ? `Precios de cierre del ${fmtDateLong(MD.asOf)}${LIVE_STATE === "fail" ? ". No se pudo conectar a las cotizaciones en vivo; se reintenta solo" : ". En este link las cotizaciones en vivo no están disponibles: usá la app de escritorio o el archivo descargado"}` : "Precios simulados"}`;
 }
 const ohlcAt = (t, i) => { const o = MD.ohlc[t]; if (!o) return null; const off = MD.dates.length - o.length; return o[i - off] || null; };
@@ -2418,7 +2522,36 @@ Reglas que nunca rompés:
 - Si una oferta suena a estafa (ganancias garantizadas, apuro, traer gente, no registrada en la CNV), avisalo claramente.
 - Si alguien cuenta que está en riesgo o pasándola muy mal, respondé con cuidado y sugerí hablar con un adulto de confianza o un profesional.`;
 
+// En Vercel responde la función api/ask (Claude con la clave del servidor), con la misma forma de uso.
+async function serverAI(turns, { signal, onText } = {}) {
+  const messages = turns.filter(m => m.content !== AI_RULES);
+  const t = getToken();
+  let r;
+  try { r = await fetch(apiURL("ask"), { method: "POST", signal, headers: { "Content-Type": "application/json", ...(t ? { Authorization: "Bearer " + t } : {}) }, body: JSON.stringify({ messages }) }); }
+  catch (e) { throw { code: e?.name === "AbortError" ? "cancelled" : "network" }; }
+  if (!r.ok) { const j = await r.json().catch(() => ({})); throw { code: j.code || (r.status === 429 ? "rate_limited" : "network") }; }
+  const rd = r.body.getReader(), dec = new TextDecoder();
+  let buf = "", text = "", end = null;
+  try {
+    for (;;) {
+      const { done, value } = await rd.read(); if (done) break;
+      buf += dec.decode(value, { stream: true });
+      let nl;
+      while ((nl = buf.indexOf("\n")) >= 0) {
+        const line = buf.slice(0, nl); buf = buf.slice(nl + 1);
+        if (!line.trim()) continue;
+        const ev = JSON.parse(line);
+        if (ev.t === "delta") { text += ev.text; onText?.({ text }); }
+        else if (ev.t === "end") end = ev;
+        else if (ev.t === "error") throw { code: ev.code, text };
+      }
+    }
+  } catch (e) { if (e?.name === "AbortError") throw { code: "cancelled", text }; throw e?.code ? e : { code: "network", text }; }
+  if (!end) throw { code: "network", text };
+  return { text, truncated: !!end.truncated };
+}
 async function initAI() {
+  if (API.ai) { AI = serverAI; if (V.orb) renderOrb(); return; }
   if (!window.claude?.use) return;
   try { AI = await window.claude.use("sample"); } catch (e) { AI = null; }
   if (AI && V.page === "ask") render();
@@ -2437,7 +2570,8 @@ function mdLite(t) {
 }
 const AI_ERR = {
   rate_limited: "Hiciste muchas preguntas seguidas. Esperá un ratito y volvé a intentar.",
-  session_expired: "Tu sesión de Claude venció. Volvé a ingresar y probá de nuevo.",
+  session_expired: "Tu sesión venció. Volvé a ingresar y probá de nuevo.",
+  unavailable: "La IA no está disponible en este momento. Probá de nuevo en un rato.",
   refused: "Esa pregunta no la puedo responder. Probá preguntarla de otra forma.",
   empty_completion: "No me salió una respuesta. Probá preguntarlo de otra forma.",
   prompt_too_large: "La conversación quedó muy larga. Tocá “Empezar de nuevo” y volvé a preguntar."
@@ -2455,7 +2589,7 @@ async function askAI(q) {
     });
     msg.t = text; msg.h = mdLite(text) + (truncated ? `<p class="xs faint">La respuesta quedó cortada. Pedime que siga.</p>` : "");
   } catch (e) {
-    const off = ["not_granted", "sampling_disabled", "not_declared", "capability_disabled", "capability_removed"].includes(e?.code);
+    const off = ["not_granted", "sampling_disabled", "not_declared", "capability_disabled", "capability_removed", "not_configured"].includes(e?.code);
     if (off) { AI = null; msg.h = answerFor(q); msg.t = ""; }
     else if (e?.code === "cancelled") { msg.t = e.text || ""; msg.h = e.text ? mdLite(e.text) : `<span class="faint">Respuesta detenida.</span>`; }
     else { msg.t = e?.text || ""; msg.h = (e?.text ? mdLite(e.text) : "") + `<p class="small" style="color:var(--red)">${AI_ERR[e?.code] || "Se cortó la conexión. Volvé a intentar en un momento."}</p>`; }
@@ -2810,9 +2944,11 @@ function jump(id) {
 }
 
 (async () => {
-  // En claude.ai se espera a la cuenta guardada antes de mostrar algo, para no mostrar la portada de más.
-  if (window.claude?.use) root.innerHTML = `<div class="splash">${logo()}<span class="typing"><i></i><i></i><i></i></span></div>`; else render();
+  // Si hay una sesión guardada se espera a abrirla antes de mostrar algo, para no mostrar la portada de más.
+  const waitFirst = !!window.claude?.use || !!getToken() || !!new URLSearchParams(location.search).get("reset");
+  if (waitFirst) root.innerHTML = `<div class="splash">${logo()}<span class="typing"><i></i><i></i><i></i></span></div>`; else render();
   await initStore();
+  await initAPI();
   await initAuth();
   if (USER && S.bk) processNewDays();
   render();

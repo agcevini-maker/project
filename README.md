@@ -17,6 +17,59 @@ Prototipo de app para animarse a invertir: **aprender** con lecciones de 1 minut
 
 Abrí `index.html` en el navegador (no necesita instalar nada). En la compu se ve como la plataforma web de un broker (barra superior, cinta de cotizaciones, tabla de mercado con panel de operación al costado); en el celular pasa a una columna con barra inferior.
 
+## Publicar en Vercel (versión para la entrega)
+
+En Vercel la app tiene **cuentas reales**: el progreso queda guardado en una base de datos y se abre desde cualquier dispositivo. También hay un **ranking real** entre todas las personas, **cotizaciones de Yahoo Finance** y **Preguntá con IA**. Todo está en este repositorio:
+
+| Parte | Qué hace |
+|---|---|
+| `public/` (se arma sola con `npm run build`) | `/` versión de PC (en un celular pasa sola a `/celular/`), `/celular/` y `/data/mercado.json` |
+| `api/auth.js` | crear cuenta, ingresar, Google, salir, recuperar la contraseña por email y borrar la cuenta. Contraseñas con scrypt y sesiones de 90 días. Frena los intentos repetidos |
+| `api/progress.js` | guarda y devuelve el progreso de cada cuenta. Si otro dispositivo guardó algo más nuevo, no lo pisa y la app trae lo nuevo |
+| `api/ranking.js` | ranking de todas las cuentas por rendimiento. Muestra nombre e inicial del apellido; los emails nunca salen del servidor |
+| `api/quotes.js` | último precio y variación del día de **Yahoo Finance** (tickers `.BA` de BYMA), con puntas y respaldo de data912. Se comparte 15 segundos en la CDN de Vercel |
+| `api/ask.js` | Preguntá con IA (Claude), con las reglas de `api/_lib/rules.js`. Pide sesión y limita la cantidad de preguntas por persona |
+| `api/health.js` | le dice a la app qué está activo |
+
+### Pasos
+
+1. En [vercel.com](https://vercel.com) → **Add New → Project** → importá este repositorio de GitHub. Vercel detecta `vercel.json` (no hay que tocar nada del build).
+2. Elegí como rama de producción (en el proyecto, **Settings → Environments → Production → Branch Tracking**, o **Settings → Git** en paneles más viejos) `claude/investment-app-practice-iu56nt` (o uní la rama a `main`). Cada vez que GitHub Actions actualiza los precios del día, Vercel publica solo.
+3. **Base de datos:** en el proyecto → **Storage → Create Database → Upstash (Redis)** → conectala al proyecto. Eso crea solo `KV_REST_API_URL` y `KV_REST_API_TOKEN`. El plan gratis alcanza para la entrega.
+4. **IA (opcional):** en **Settings → Environment Variables** agregá `ANTHROPIC_API_KEY` (de console.anthropic.com). Sin la clave, Preguntá usa las respuestas guardadas.
+5. **Redeploy** (Deployments → ⋯ → Redeploy) para que tome las variables. Abrí `https://<tu-proyecto>.vercel.app/api/health`: tiene que decir `"accounts": true`.
+
+Variables opcionales:
+
+| Variable | Para qué |
+|---|---|
+| `GOOGLE_CLIENT_ID` | "Continuar con Google" real. Creá un ID de cliente OAuth (tipo Web) en Google Cloud y agregá tu dominio de Vercel en "Orígenes autorizados de JavaScript". Sin esto, el botón simula Google (pide Gmail y contraseña) |
+| `RESEND_API_KEY` y `MAIL_FROM` | Recuperar la contraseña por email con [Resend](https://resend.com) (por ejemplo `MAIL_FROM="Sin Miedo <hola@tudominio.com>"`, con el dominio verificado en Resend). Sin esto, la pantalla avisa que no está activada |
+| `AI_MODEL` | Modelo de Claude para Preguntá (por defecto `claude-opus-5-5`) |
+
+Sin la base de datos, la app igual funciona: precios de Yahoo e IA desde el servidor, y cuentas y progreso en el dispositivo.
+
+### Probar en la compu
+
+```bash
+npm install
+npm test                                   # pruebas de las funciones del servidor
+npm run build && MEMORY_ACCOUNTS=1 npm run dev   # http://localhost:3000 con cuentas en memoria
+```
+
+`MEMORY_ACCOUNTS=1` activa las cuentas sin Upstash, en una memoria que se borra al cortar el servidor. También sirve `vercel dev` si tenés la CLI de Vercel.
+
+### App de escritorio y de Android con las mismas cuentas
+
+En `prototipo/index.html` poné la dirección del proyecto en `API_BASE` (por ejemplo `const API_BASE = "https://sin-miedo.vercel.app";`), regenerá con `python3 scripts/build_mobile.py` y volvé a armar las apps. Así usan las mismas cuentas, el mismo ranking y los precios de Yahoo.
+
+### Antes de abrirla al público
+
+- **Datos personales y menores (Ley 25.326):** la app guarda nombre, email y progreso. LBO tiene que revisar y completar los términos y la política de privacidad (están marcados "a completar") y definir el consentimiento para menores. Cada persona puede borrar su cuenta (`POST /api/auth` con `action: "delete"`).
+- **Términos de uso de los datos de mercado:** Yahoo Finance y data912 no tienen una API oficial con licencia para uso comercial. Para una app pública de LBO conviene reemplazarlas por un proveedor con licencia (por ejemplo, el feed de BYMA). El cambio es solo en `api/quotes.js`.
+- **Ranking:** el rendimiento lo calcula la app con la cartera de práctica y el servidor controla que los números sean razonables. Una persona con conocimientos técnicos podría mandar un resultado falso: para premios reales habría que calcularlo en el servidor.
+- **IA:** cada pregunta tiene costo en la cuenta de Anthropic. Hay un límite de 15 preguntas cada 10 minutos y 120 por día por persona (`api/ask.js`).
+
 ## Flujo
 
 1. **Bienvenida**: 3 preguntas (experiencia, qué te frena, cuánto podrías poner). Adaptan el camino:
@@ -90,26 +143,11 @@ Pantallas: landing, registro/ingreso (Google o email), diagnóstico, inicio, Apr
 
 Al comenzar, cada usuario entra con **"Continuar con Google"** (también desde la landing, "Empezar con Google") o con nombre, email y contraseña. Cada cuenta tiene su propio progreso (niveles, XP, racha, cartera de práctica).
 
-"Continuar con Google" funciona de tres maneras según `AUTH_CFG`:
+Dónde se guardan las cuentas depende de dónde se abra la app:
 
-- **Sin configurar (por defecto):** modo prototipo. No abre Google: se escribe el Gmail y una contraseña (la primera vez también el nombre) para simular el ingreso. La contraseña se pide siempre, igual que con email.
-- **`googleClientId`:** ingreso real con Google (Google Identity Services) y progreso guardado en el dispositivo. Requiere un ID de cliente OAuth creado en Google Cloud, con el dominio donde se publica en "Orígenes autorizados", y abrir el prototipo desde ese dominio (no como archivo suelto).
-- **Supabase:** activá Google como proveedor en Supabase (Authentication → Providers) y el progreso se guarda en la nube.
-
-- **Modo local (por defecto):** las cuentas se guardan en el navegador (`localStorage`), con la contraseña hasheada (SHA-256). Sirve para la demo, pero cada cuenta existe solo en ese dispositivo y navegador. No es un sistema de cuentas real.
-- **Modo nube (Supabase):** completá `AUTH_CFG` (`supabaseUrl` y `supabaseAnonKey`) en el archivo y creá esta tabla:
-
-```sql
-create table progreso (
-  user_id uuid primary key references auth.users on delete cascade,
-  data jsonb not null,
-  updated_at timestamptz default now()
-);
-alter table progreso enable row level security;
-create policy "cada uno ve lo suyo" on progreso for select using (auth.uid() = user_id);
-create policy "cada uno guarda lo suyo" on progreso for insert with check (auth.uid() = user_id);
-create policy "cada uno actualiza lo suyo" on progreso for update using (auth.uid() = user_id);
-```
+- **Publicada en Vercel:** cuentas reales en el servidor (ver "Publicar en Vercel"). "Continuar con Google" es real si está `GOOGLE_CLIENT_ID`; si no, se simula (Gmail y contraseña, y el nombre la primera vez).
+- **En claude.ai:** cuentas del navegador, y el progreso se copia en la base privada de cada persona (capacidad `db`).
+- **Archivo suelto o app de escritorio:** las cuentas se guardan en el navegador (`localStorage`), con la contraseña hasheada (SHA-256). Sirve para la demo, pero cada cuenta existe solo en ese dispositivo. Con `AUTH_CFG.googleClientId` el ingreso con Google es real, si el archivo se abre desde un dominio autorizado.
 
 Antes de usarlo con usuarios reales (y menores de edad) hace falta que LBO revise la política de privacidad y el tratamiento de datos personales (Ley 25.326). El texto de los términos está marcado "a completar".
 
@@ -123,13 +161,13 @@ Antes de usarlo con usuarios reales (y menores de edad) hace falta que LBO revis
 
 - **Bienvenida:** después del diagnóstico, una pantalla muestra todo lo que se puede hacer y recomienda por dónde arrancar según el freno elegido.
 - **Inicio:** lo principal es "Tu próximo paso" y "Tu camino" (6 pasos: nivel 1, primera compra, detector, una pregunta, los 6 niveles y el salto). Las cuentas nuevas arrancan de cero y la racha cuenta los días seguidos reales.
-- **Ranking:** ordena por rendimiento de la cartera de práctica desde que cada persona empezó. En claude.ai cada persona publica su resultado en la colección compartida `ranking` (solo puede escribir el suyo, regla `ranking/{self}`) y todos ven la tabla; se puede dejar de aparecer. Como archivo o app se arma con las cuentas del dispositivo. Con menos de 3 personas se muestran filas marcadas "ejemplo".
-- **Contraseña:** "¿Te olvidaste la contraseña?" en Ingresar. Con Supabase manda el email de recuperación; en el prototipo local se crea una nueva en la misma pantalla (avisándolo). Se entra con email y contraseña, o con Google; el nombre es solo para saludar.
+- **Ranking:** ordena por rendimiento de la cartera de práctica desde que cada persona empezó. En Vercel es entre todas las cuentas (`api/ranking.js`). En claude.ai cada persona publica su resultado en la colección compartida `ranking` (solo puede escribir el suyo, regla `ranking/{self}`) y todos ven la tabla; se puede dejar de aparecer. Como archivo o app se arma con las cuentas del dispositivo. Con menos de 3 personas se muestran filas marcadas "ejemplo".
+- **Contraseña:** "¿Te olvidaste la contraseña?" en Ingresar. En Vercel manda un link por email (con Resend configurado); en el prototipo local se crea una nueva en la misma pantalla (avisándolo). Se entra con email y contraseña, o con Google; el nombre es solo para saludar.
 
 ### Asistente con IA y progreso guardado
 
-- **Preguntá** (dentro de la esfera flotante, pestaña "Preguntá") responde cualquier pregunta con IA (Claude) cuando el prototipo se abre publicado en claude.ai (capacidad `sample`). Las instrucciones están en `AI_RULES`: voseo, respuestas cortas, nunca promete ganancias ni recomienda qué comprar, avisa que no tiene datos en vivo y no inventa datos de LBO. Como archivo suelto o app de escritorio usa las respuestas guardadas (`ANSWERS`).
-- **Progreso:** siempre se guarda en el navegador. En claude.ai además se guarda en la base privada de cada persona (capacidad `db`, `data/users/<id>`), así vuelve aunque se borre el navegador o se entre desde otro dispositivo. La barra lateral muestra dónde quedó guardado.
+- **Preguntá** (dentro de la esfera flotante, pestaña "Preguntá") responde cualquier pregunta con IA (Claude): en Vercel a través de `api/ask.js` y en claude.ai con la capacidad `sample`. Las instrucciones están en `AI_RULES`: voseo, respuestas cortas, nunca promete ganancias ni recomienda qué comprar, avisa que no tiene datos en vivo y no inventa datos de LBO. Como archivo suelto o app de escritorio usa las respuestas guardadas (`ANSWERS`).
+- **Progreso:** siempre se guarda en el navegador. En Vercel además se guarda en la cuenta, en el servidor. En claude.ai además se guarda en la base privada de cada persona (capacidad `db`, `data/users/<id>`), así vuelve aunque se borre el navegador o se entre desde otro dispositivo. La barra lateral muestra dónde quedó guardado.
 
 ### Aprender (más lúdico)
 
@@ -137,7 +175,7 @@ XP por nivel (+50, +20 si respondés bien al primer intento), estrellas, meta di
 
 ### Cotizaciones en vivo
 
-En la app de escritorio y abriendo el archivo en el navegador, el simulador trae las cotizaciones de BYMA desde data912.com (último precio, puntas, volumen y variación del día): cada 20 segundos con el mercado abierto y cada 5 minutos cerrado. Las órdenes a mercado se ejecutan a las puntas reales y las limitadas pendientes se revisan con cada actualización. Pueden tener unos minutos de demora. En claude.ai el navegador bloquea las conexiones a otros sitios, así que ahí se usan los precios de cierre. Si la fuente no responde, también se usan los cierres y se reintenta solo.
+En Vercel el simulador trae el último precio y la variación del día de **Yahoo Finance** (vía `api/quotes.js`), con las puntas de BYMA. En la app de escritorio y abriendo el archivo en el navegador, trae las cotizaciones de BYMA desde data912.com (último precio, puntas, volumen y variación del día): cada 20 segundos con el mercado abierto y cada 5 minutos cerrado. Las órdenes a mercado se ejecutan a las puntas reales y las limitadas pendientes se revisan con cada actualización. Pueden tener unos minutos de demora. En claude.ai el navegador bloquea las conexiones a otros sitios, así que ahí se usan los precios de cierre. Si la fuente no responde, también se usan los cierres y se reintenta solo.
 
 ### Simulador día a día con datos reales
 
