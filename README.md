@@ -26,7 +26,7 @@ En Vercel la app tiene **cuentas reales**: el progreso queda guardado en una bas
 | `public/` (se arma sola con `npm run build`) | `/` versión de PC (en un celular pasa sola a `/celular/`), `/celular/` y `/data/mercado.json` |
 | `api/auth.js` | crear cuenta, ingresar, Google, salir, recuperar la contraseña por email y borrar la cuenta. Contraseñas con scrypt y sesiones de 90 días. Frena los intentos repetidos |
 | `api/progress.js` | guarda y devuelve el progreso de cada cuenta. Si otro dispositivo guardó algo más nuevo, no lo pisa y la app trae lo nuevo |
-| `api/ranking.js` | ranking de todas las cuentas por rendimiento. Muestra nombre e inicial del apellido; los emails nunca salen del servidor |
+| `api/ranking.js` | ranking real de todas las cuentas. **El rendimiento lo calcula el servidor** (`api/_lib/portfolio.js`): rehace la cuenta con las órdenes guardadas y los cierres reales del día; si el saldo o las tenencias no salen de las órdenes, o un precio está lejos del real, esa cuenta no entra. Cada día con cierres nuevos se recalcula solo. Muestra nombre e inicial del apellido; los emails nunca salen del servidor |
 | `api/quotes.js` | último precio y variación del día de **Yahoo Finance** (tickers `.BA` de BYMA), con puntas y respaldo de data912 (BYMA). Se comparte 15 segundos en la CDN de Vercel. Para ver qué fuente se usó: `/api/quotes?s=GGAL` → `src` |
 | `api/ask.js` | Preguntá con IA (Claude), con las reglas de `api/_lib/rules.js`. Pide sesión y limita la cantidad de preguntas por persona |
 | `api/health.js` | le dice a la app qué está activo |
@@ -35,9 +35,9 @@ En Vercel la app tiene **cuentas reales**: el progreso queda guardado en una bas
 
 1. En [vercel.com](https://vercel.com) → **Add New → Project** → importá este repositorio de GitHub. Vercel detecta `vercel.json` (no hay que tocar nada del build).
 2. Elegí como rama de producción (en el proyecto, **Settings → Environments → Production → Branch Tracking**, o **Settings → Git** en paneles más viejos) `claude/investment-app-practice-iu56nt` (o uní la rama a `main`). Cada vez que GitHub Actions actualiza los precios del día, Vercel publica solo.
-3. **Base de datos:** en el proyecto → **Storage → Create Database → Upstash (Redis)** → conectala al proyecto. Eso crea solo `KV_REST_API_URL` y `KV_REST_API_TOKEN`. El plan gratis alcanza para la entrega.
+3. **Base de datos (sin esto no se guarda el progreso en la cuenta ni hay ranking):** en el proyecto → **Storage → Create Database → Upstash (Redis)** → conectala al proyecto. Eso crea solo `KV_REST_API_URL` y `KV_REST_API_TOKEN` (o `UPSTASH_REDIS_REST_URL`/`_TOKEN`). También sirve un Redis común con `REDIS_URL` (por ejemplo "Redis" de Redis Cloud en el Marketplace). El plan gratis alcanza para la entrega.
 4. **IA (opcional):** en **Settings → Environment Variables** agregá `ANTHROPIC_API_KEY` (de console.anthropic.com). Sin la clave, Preguntá usa las respuestas guardadas.
-5. **Redeploy** (Deployments → ⋯ → Redeploy) para que tome las variables. Abrí `https://<tu-proyecto>.vercel.app/api/health`: tiene que decir `"accounts": true`.
+5. **Redeploy** (Deployments → ⋯ → Redeploy) para que tome las variables. Abrí `https://<tu-proyecto>.vercel.app/api/health`: tiene que decir `"accounts": true`. Si dice `false`, el campo `fix` explica qué falta. Mientras falte, la app lo avisa en el Ranking y en "Guardado solo en este dispositivo".
 
 Variables opcionales:
 
@@ -68,7 +68,7 @@ En `prototipo/index.html` poné la dirección del proyecto en `API_BASE` (por ej
 - **Datos personales y menores (Ley 25.326):** la app guarda nombre, email y progreso. LBO tiene que revisar y completar los términos y la política de privacidad (están marcados "a completar") y definir el consentimiento para menores. Cada persona puede borrar su cuenta (`POST /api/auth` con `action: "delete"`).
 - **Yahoo desde servidores:** Yahoo suele responder 429 ("demasiados pedidos") a servidores en la nube; desde GitHub Actions lo hace siempre. Si pasa en Vercel, la app usa sola los precios de BYMA (data912), que también son reales, y la nota de precios no dice "vía Yahoo Finance". El workflow "Pruebas de la versión web" muestra qué responde cada fuente.
 - **Términos de uso de los datos de mercado:** Yahoo Finance y data912 no tienen una API oficial con licencia para uso comercial. Para una app pública de LBO conviene reemplazarlas por un proveedor con licencia (por ejemplo, el feed de BYMA). El cambio es solo en `api/quotes.js`.
-- **Ranking:** el rendimiento lo calcula la app con la cartera de práctica y el servidor controla que los números sean razonables. Una persona con conocimientos técnicos podría mandar un resultado falso: para premios reales habría que calcularlo en el servidor.
+- **Ranking:** el servidor recalcula cada cartera con sus órdenes y los precios reales, así que no alcanza con mandar un número inventado. Igual, las órdenes se generan en el navegador: alguien con conocimientos técnicos podría fabricar órdenes coherentes a precios reales del día (por ejemplo, comprando "ayer" algo que ya sabe que subió). Para premios con plata de verdad, las órdenes tendrían que ejecutarse en el servidor.
 - **IA:** cada pregunta tiene costo en la cuenta de Anthropic. Hay un límite de 15 preguntas cada 10 minutos y 120 por día por persona (`api/ask.js`).
 
 ## Flujo

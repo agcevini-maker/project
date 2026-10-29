@@ -3,10 +3,10 @@
 // PUT  /api/progress { state, base, rank } →  { ok, savedAt }   (409 si otro dispositivo guardó algo más nuevo)
 import { getJSON, setJSON } from "./_lib/store.js";
 import { handler, send, fail, readBody, sessionUser } from "./_lib/http.js";
-import { cleanEntry, setRank } from "./_lib/rank.js";
+import { entryFor, setRank } from "./_lib/rank.js";
+import { marketData } from "./_lib/portfolio.js";
 
 const LIMIT = 400_000;
-const rankName = name => { const n = String(name || "").trim().split(/\s+/); return (n[0] || "Inversor").slice(0, 20) + (n[1] ? " " + n[1][0].toUpperCase() + "." : ""); };
 
 export default handler(["GET", "PUT"], async (req, res) => {
   const s = await sessionUser(req);
@@ -22,6 +22,13 @@ export default handler(["GET", "PUT"], async (req, res) => {
   if (cur && b.base !== undefined && b.base !== cur.at && !b.force) return send(res, 409, { ok: false, error: "Hay progreso más nuevo guardado desde otro dispositivo.", state: cur.data, savedAt: cur.at });
   const at = new Date().toISOString();
   await setJSON(key, { data: b.state, at });
-  if ("rank" in b) await setRank(s.email, b.state.rankOff ? null : cleanEntry(b.rank, rankName(b.state.name || s.user.name)));
-  return send(res, 200, { ok: true, savedAt: at });
+  // El ranking se calcula acá con las órdenes guardadas y los cierres reales; la app solo manda su nivel de inversor.
+  let rank = null;
+  try {
+    const md = await marketData(req.headers.host);
+    const st = { ...b.state, rankScore: b.rank?.score, rankTier: b.rank?.tier };
+    rank = entryFor(st, s.user.name, md);
+    await setRank(s.email, rank);
+  } catch (e) { console.error("ranking:", e.message); }
+  return send(res, 200, { ok: true, savedAt: at, rank: rank ? { ret: rank.ret, days: rank.days } : null });
 });

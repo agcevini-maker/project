@@ -1,10 +1,39 @@
-// Base de datos de la app: Upstash Redis (se conecta desde Vercel → Storage → Upstash).
-// Sin las variables de entorno usa una memoria temporal: sirve para probar, pero se borra
-// cada vez que la función se reinicia, así que /api/health avisa y la app sigue guardando en el dispositivo.
+// Base de datos de la app. Sirve cualquiera de las dos que ofrece Vercel en Storage:
+//  - Upstash (Redis por REST): variables KV_REST_API_URL/KV_REST_API_TOKEN o UPSTASH_REDIS_REST_URL/_TOKEN.
+//  - Redis común (por ejemplo "Redis" de Redis Cloud en el Marketplace): variable REDIS_URL (o KV_URL).
+// Sin ninguna usa una memoria temporal: sirve para probar, pero se borra cada vez que la función se reinicia,
+// así que /api/health avisa qué falta y la app sigue guardando en el dispositivo.
 import { Redis } from "@upstash/redis";
+import { createClient } from "redis";
 
 const url = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
 const token = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
+const tcpUrl = process.env.REDIS_URL || process.env.KV_URL;
+
+// Redis común: una conexión por instancia de la función, que se reusa entre pedidos.
+function tcpStore() {
+  const c = createClient({ url: tcpUrl, socket: { connectTimeout: 5000, reconnectStrategy: n => n > 3 ? false : 200 } });
+  c.on("error", e => console.error("redis:", e.message));
+  let ready = null;
+  const r = () => (ready ||= c.connect().then(() => c).catch(e => { ready = null; throw e; }));
+  return {
+    kind: "redis",
+    get: async k => (await r()).get(k),
+    set: async (k, v, o = {}) => (await r()).set(k, v, { ...(o.ex ? { EX: o.ex } : {}), ...(o.nx ? { NX: true } : {}) }),
+    del: async k => (await r()).del(k),
+    incr: async k => (await r()).incr(k),
+    expire: async (k, s) => (await r()).expire(k, s),
+    zadd: async (k, e) => (await r()).zAdd(k, { score: e.score, value: e.member }),
+    zrem: async (k, m) => (await r()).zRem(k, m),
+    zrange: async (k, a, b, o = {}) => (await r()).zRange(k, a, b, o.rev ? { REV: true } : undefined),
+    zrevrank: async (k, m) => (await r()).zRevRank(k, m),
+    zcard: async k => (await r()).zCard(k),
+    hset: async (k, o) => (await r()).hSet(k, o),
+    hdel: async (k, f) => (await r()).hDel(k, f),
+    hmget: async (k, ...fs) => fs.length ? (await r()).hmGet(k, fs) : [],
+    hgetall: async k => (await r()).hGetAll(k)
+  };
+}
 
 function memoryStore() {
   const kv = new Map(), zsets = new Map(), hashes = new Map();
@@ -32,7 +61,8 @@ function memoryStore() {
     async zcard(k) { return zsets.get(k)?.size || 0; },
     async hset(k, obj) { if (!hashes.has(k)) hashes.set(k, new Map()); Object.entries(obj).forEach(([f, v]) => hashes.get(k).set(f, v)); return 1; },
     async hdel(k, f) { hashes.get(k)?.delete(f); return 1; },
-    async hmget(k, ...fs) { const h = hashes.get(k) || new Map(); return fs.map(f => h.get(f) ?? null); }
+    async hmget(k, ...fs) { const h = hashes.get(k) || new Map(); return fs.map(f => h.get(f) ?? null); },
+    async hgetall(k) { return Object.fromEntries(hashes.get(k) || new Map()); }
   };
 }
 
@@ -55,8 +85,11 @@ export function db() {
       zcard: k => r.zcard(k),
       hset: (k, o) => r.hset(k, o),
       hdel: (k, f) => r.hdel(k, f),
-      hmget: (k, ...fs) => fs.length ? r.hmget(k, ...fs).then(x => Array.isArray(x) ? x : fs.map(f => x?.[f] ?? null)) : Promise.resolve([])
+      hmget: (k, ...fs) => fs.length ? r.hmget(k, ...fs).then(x => Array.isArray(x) ? x : fs.map(f => x?.[f] ?? null)) : Promise.resolve([]),
+      hgetall: k => r.hgetall(k).then(x => x || {})
     };
+  } else if (tcpUrl) {
+    store = tcpStore();
   } else {
     store = memoryStore();
   }

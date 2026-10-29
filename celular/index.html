@@ -833,6 +833,12 @@
   .onb-g { grid-template-columns: minmax(0, 1fr); gap: 8px; } .onb-i { flex-direction: row; align-items: center; gap: 12px; padding: 12px; } .onb-i b { margin: 0; min-width: 70px; }
   .onb-final { padding: 20px 16px !important; } .onb-final h1 { font-size: 24px; } .onb-cta { padding: 18px 16px; } .onb-cta h2 { font-size: 19px; }
   .guide { padding: 14px 14px; } .guide b { font-size: 16px; } .guide .g-steps { margin-right: 96px; } .g-skip { top: 9px; }
+  /* Ranking en el celular: sin la columna de días y con el nivel en dos líneas, para que entre sin cortarse. */
+  .rank-t th:nth-child(5), .rank-t td:nth-child(5) { display: none; }
+  .rank-t th, .rank-t td { padding-left: 8px; padding-right: 8px; }
+  .rank-t th:first-child, .rank-t td:first-child { width: 44px; }
+  .rank-t td:nth-child(4) { font-size: 12.5px; white-space: normal; max-width: 90px; }
+  .rank-t th:nth-child(4) { white-space: normal; max-width: 90px; }
 </style>
 </head>
 <body>
@@ -1043,9 +1049,10 @@ async function api(path, { method = "GET", body, timeout = 12000, keepalive = fa
 }
 async function initAPI() {
   if (!API_BASE && (!/^https?:$/.test(location.protocol) || window.claude?.use)) return;
-  const r = await api("health", { timeout: 5000 });
+  const r = await api("health", { timeout: 8000 });
   if (!r.ok) return;
   Object.assign(API, { on: true, accounts: !!r.data.accounts, ai: !!r.data.ai, google: r.data.google || "", mail: !!r.data.mail });
+  if (!API.accounts) { STORE.status = "nodb"; console.warn("Sin Miedo: el servidor no tiene base de datos.", r.data.fix || ""); }
 }
 // Guarda el progreso en el servidor (un rato después del último cambio, para no mandar de más).
 function cloudSave(now) {
@@ -1062,7 +1069,12 @@ async function pushProgress(keepalive) {
   const r = await api("progress", { method: "PUT", body: { state: S, base: API.at, rank: S.rankOff ? null : myEntry() }, keepalive, timeout: 15000 });
   API.busy = false;
   if (!USER || USER.email !== email) return;
-  if (r.ok) { API.at = r.data.savedAt; STORE.status = "cloud"; lsSet(SESSION_KEY, { email, name: USER.name, at: API.at }); }
+  if (r.ok) {
+    API.at = r.data.savedAt; STORE.status = "cloud"; lsSet(SESSION_KEY, { email, name: USER.name, at: API.at });
+    // Si cambió tu lugar en el ranking (lo calcula el servidor), se vuelve a pedir la tabla.
+    const rk = JSON.stringify(r.data.rank || null);
+    if (rk !== API.lastRank) { API.lastRank = rk; V.rank = null; if (V.page === "rank") render(); }
+  }
   else if (r.status === 409 && r.data.state) {
     // Otro dispositivo guardó algo más nuevo: se trae eso para no pisarlo.
     API.at = r.data.savedAt; S = Object.assign(fresh(), r.data.state);
@@ -1106,7 +1118,7 @@ async function cloudPut(k, v) {
   STORE.busy[id] = false; renderSaved();
 }
 function renderSaved() { const el = document.getElementById("saved"); if (el) el.innerHTML = savedLabel(); }
-const savedLabel = () => `${icon("check", "ic")}${STORE.status === "cloud" ? "Progreso guardado en tu cuenta" : STORE.status === "local" ? "Progreso guardado en este dispositivo" : STORE.status === "full" ? "No hay más espacio para guardar" : "No se pudo guardar en la nube; quedó en este dispositivo"}`;
+const savedLabel = () => `${icon("check", "ic")}${STORE.status === "cloud" ? "Progreso guardado en tu cuenta" : STORE.status === "local" ? "Progreso guardado en este dispositivo" : STORE.status === "nodb" ? "Guardado solo en este dispositivo: el sitio no tiene base de datos" : STORE.status === "full" ? "No hay más espacio para guardar" : "No se pudo guardar en la nube; quedó en este dispositivo"}`;
 const lsGet = (k, def) => {
   const id = docKey(k);
   if (STORE.db && id in STORE.cache) return STORE.cache[id] ?? def;
@@ -1802,7 +1814,7 @@ async function loadRanking() {
   let rows = [], mode = "local";
   if (API.accounts) {
     const r = await api("ranking");
-    if (r.ok) { rows = r.data.rows.concat(r.data.mine ? [r.data.mine] : []); mode = "shared"; V.rankTotal = r.data.total; }
+    if (r.ok) { rows = r.data.rows.concat(r.data.mine ? [r.data.mine] : []); mode = "server"; V.rankTotal = r.data.total; V.rankAsOf = r.data.asOf; }
     else { V.rank = { rows: [], mode: "error", at: new Date() }; if (V.page === "rank" || V.page === "sim") render(); return; }
   } else if (STORE.db) {
     try {
@@ -1818,7 +1830,8 @@ async function loadRanking() {
       const e = isMe ? (S.rankOff ? null : myEntry()) : entryOf(lsGet(keyFor(em), {}));
       if (e) rows.push({ ...e, me: isMe });
     });
-  } else if (!S.rankOff) {
+  } else if (mode === "shared" && !S.rankOff) {
+    // En claude.ai cada uno publica su fila; la propia se muestra con el cálculo más reciente.
     const mine = myEntry(), i = rows.findIndex(r => r.me);
     if (mine) { if (i >= 0) rows[i] = { ...rows[i], ...mine, me: true }; else rows.push({ ...mine, me: true }); }
     else if (i >= 0) rows.splice(i, 1);
@@ -1834,21 +1847,24 @@ function rankMe() {
 }
 function rank() {
   if (!V.rank) { rankMe(); return `<div class="page-h"><div><h1>Ranking</h1></div></div><div class="card muted">Cargando el ranking…</div>`; }
-  const rows = V.rank.rows, examples = rows.length < 3;
-  const demo = [{ name: "Cami R.", ret: 0.0412, score: 78, tier: "Estratega", days: 18 }, { name: "Tomi G.", ret: 0.0187, score: 66, tier: "Prudente", days: 12 }, { name: "Juli P.", ret: -0.0095, score: 52, tier: "Aprendiz", days: 9 }];
+  const rows = V.rank.rows, mode = V.rank.mode, server = mode === "server";
   const medal = k => k < 3 ? `<span class="rank r${k + 1}">${k + 1}</span>` : `<span class="rank">${k + 1}</span>`;
-  const row = (r, k, ex) => `<tr class="${r.me ? "me-row" : ""} ${ex ? "ex-row" : ""}"><td>${ex ? "" : medal(r.pos ? r.pos - 1 : k)}</td><td><b>${esc(r.name)}</b>${r.me ? ' <span class="pill">Vos</span>' : ""}${ex ? ' <span class="pill grey">ejemplo</span>' : ""}</td>
+  const row = (r, k) => `<tr class="${r.me ? "me-row" : ""}"><td>${medal(r.pos ? r.pos - 1 : k)}</td><td><b>${esc(r.name)}</b>${r.me ? ' <span class="pill">Vos</span>' : ""}</td>
     <td class="r num"><b class="${r.ret >= 0 ? "up" : "down"}">${pc2(r.ret)}</b></td><td class="r">${r.score != null ? `${r.score} · ${esc(r.tier)}` : "Se calcula mañana"}</td><td class="r num">${r.days}</td></tr>`;
-  const mine = myEntry();
+  const mine = myEntry(), inRank = rows.some(r => r.me);
+  // Publicada en un servidor sin base de datos: se avisa en vez de mostrar un ranking que no es de verdad.
+  const noDb = API.on && !API.accounts;
   return `
     <div class="page-h"><div><h1>Ranking</h1></div>
       <label class="toggle small"><input type="checkbox" data-act="rankToggle" ${S.rankOff ? "" : "checked"}><span class="sw"></span>Aparecer en el ranking</label></div>
+    ${noDb ? `<div class="callout red" style="margin-bottom:14px"><b>El ranking compartido no está activo.</b> Este sitio todavía no tiene la base de datos conectada, así que el progreso queda solo en este dispositivo. Quien administra la app tiene que conectarla en Vercel (Storage → Upstash Redis) y volver a publicar.</div>` : ""}
     ${!mine && !S.rankOff ? `<div class="callout" style="margin-bottom:14px">Para entrar al ranking hacé tu primera compra en el simulador. <button class="link" data-step="buy">Ir al simulador</button></div>` : ""}
-    <div class="card" style="padding:0;overflow:hidden">
+    ${server && mine && !inRank && !S.rankOff ? `<div class="callout amber" style="margin-bottom:14px">Tu cartera todavía no aparece: se suma cuando se guarda tu progreso. Si ya pasó un rato, tocá <button class="link" data-act="rankReload">actualizar</button>.</div>` : ""}
+    ${mode === "error" ? `<div class="card muted">No se pudo cargar el ranking. <button class="link" data-act="rankReload">Probar de nuevo</button></div>` : rows.length ? `<div class="card" style="padding:0;overflow:hidden">
       <table class="bk-table rank-t"><thead><tr><th style="width:60px">Puesto</th><th>Nombre</th><th class="r">Rendimiento</th><th class="r">Nivel de inversor</th><th class="r">Días</th></tr></thead>
-      <tbody>${rows.map((r, k) => row(r, k)).join("")}${examples ? demo.map(r => row(r, 0, true)).join("") : ""}${!rows.length && !examples ? "" : ""}</tbody></table>
-    </div>
-    <p class="note" style="margin-top:10px">Gana quien mejor le va con su cartera de práctica desde el día en que empezó, con plata virtual. ${V.rank.mode === "error" ? "No se pudo cargar el ranking. Probá de nuevo en un rato. " : V.rank.mode === "shared" ? `${API.accounts ? `Todas las personas que usan Sin Miedo (${Math.max(V.rankTotal || 0, rows.length)})` : `Personas que usan Sin Miedo en este link (${rows.length})`}. Se muestra el nombre y la inicial del apellido.` : `Cuentas creadas en este dispositivo (${rows.length}). En la versión online el ranking es con todas las personas que la usan.`}${examples ? " Las filas marcadas “ejemplo” muestran cómo se va a ver cuando se sume más gente." : ""} El rendimiento usa los precios de cierre y en vivo; no es una recomendación de inversión.</p>`;
+      <tbody>${rows.map((r, k) => row(r, k)).join("")}</tbody></table>
+    </div>` : `<div class="card" style="text-align:center;padding:28px"><b style="font-size:18px">Todavía no hay nadie en el ranking</b><p class="muted" style="margin-top:6px">Hacé tu primera compra y sé el primero.</p></div>`}
+    <p class="note" style="margin-top:10px">Gana quien mejor le va con su cartera de práctica desde el día en que empezó, con plata virtual. ${server ? `Son todas las personas que usan Sin Miedo y ya hicieron su primera compra (${Math.max(V.rankTotal || 0, rows.length)}). El rendimiento lo calcula el servidor con tus órdenes y los precios de cierre reales${V.rankAsOf ? ` del ${fmtDateLong(V.rankAsOf)}` : ""}, así que puede diferir un poco del que ves en vivo.` : mode === "shared" ? `Personas que usan Sin Miedo en este link (${rows.length}).` : `Cuentas creadas en este dispositivo (${rows.length}). En la versión online el ranking es con todas las personas que la usan.`} Se muestra el nombre y la inicial del apellido. No es una recomendación de inversión.</p>`;
 }
 /* ---------- 5. Aprender ---------- */
 function learn() {
@@ -3009,8 +3025,9 @@ document.addEventListener("click", e => {
     case "welcomeHome": S.started = true; S.welcomed = true; save(); go("sim"); break;
     case "onbLearn": S.started = true; S.welcomed = true; save(); go("lesson", { lvl: 0, step: 0 }); break;
     case "guideOff": S.guideOff = true; save(); render(); renderDrawer(true); break;
-    case "rankToggle": S.rankOff = !el.checked; save(); V.rank = null; render(); break;
+    case "rankToggle": S.rankOff = !el.checked; save(); if (API.accounts) cloudSave(true); else { V.rank = null; render(); } break;
     case "aiStop": aiCtl?.abort(); break;
+    case "rankReload": V.rank = null; render(); break;
     case "chatReset": S.chat = null; save(); render(); break;
     case "reset": { const nm = S.name; S = fresh(); S.name = nm; save(); modal(""); go("diag", { step: 0 }); break; }
     case "demoPort": demoPortfolio(); modal(""); go("sim"); break;

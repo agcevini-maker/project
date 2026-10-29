@@ -148,3 +148,9 @@
   .onb-g { grid-template-columns: minmax(0, 1fr); gap: 8px; } .onb-i { flex-direction: row; align-items: center; gap: 12px; padding: 12px; } .onb-i b { margin: 0; min-width: 70px; }
   .onb-final { padding: 20px 16px !important; } .onb-final h1 { font-size: 24px; } .onb-cta { padding: 18px 16px; } .onb-cta h2 { font-size: 19px; }
   .guide { padding: 14px 14px; } .guide b { font-size: 16px; } .guide .g-steps { margin-right: 96px; } .g-skip { top: 9px; }
+  /* Ranking en el celular: sin la columna de días y con el nivel en dos líneas, para que entre sin cortarse. */
+  .rank-t th:nth-child(5), .rank-t td:nth-child(5) { display: none; }
+  .rank-t th, .rank-t td { padding-left: 8px; padding-right: 8px; }
+  .rank-t th:first-child, .rank-t td:first-child { width: 44px; }
+  .rank-t td:nth-child(4) { font-size: 12.5px; white-space: normal; max-width: 90px; }
+  .rank-t th:nth-child(4) { white-space: normal; max-width: 90px; }
