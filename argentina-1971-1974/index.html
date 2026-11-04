@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Argentina 1971–1974 | El retorno del peronismo y la crisis política</title>
+  <meta name="description" content="Línea de tiempo interactiva sobre la Argentina de 1971 a 1974: del Gran Acuerdo Nacional a la muerte de Perón." />
+  <meta name="theme-color" content="#0a111d" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Indicador de progreso de lectura -->
+  <div class="progress" aria-hidden="true"><span class="progress__bar" id="progressBar"></span></div>
+
+  <!-- Barra superior con navegación rápida entre años -->
+  <header class="topbar" id="topbar">
+    <a class="topbar__brand" href="#inicio">
+      <span class="sun sun--sm" aria-hidden="true"></span>
+      <span>Argentina <strong>71–74</strong></span>
+    </a>
+    <nav class="topbar__years" aria-label="Ir a un año">
+      <a href="#anio-1971" data-jump="1971">1971</a>
+      <a href="#anio-1972" data-jump="1972">1972</a>
+      <a href="#anio-1973" data-jump="1973">1973</a>
+      <a href="#anio-1974" data-jump="1974">1974</a>
+    </nav>
+  </header>
+
+  <main>
+    <!-- HERO -->
+    <section class="hero" id="inicio">
+      <div class="hero__stripes" aria-hidden="true"></div>
+      <div class="hero__inner">
+        <p class="eyebrow reveal">Cuaderno de historia · Línea de tiempo</p>
+        <h1 class="hero__title reveal">
+          Argentina<br />
+          <span class="hero__years">1971<span class="dash">–</span>1974</span>
+        </h1>
+        <p class="hero__subtitle reveal">
+          El retorno del peronismo, la esperanza democrática y la crisis política.
+        </p>
+        <p class="hero__intro reveal">
+          En apenas cuatro años, el país pasó de un gobierno militar que buscaba una salida
+          electoral al regreso de Juan Domingo Perón tras 18 años de exilio. Las elecciones,
+          las movilizaciones y el Pacto Social despertaron una enorme esperanza, pero las
+          tensiones internas del peronismo y la violencia política fueron creciendo
+          hasta la muerte de Perón, en julio de 1974.
+        </p>
+        <div class="hero__actions reveal">
+          <a class="btn btn--primary" href="#cronologia" id="exploreBtn">
+            Explorar línea de tiempo
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+          </a>
+        </div>
+        <dl class="hero__stats reveal">
+          <div><dt>18 años</dt><dd>de exilio de Perón</dd></div>
+          <div><dt>49,5 %</dt><dd>FREJULI, marzo de 1973</dd></div>
+          <div><dt>62 %</dt><dd>Perón–Isabel, septiembre de 1973</dd></div>
+        </dl>
+      </div>
+      <div class="hero__sun" aria-hidden="true"></div>
+    </section>
+
+    <!-- LÍNEA DE TIEMPO -->
+    <section class="chrono" id="cronologia" aria-labelledby="chronoTitle">
+      <header class="chrono__head">
+        <p class="eyebrow">Cronología</p>
+        <h2 id="chronoTitle">De la salida electoral a la muerte de Perón</h2>
+        <p class="chrono__lead">Catorce acontecimientos, en orden. Tocá “Ver más” en cada tarjeta para conocer por qué fue importante.</p>
+
+        <div class="filters" role="group" aria-label="Filtrar acontecimientos por año">
+          <button class="filter is-active" type="button" data-filter="all" aria-pressed="true">Todos</button>
+          <button class="filter" type="button" data-filter="1971" aria-pressed="false">1971</button>
+          <button class="filter" type="button" data-filter="1972" aria-pressed="false">1972</button>
+          <button class="filter" type="button" data-filter="1973" aria-pressed="false">1973</button>
+          <button class="filter" type="button" data-filter="1974" aria-pressed="false">1974</button>
+        </div>
+
+        <ul class="legend" aria-label="Referencias de colores">
+          <li><span class="dot dot--politica"></span>Política</li>
+          <li><span class="dot dot--economia"></span>Economía</li>
+          <li><span class="dot dot--sociedad"></span>Movilización</li>
+          <li><span class="dot dot--violencia"></span>Violencia política</li>
+        </ul>
+        <p class="filters__status" id="filterStatus" aria-live="polite"></p>
+      </header>
+
+      <div class="timeline" id="timeline">
+        <div class="timeline__line" aria-hidden="true"><span class="timeline__fill" id="timelineFill"></span></div>
+        <!-- Las tarjetas se generan desde app.js -->
+      </div>
+    </section>
+
+    <!-- CIERRE -->
+    <section class="ending" id="final" aria-labelledby="endingTitle">
+      <div class="ending__inner">
+        <p class="eyebrow">Epílogo</p>
+        <h2 id="endingTitle" class="reveal">El final de una etapa</h2>
+        <p class="ending__lead reveal">
+          El 1 de julio de 1974 murió Juan Domingo Perón. Con él desapareció la figura que
+          había reunido bajo un mismo liderazgo a sectores enfrentados entre sí, y María Estela
+          Martínez de Perón asumió la presidencia en un país cada vez más inestable.
+        </p>
+        <div class="ending__grid">
+          <article class="pillar reveal">
+            <span class="pillar__num">01</span>
+            <h3>Política</h3>
+            <p>Las disputas entre la derecha y la izquierda peronista, visibles desde Ezeiza y abiertas tras el 1 de mayo, quedaron sin el conductor que las arbitraba.</p>
+          </article>
+          <article class="pillar reveal">
+            <span class="pillar__num">02</span>
+            <h3>Economía</h3>
+            <p>El Pacto Social y el plan de José Ber Gelbard se habían apoyado en la autoridad de Perón; sin él, el acuerdo económico perdió a su principal garante.</p>
+          </article>
+          <article class="pillar reveal">
+            <span class="pillar__num">03</span>
+            <h3>Sociedad</h3>
+            <p>La violencia política, que ya incluía el asesinato de Rucci y la acción clandestina de la Triple A, siguió marcando la vida cotidiana del país.</p>
+          </article>
+        </div>
+        <p class="ending__close reveal">
+          La esperanza democrática de 1973 dio paso así a una etapa de crisis política,
+          económica y social.
+        </p>
+        <a class="btn btn--ghost reveal" href="#cronologia">Volver a la cronología</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p><strong>Argentina 1971–1974</strong> · Material educativo.</p>
+    <p class="footer__note">
+      Las imágenes de las tarjetas son ilustraciones gráficas originales: no se incluyeron
+      fotografías porque no pudo verificarse su origen ni su licencia. Para sumar fotos
+      históricas auténticas, completá los campos <code>image</code> y <code>credit</code> de
+      cada acontecimiento en <code>app.js</code> con archivos de dominio público o con licencia
+      libre, citando siempre la fuente.
+    </p>
+  </footer>
+
+  <!-- Volver al inicio -->
+  <button class="to-top" id="toTop" type="button" aria-label="Volver al inicio">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+  </button>
+
+  <script src="app.js"></script>
+</body>
+</html>
