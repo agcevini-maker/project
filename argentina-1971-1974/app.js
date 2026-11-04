@@ -279,23 +279,25 @@ function setupToggles() {
 /* ---------- Animaciones de aparición ---------- */
 let revealObserver;
 function setupReveal() {
-  const items = $$(".reveal");
-  if (prefersReducedMotion || !("IntersectionObserver" in window)) {
-    items.forEach((el) => el.classList.add("is-visible"));
-    return;
-  }
+  if (prefersReducedMotion || !("IntersectionObserver" in window)) return;
   revealObserver = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
-          entry.target.classList.add("is-visible");
+          entry.target.classList.remove("is-pending");
           revealObserver.unobserve(entry.target);
         }
       });
     },
     { threshold: 0.12, rootMargin: "0px 0px -40px 0px" }
   );
-  items.forEach((el) => revealObserver.observe(el));
+  // Lo visible al cargar queda quieto; solo lo que está más abajo se anima al llegar
+  $$(".reveal").forEach((el) => {
+    if (el.getBoundingClientRect().top > window.innerHeight) {
+      el.classList.add("is-pending");
+      revealObserver.observe(el);
+    }
+  });
 }
 
 /* ---------- Filtros por año ---------- */
@@ -310,7 +312,7 @@ function applyFilter(filter) {
   $$(".event, .year-marker").forEach((el) => {
     const show = filter === "all" || el.dataset.year === filter;
     el.hidden = !show;
-    if (show) el.classList.add("is-visible");
+    if (show) el.classList.remove("is-pending");
   });
   const n = filter === "all" ? EVENTS.length : EVENTS.filter((e) => String(e.year) === filter).length;
   $("#filterStatus").textContent =
