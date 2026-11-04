@@ -2,147 +2,416 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Argentina 1971–1974 | El retorno del peronismo y la crisis política</title>
-  <meta name="description" content="Línea de tiempo interactiva sobre la Argentina de 1971 a 1974: del Gran Acuerdo Nacional a la muerte de Perón." />
+  <meta name="description" content="Guía y línea de tiempo interactiva sobre la Argentina de 1971 a 1974: del Gran Acuerdo Nacional al Pacto Social y la muerte de Perón." />
   <meta name="theme-color" content="#0a111d" />
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <meta property="og:type" content="website" />
   <meta property="og:title" content="Argentina 1971–1974" />
-  <meta property="og:description" content="El retorno del peronismo, la esperanza democrática y la crisis política. Línea de tiempo interactiva." />
+  <meta property="og:description" content="El retorno del peronismo, la esperanza democrática y la crisis política. Guía y línea de tiempo interactiva." />
   <meta property="og:locale" content="es_AR" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,800;1,9..144,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <!-- Indicador de progreso de lectura -->
   <div class="progress" aria-hidden="true"><span class="progress__bar" id="progressBar"></span></div>
 
-  <!-- Barra superior con navegación rápida entre años -->
+  <!-- Barra superior: navegación por capítulos -->
   <header class="topbar" id="topbar">
     <a class="topbar__brand" href="#inicio">
       <span class="sun sun--sm" aria-hidden="true"></span>
       <span>Argentina <strong>71–74</strong></span>
     </a>
-    <nav class="topbar__years" aria-label="Ir a un año">
-      <a href="#anio-1971" data-jump="1971">1971</a>
-      <a href="#anio-1972" data-jump="1972">1972</a>
-      <a href="#anio-1973" data-jump="1973">1973</a>
-      <a href="#anio-1974" data-jump="1974">1974</a>
+    <nav class="topbar__nav" aria-label="Capítulos de la guía">
+      <a href="#contexto" data-section="contexto">Contexto</a>
+      <a href="#cronologia" data-section="cronologia">Cronología</a>
+      <a href="#pacto" data-section="pacto">Pacto Social</a>
+      <a href="#corrientes" data-section="corrientes">Peronismo</a>
+      <a href="#protagonistas" data-section="protagonistas">Protagonistas</a>
+      <a href="#glosario" data-section="glosario">Glosario</a>
+      <a href="#repaso" data-section="repaso">Repaso</a>
     </nav>
   </header>
 
   <main>
-    <!-- HERO -->
+    <!-- ============ HERO ============ -->
     <section class="hero" id="inicio">
       <div class="hero__stripes" aria-hidden="true"></div>
+      <div class="hero__sun" aria-hidden="true"></div>
       <div class="hero__inner">
-        <p class="eyebrow reveal">Cuaderno de historia · Línea de tiempo</p>
-        <h1 class="hero__title reveal">
+        <p class="eyebrow">Guía de estudio · Línea de tiempo</p>
+        <h1 class="hero__title">
           Argentina<br />
           <span class="hero__years">1971<span class="dash">–</span>1974</span>
         </h1>
-        <p class="hero__subtitle reveal">
-          El retorno del peronismo, la esperanza democrática y la crisis política.
-        </p>
-        <p class="hero__intro reveal">
+        <p class="hero__subtitle">El retorno del peronismo, la esperanza democrática y la crisis política.</p>
+        <p class="hero__intro">
           En apenas cuatro años, el país pasó de un gobierno militar que buscaba una salida
           electoral al regreso de Juan Domingo Perón tras 18 años de exilio. Las elecciones,
           las movilizaciones y el Pacto Social despertaron una enorme esperanza, pero las
           tensiones internas del peronismo y la violencia política fueron creciendo
           hasta la muerte de Perón, en julio de 1974.
         </p>
-        <div class="hero__actions reveal">
+        <div class="hero__actions">
           <a class="btn btn--primary" href="#cronologia" id="exploreBtn">
             Explorar línea de tiempo
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
           </a>
+          <a class="btn btn--ghost" href="#contexto">Empezar por el contexto</a>
         </div>
-        <dl class="hero__stats reveal">
+        <dl class="hero__stats">
           <div><dt>18 años</dt><dd>de exilio de Perón</dd></div>
-          <div><dt>49,5 %</dt><dd>FREJULI, marzo de 1973</dd></div>
-          <div><dt>62 %</dt><dd>Perón–Isabel, septiembre de 1973</dd></div>
+          <div><dt>5</dt><dd>presidentes entre 1971 y 1974</dd></div>
+          <div><dt>49,5 % → 62 %</dt><dd>el voto peronista en las dos elecciones de 1973</dd></div>
         </dl>
       </div>
-      <div class="hero__sun" aria-hidden="true"></div>
     </section>
 
-    <!-- LÍNEA DE TIEMPO -->
+    <!-- Índice de la guía -->
+    <nav class="toc" aria-labelledby="tocTitle">
+      <div class="wrap">
+        <h2 id="tocTitle" class="toc__title">Cómo está organizada esta guía</h2>
+        <ol class="toc__list">
+          <li><a href="#contexto"><span>Antes de 1971</span><small>Cómo se llegó hasta acá</small></a></li>
+          <li><a href="#gobiernos"><span>¿Quién gobernaba?</span><small>Los cinco presidentes del período</small></a></li>
+          <li><a href="#cronologia"><span>Cronología</span><small>14 acontecimientos y hechos complementarios</small></a></li>
+          <li><a href="#pacto"><span>El Pacto Social</span><small>La apuesta económica, explicada</small></a></li>
+          <li><a href="#elecciones"><span>Las elecciones de 1973</span><small>Marzo y septiembre, comparadas</small></a></li>
+          <li><a href="#corrientes"><span>Las dos almas del peronismo</span><small>Ortodoxia y Tendencia</small></a></li>
+          <li><a href="#protagonistas"><span>Protagonistas</span><small>Personas y organizaciones</small></a></li>
+          <li><a href="#glosario"><span>Glosario</span><small>Las palabras clave</small></a></li>
+          <li><a href="#final"><span>El final de una etapa</span><small>Qué dejó la muerte de Perón</small></a></li>
+          <li><a href="#repaso"><span>Repaso</span><small>Preguntas para comprobar lo aprendido</small></a></li>
+        </ol>
+      </div>
+    </nav>
+
+    <!-- ============ CONTEXTO ============ -->
+    <section class="section" id="contexto" aria-labelledby="contextoTitle">
+      <div class="wrap">
+        <header class="section__head">
+          <p class="eyebrow">Capítulo 1 · Antes de 1971</p>
+          <h2 id="contextoTitle">Cómo se llegó hasta acá</h2>
+          <p class="section__lead">Para entender 1971–1974 hay que mirar atrás: un líder exiliado, un movimiento prohibido durante 18 años y un gobierno militar en crisis.</p>
+        </header>
+        <ol class="strip" id="backgroundList"></ol>
+      </div>
+    </section>
+
+    <!-- ============ GOBIERNOS ============ -->
+    <section class="section section--tint" id="gobiernos" aria-labelledby="gobiernosTitle">
+      <div class="wrap">
+        <header class="section__head">
+          <p class="eyebrow">Capítulo 2 · Presidencias</p>
+          <h2 id="gobiernosTitle">¿Quién gobernaba?</h2>
+          <p class="section__lead">En menos de cuatro años pasaron cinco presidentes: un general, dos peronistas electos, un interino y la primera mujer en ejercer la presidencia.</p>
+        </header>
+        <figure class="gantt" id="gantt" aria-label="Duración de cada presidencia entre 1971 y 1974"></figure>
+      </div>
+    </section>
+
+    <!-- ============ LÍNEA DE TIEMPO ============ -->
     <section class="chrono" id="cronologia" aria-labelledby="chronoTitle">
       <header class="chrono__head">
-        <p class="eyebrow">Cronología</p>
+        <p class="eyebrow">Capítulo 3 · Cronología</p>
         <h2 id="chronoTitle">De la salida electoral a la muerte de Perón</h2>
-        <p class="chrono__lead">Catorce acontecimientos, en orden. Tocá “Ver más” en cada tarjeta para conocer por qué fue importante.</p>
+        <p class="chrono__lead">Los 14 acontecimientos principales, en orden, junto con hechos complementarios que ayudan a entenderlos. Tocá “Ver más” para leer el contexto, qué pasó y sus consecuencias.</p>
 
-        <div class="filters" role="group" aria-label="Filtrar acontecimientos por año">
-          <button class="filter is-active" type="button" data-filter="all" aria-pressed="true">Todos</button>
-          <button class="filter" type="button" data-filter="1971" aria-pressed="false">1971</button>
-          <button class="filter" type="button" data-filter="1972" aria-pressed="false">1972</button>
-          <button class="filter" type="button" data-filter="1973" aria-pressed="false">1973</button>
-          <button class="filter" type="button" data-filter="1974" aria-pressed="false">1974</button>
+        <div class="controls">
+          <div class="filters" role="group" aria-label="Filtrar acontecimientos por año">
+            <button class="filter is-active" type="button" data-filter="all" aria-pressed="true">Todos</button>
+            <button class="filter" type="button" data-filter="1971" aria-pressed="false">1971</button>
+            <button class="filter" type="button" data-filter="1972" aria-pressed="false">1972</button>
+            <button class="filter" type="button" data-filter="1973" aria-pressed="false">1973</button>
+            <button class="filter" type="button" data-filter="1974" aria-pressed="false">1974</button>
+          </div>
+          <div class="controls__row">
+            <label class="switch">
+              <input type="checkbox" id="toggleContext" checked />
+              <span class="switch__track" aria-hidden="true"></span>
+              Hechos complementarios
+            </label>
+            <button class="link-btn" type="button" id="expandAll">Abrir todas las tarjetas</button>
+          </div>
+          <ul class="legend" aria-label="Referencias de colores">
+            <li><span class="dot dot--politica"></span>Política</li>
+            <li><span class="dot dot--economia"></span>Economía</li>
+            <li><span class="dot dot--sociedad"></span>Movilización</li>
+            <li><span class="dot dot--violencia"></span>Violencia política</li>
+          </ul>
+          <p class="filters__status" id="filterStatus" aria-live="polite"></p>
         </div>
-
-        <ul class="legend" aria-label="Referencias de colores">
-          <li><span class="dot dot--politica"></span>Política</li>
-          <li><span class="dot dot--economia"></span>Economía</li>
-          <li><span class="dot dot--sociedad"></span>Movilización</li>
-          <li><span class="dot dot--violencia"></span>Violencia política</li>
-        </ul>
-        <p class="filters__status" id="filterStatus" aria-live="polite"></p>
       </header>
+
+      <!-- Saltos rápidos por año (fijo mientras se recorre la cronología) -->
+      <nav class="yearbar" id="yearbar" aria-label="Ir a un año">
+        <span class="yearbar__label">Ir a</span>
+        <a href="#anio-1971" data-jump="1971">1971</a>
+        <a href="#anio-1972" data-jump="1972">1972</a>
+        <a href="#anio-1973" data-jump="1973">1973</a>
+        <a href="#anio-1974" data-jump="1974">1974</a>
+      </nav>
 
       <div class="timeline" id="timeline">
         <div class="timeline__line" aria-hidden="true"><span class="timeline__fill" id="timelineFill"></span></div>
-        <!-- Las tarjetas se generan desde app.js -->
       </div>
     </section>
 
-    <!-- CIERRE -->
+    <!-- ============ PACTO SOCIAL ============ -->
+    <section class="section section--tint" id="pacto" aria-labelledby="pactoTitle">
+      <div class="wrap">
+        <header class="section__head">
+          <p class="eyebrow">Capítulo 4 · Dossier económico</p>
+          <h2 id="pactoTitle">El Pacto Social, explicado</h2>
+          <p class="section__lead">Fue la gran apuesta económica del regreso peronista: frenar la inflación con un acuerdo entre el Estado, los trabajadores y los empresarios, en lugar de imponer un ajuste.</p>
+        </header>
+
+        <div class="pact">
+          <div class="pact__intro">
+            <h3>¿Qué problema quería resolver?</h3>
+            <p>A comienzos de los años setenta la inflación era alta. Los precios subían, los sindicatos pedían aumentos para no perder poder de compra, los empresarios volvían a subir precios… y la rueda seguía girando. Los economistas llaman a esto la <strong>puja distributiva</strong>: cada sector intenta no perder frente a los demás.</p>
+            <p>El ministro de Economía, <strong>José Ber Gelbard</strong>, propuso frenar esa rueda de golpe: que todos se comprometieran al mismo tiempo a no subir ni precios ni salarios.</p>
+          </div>
+
+          <!-- Diagrama: quiénes firmaron -->
+          <figure class="pact__diagram" aria-labelledby="pactDiagramCap">
+            <div class="pact__node pact__node--gov">
+              <span class="pact__who">Gobierno</span>
+              <span class="pact__name">Ministro José Ber Gelbard</span>
+              <span class="pact__role">Fija y controla los precios. Arbitra entre las partes.</span>
+            </div>
+            <div class="pact__center">
+              <span class="pact__date">30 de mayo de 1973</span>
+              <strong>Acta de Compromiso Nacional</strong>
+            </div>
+            <div class="pact__node pact__node--cgt">
+              <span class="pact__who">CGT · Trabajadores</span>
+              <span class="pact__name">José Ignacio Rucci</span>
+              <span class="pact__role">Acepta un aumento único y suspender las paritarias por dos años.</span>
+            </div>
+            <div class="pact__node pact__node--cge">
+              <span class="pact__who">CGE · Empresarios</span>
+              <span class="pact__name">Empresarios nacionales</span>
+              <span class="pact__role">Acepta congelar los precios.</span>
+            </div>
+            <figcaption id="pactDiagramCap">Las tres partes del acuerdo y el compromiso de cada una.</figcaption>
+          </figure>
+
+          <div class="pact__grid">
+            <article class="info-card">
+              <h3>Las medidas principales</h3>
+              <ul class="checklist">
+                <li><strong>Congelamiento de precios</strong> de una amplia lista de productos.</li>
+                <li><strong>Aumento salarial general</strong> por única vez al comenzar el acuerdo.</li>
+                <li><strong>Suspensión de las paritarias</strong> por dos años: los salarios dejaban de negociarse.</li>
+                <li>Un programa económico de largo plazo, que en diciembre de 1973 se presentó como el <strong>Plan Trienal</strong>.</li>
+              </ul>
+            </article>
+            <article class="info-card">
+              <h3>Lo que funcionó</h3>
+              <p>En los primeros meses la inflación bajó con fuerza y los salarios recuperaron poder de compra. El gobierno mostraba que se podía estabilizar la economía mediante el acuerdo y no con un ajuste.</p>
+            </article>
+            <article class="info-card">
+              <h3>Lo que falló</h3>
+              <ul class="checklist checklist--warn">
+                <li>A fines de 1973 la <strong>crisis mundial del petróleo</strong> encareció las importaciones y los costos de las empresas.</li>
+                <li>Con precios congelados aparecieron el <strong>desabastecimiento</strong>, el <strong>mercado negro</strong> y los sobreprecios.</li>
+                <li>Los trabajadores presionaban por aumentos y los sindicatos tenían cada vez más dificultades para contenerlos.</li>
+                <li>El acuerdo dependía de la autoridad de Perón y del apoyo sindical: el asesinato de Rucci primero, y la muerte de Perón después, lo dejaron sin sus garantes.</li>
+              </ul>
+            </article>
+          </div>
+
+          <h3 class="pact__subhead">El recorrido del Pacto Social</h3>
+          <ol class="mini-steps">
+            <li><span>Mayo 1973</span>Se firma el Acta de Compromiso Nacional.</li>
+            <li><span>Segundo semestre 1973</span>La inflación baja con fuerza.</li>
+            <li><span>Septiembre 1973</span>Asesinan a Rucci, sostén sindical del acuerdo.</li>
+            <li><span>Fines de 1973</span>La crisis del petróleo encarece costos e importaciones.</li>
+            <li><span>Comienzos de 1974</span>Desabastecimiento y nuevos reclamos: el gobierno concede aumentos y revisa precios.</li>
+            <li><span>12 de junio de 1974</span>Perón denuncia presiones contra el acuerdo.</li>
+            <li><span>1 de julio de 1974</span>Muere Perón, principal garante del pacto.</li>
+            <li><span>Octubre 1974</span>Gelbard deja el Ministerio de Economía.</li>
+          </ol>
+
+          <aside class="callout">
+            <strong>Para recordar</strong>
+            <p>El Pacto Social intentó resolver un problema económico, la inflación, con una herramienta política: un acuerdo entre sectores. Por eso su suerte dependió tanto de la política como de la economía.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ ELECCIONES ============ -->
+    <section class="section" id="elecciones" aria-labelledby="eleccionesTitle">
+      <div class="wrap">
+        <header class="section__head">
+          <p class="eyebrow">Capítulo 5 · Datos</p>
+          <h2 id="eleccionesTitle">Las dos elecciones de 1973</h2>
+          <p class="section__lead">En seis meses el peronismo ganó dos veces. Con Perón como candidato, el apoyo creció más de 12 puntos.</p>
+        </header>
+        <div class="chart" id="electionChart"></div>
+        <p class="chart__source">Porcentajes aproximados de votos válidos. Pasá el cursor o tocá cada barra para ver las fórmulas; también podés abrir la tabla.</p>
+      </div>
+    </section>
+
+    <!-- ============ CORRIENTES ============ -->
+    <section class="section section--tint" id="corrientes" aria-labelledby="corrientesTitle">
+      <div class="wrap">
+        <header class="section__head">
+          <p class="eyebrow">Capítulo 6 · Conflicto interno</p>
+          <h2 id="corrientesTitle">Las dos almas del peronismo</h2>
+          <p class="section__lead">El peronismo que volvió en 1973 reunía sectores que querían cosas muy distintas. Mientras Perón estuvo en el exilio, todos se reconocían en él; cuando volvió, tuvo que elegir.</p>
+        </header>
+
+        <div class="versus">
+          <article class="versus__side versus__side--right">
+            <p class="versus__tag">Derecha peronista · Ortodoxia</p>
+            <h3>“Patria peronista”</h3>
+            <dl>
+              <dt>Quiénes</dt><dd>La conducción de la CGT y los grandes sindicatos, sectores políticos tradicionales y el grupo de José López Rega.</dd>
+              <dt>Qué querían</dt><dd>Un peronismo nacionalista y anticomunista, con los sindicatos como columna vertebral.</dd>
+              <dt>Cómo veían a la otra parte</dt><dd>Como infiltrados marxistas que querían desviar al movimiento.</dd>
+            </dl>
+          </article>
+          <div class="versus__vs" aria-hidden="true">vs</div>
+          <article class="versus__side versus__side--left">
+            <p class="versus__tag">Izquierda peronista · Tendencia</p>
+            <h3>“Patria socialista”</h3>
+            <dl>
+              <dt>Quiénes</dt><dd>Montoneros, las FAR y buena parte de la Juventud Peronista, con fuerte presencia de jóvenes y estudiantes.</dd>
+              <dt>Qué querían</dt><dd>Que el regreso de Perón abriera el camino a una transformación revolucionaria, al “socialismo nacional”.</dd>
+              <dt>Cómo veían a la otra parte</dt><dd>Como una “burocracia sindical” y un entorno que alejaba a Perón del pueblo.</dd>
+            </dl>
+          </article>
+        </div>
+
+        <h3 class="pact__subhead">Cómo se rompió la convivencia</h3>
+        <ol class="escalation">
+          <li><time>25/5/1973</time><strong>Primavera camporista</strong><span>La izquierda peronista gana espacios en el gobierno de Cámpora.</span></li>
+          <li><time>20/6/1973</time><strong>Ezeiza</strong><span>El enfrentamiento se vuelve armado y público.</span></li>
+          <li><time>13/7/1973</time><strong>Renuncia de Cámpora</strong><span>La ortodoxia recupera el control.</span></li>
+          <li><time>25/9/1973</time><strong>Asesinato de Rucci</strong><span>Golpe directo al aliado sindical de Perón.</span></li>
+          <li><time>1974</time><strong>Triple A</strong><span>La persecución a la izquierda se organiza desde el Estado.</span></li>
+          <li><time>1/5/1974</time><strong>“Imberbes”</strong><span>Ruptura pública entre Perón y Montoneros.</span></li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- ============ PROTAGONISTAS ============ -->
+    <section class="section" id="protagonistas" aria-labelledby="protagonistasTitle">
+      <div class="wrap">
+        <header class="section__head">
+          <p class="eyebrow">Capítulo 7 · Quién es quién</p>
+          <h2 id="protagonistasTitle">Protagonistas</h2>
+          <p class="section__lead">Las personas y organizaciones que aparecen en la cronología. Filtrá por sector.</p>
+        </header>
+        <div class="filters filters--left" role="group" aria-label="Filtrar protagonistas por sector" id="peopleFilters"></div>
+        <div class="people-grid" id="peopleGrid"></div>
+      </div>
+    </section>
+
+    <!-- ============ GLOSARIO ============ -->
+    <section class="section section--tint" id="glosario" aria-labelledby="glosarioTitle">
+      <div class="wrap">
+        <header class="section__head">
+          <p class="eyebrow">Capítulo 8 · Vocabulario</p>
+          <h2 id="glosarioTitle">Glosario</h2>
+          <p class="section__lead">Las palabras clave para entender el período.</p>
+        </header>
+        <div class="search">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+          <label class="sr-only" for="glossarySearch">Buscar en el glosario</label>
+          <input type="search" id="glossarySearch" placeholder="Buscar un término, por ejemplo “paritarias”" autocomplete="off" />
+        </div>
+        <dl class="glossary" id="glossaryList"></dl>
+        <p class="glossary__empty" id="glossaryEmpty" hidden>No hay términos que coincidan con la búsqueda.</p>
+      </div>
+    </section>
+
+    <!-- ============ CIERRE ============ -->
     <section class="ending" id="final" aria-labelledby="endingTitle">
       <div class="ending__inner">
-        <p class="eyebrow">Epílogo</p>
-        <h2 id="endingTitle" class="reveal">El final de una etapa</h2>
-        <p class="ending__lead reveal">
+        <p class="eyebrow">Capítulo 9 · Epílogo</p>
+        <h2 id="endingTitle">El final de una etapa</h2>
+        <p class="ending__lead">
           El 1 de julio de 1974 murió Juan Domingo Perón. Con él desapareció la figura que
           había reunido bajo un mismo liderazgo a sectores enfrentados entre sí, y María Estela
           Martínez de Perón asumió la presidencia en un país cada vez más inestable.
         </p>
         <div class="ending__grid">
-          <article class="pillar reveal">
-            <span class="pillar__num">01</span>
+          <article class="pillar">
             <h3>Política</h3>
-            <p>Las disputas entre la derecha y la izquierda peronista, visibles desde Ezeiza y abiertas tras el 1 de mayo, quedaron sin el conductor que las arbitraba.</p>
+            <p>Las disputas entre la derecha y la izquierda peronista, visibles desde Ezeiza y abiertas tras el 1 de mayo, quedaron sin el conductor que las arbitraba. López Rega concentró cada vez más poder junto a la nueva presidenta.</p>
           </article>
-          <article class="pillar reveal">
-            <span class="pillar__num">02</span>
+          <article class="pillar">
             <h3>Economía</h3>
-            <p>El Pacto Social y el plan de José Ber Gelbard se habían apoyado en la autoridad de Perón; sin él, el acuerdo económico perdió a su principal garante.</p>
+            <p>El Pacto Social y el plan de José Ber Gelbard se habían apoyado en la autoridad de Perón. Sin él, el acuerdo perdió a su principal garante y la inflación volvió a acelerarse.</p>
           </article>
-          <article class="pillar reveal">
-            <span class="pillar__num">03</span>
+          <article class="pillar">
             <h3>Sociedad</h3>
-            <p>La violencia política, que ya incluía el asesinato de Rucci y la acción clandestina de la Triple A, siguió marcando la vida cotidiana del país.</p>
+            <p>La violencia política, que ya incluía el asesinato de Rucci y la acción clandestina de la Triple A, siguió creciendo y marcando la vida cotidiana del país.</p>
           </article>
         </div>
-        <p class="ending__close reveal">
+
+        <div class="after">
+          <h3>Lo que vino después</h3>
+          <p class="after__lead">Fuera del período de esta guía, pero necesario para cerrar la historia:</p>
+          <ol class="after__list">
+            <li><time>Septiembre 1974</time>Montoneros anuncia que pasa a la clandestinidad.</li>
+            <li><time>Junio 1975</time>El “Rodrigazo”: un fuerte ajuste del ministro Celestino Rodrigo provoca una crisis económica y la primera huelga general de la CGT contra un gobierno peronista.</li>
+            <li><time>Julio 1975</time>López Rega pierde su poder y abandona el país.</li>
+            <li><time>24 de marzo de 1976</time>Un golpe militar derroca a Isabel Perón. Comienza la última dictadura cívico-militar.</li>
+          </ol>
+        </div>
+
+        <p class="ending__close">
           La esperanza democrática de 1973 dio paso así a una etapa de crisis política,
           económica y social.
         </p>
-        <a class="btn btn--ghost reveal" href="#cronologia">Volver a la cronología</a>
+      </div>
+    </section>
+
+    <!-- ============ REPASO ============ -->
+    <section class="section" id="repaso" aria-labelledby="repasoTitle">
+      <div class="wrap">
+        <header class="section__head">
+          <p class="eyebrow">Capítulo 10 · Actividades</p>
+          <h2 id="repasoTitle">Repaso</h2>
+          <p class="section__lead">Comprobá lo que aprendiste. Elegí una respuesta en cada pregunta: vas a ver enseguida si es correcta y por qué.</p>
+        </header>
+        <div class="quiz" id="quiz"></div>
+        <div class="quiz__footer">
+          <p class="quiz__score" id="quizScore" aria-live="polite"></p>
+          <button class="btn btn--ghost btn--sm" type="button" id="quizReset">Empezar de nuevo</button>
+        </div>
+
+        <div class="think">
+          <h3>Preguntas para pensar</h3>
+          <p>No tienen una única respuesta correcta. Sirven para debatir en clase o escribir un breve texto.</p>
+          <ol id="thinkList"></ol>
+        </div>
+
+        <div class="sources">
+          <h3>Para profundizar</h3>
+          <ul id="sourcesList"></ul>
+        </div>
       </div>
     </section>
   </main>
 
   <footer class="footer">
-    <p><strong>Argentina 1971–1974</strong> · Material educativo.</p>
+    <p><strong>Argentina 1971–1974</strong> · Guía educativa.</p>
     <p class="footer__note">
       Las imágenes de las tarjetas son ilustraciones gráficas originales: no se incluyeron
       fotografías porque no pudo verificarse su origen ni su licencia. Para sumar fotos
       históricas auténticas, completá los campos <code>image</code> y <code>credit</code> de
-      cada acontecimiento en <code>app.js</code> con archivos de dominio público o con licencia
-      libre, citando siempre la fuente.
+      cada acontecimiento en <code>data.js</code> con archivos de dominio público o con licencia
+      libre, citando siempre la fuente. Los porcentajes electorales son aproximados.
     </p>
   </footer>
 
@@ -151,6 +420,9 @@
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
   </button>
 
+  <div class="tooltip" id="tooltip" role="status" hidden></div>
+
+  <script src="data.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

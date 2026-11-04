@@ -1,11 +1,11 @@
 # Argentina 1971–1974
 
-Página educativa e interactiva: línea de tiempo del retorno del peronismo y la crisis política (1971–1974).
+Guía de estudio interactiva sobre el retorno del peronismo y la crisis política (1971–1974): contexto previo, presidencias, cronología con hechos complementarios, dossier del Pacto Social, elecciones de 1973, las corrientes del peronismo, protagonistas, glosario, epílogo y repaso con preguntas.
 
-Es un sitio estático: `index.html`, `styles.css`, `app.js` y `favicon.svg`. No necesita instalar nada ni compilar.
+Es un sitio estático: `index.html`, `styles.css`, `data.js`, `app.js` y `favicon.svg`. No necesita instalar nada ni compilar.
 
 - **Verla en la compu:** abrir `index.html` en el navegador.
-- **Editar contenido:** los acontecimientos están en el arreglo `EVENTS`, al principio de `app.js`.
+- **Editar contenido:** todo el texto de las secciones dinámicas (cronología, contexto, presidencias, elecciones, protagonistas, glosario y repaso) está en `data.js`. El dossier del Pacto Social, las corrientes del peronismo y el epílogo están directamente en `index.html`.
 
 ## Publicar en Vercel
 
@@ -34,4 +34,4 @@ vercel --prod   # publicación definitiva
 
 ## Imágenes
 
-Las tarjetas usan ilustraciones propias. Para sumar fotos históricas, completar `image` y `credit` en cada acontecimiento de `app.js`, usando solo archivos de dominio público o con licencia libre y citando la fuente.
+Las tarjetas usan ilustraciones propias. Para sumar fotos históricas, completar `image` y `credit` en cada acontecimiento de `data.js`, usando solo archivos de dominio público o con licencia libre y citando la fuente.

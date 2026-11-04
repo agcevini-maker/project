@@ -1,164 +1,8 @@
 /* =========================================================
-   Argentina 1971–1974 · Línea de tiempo interactiva
-   ---------------------------------------------------------
-   Para editar contenido, modificá solo el arreglo EVENTS.
-   Campos de cada acontecimiento:
-     year      Año (se usa para filtros y navegación)
-     date      Fecha tal como se muestra
-     title     Título
-     text      Descripción breve
-     more      Texto extra de "Ver más" (por qué importa)
-     people    Protagonistas mencionados
-     category  politica | economia | sociedad | violencia
-     icon      Ilustración (ver ICONS más abajo)
-     image     (opcional) URL de una foto histórica con licencia libre
-     credit    (opcional) Crédito/fuente de esa foto
+   Argentina 1971–1974 · Lógica de la página
+   El contenido está en data.js. Este archivo lo dibuja
+   y maneja la interacción.
    ========================================================= */
-
-const EVENTS = [
-  {
-    year: 1971,
-    date: "1971",
-    title: "Gran Acuerdo Nacional (GAN)",
-    text: "Alejandro Agustín Lanusse impulsa el GAN para organizar una salida electoral, estableciendo condiciones que impedían la candidatura de Perón.",
-    more: "Abre el camino hacia las elecciones de 1973, pero con reglas que dejan afuera a Perón. Esa exclusión explica por qué el peronismo se presentará con otro candidato.",
-    people: ["Alejandro Agustín Lanusse", "Juan Domingo Perón"],
-    category: "politica",
-    icon: "document",
-  },
-  {
-    year: 1972,
-    date: "17 de noviembre de 1972",
-    title: "Operativo Retorno",
-    text: "Juan Domingo Perón regresa brevemente a Argentina después de 18 años de exilio.",
-    more: "Es la primera vez que Perón pisa el país desde su exilio. Aunque la estadía es breve, anticipa el regreso definitivo de junio de 1973.",
-    people: ["Juan Domingo Perón"],
-    category: "politica",
-    icon: "plane",
-  },
-  {
-    year: 1973,
-    date: "11 de marzo de 1973",
-    title: "Elecciones presidenciales",
-    text: "El FREJULI gana las elecciones con aproximadamente el 49,5 % de los votos, bajo el lema “Cámpora al gobierno, Perón al poder”.",
-    more: "Con Perón impedido de ser candidato, el lema dejaba claro quién era el verdadero conductor del movimiento: el peronismo volvía al gobierno a través de Cámpora.",
-    people: ["Héctor J. Cámpora", "FREJULI"],
-    category: "politica",
-    icon: "ballot",
-    stat: { value: "49,5 %", label: "de los votos" },
-  },
-  {
-    year: 1973,
-    date: "25 de mayo de 1973",
-    title: "Asunción de Cámpora y Devotazo",
-    text: "Héctor J. Cámpora asume la presidencia. Una movilización popular exige la liberación de presos políticos y se producen liberaciones.",
-    more: "El primer día del nuevo gobierno muestra a la vez la esperanza democrática y la fuerza de la movilización popular en las calles.",
-    people: ["Héctor J. Cámpora"],
-    category: "sociedad",
-    icon: "crowd",
-  },
-  {
-    year: 1973,
-    date: "30 de mayo de 1973",
-    title: "Acta de Compromiso Nacional",
-    text: "Se inicia el Pacto Social y el plan económico impulsado por José Ber Gelbard.",
-    more: "Es la apuesta económica central del período: ordenar la economía a través de un acuerdo, el Pacto Social, con el plan de Gelbard como eje.",
-    people: ["José Ber Gelbard"],
-    category: "economia",
-    icon: "handshake",
-  },
-  {
-    year: 1973,
-    date: "20 de junio de 1973",
-    title: "Regreso definitivo de Perón y Masacre de Ezeiza",
-    text: "El regreso de Perón genera una movilización multitudinaria que termina en enfrentamientos entre sectores de la derecha y la izquierda peronista.",
-    more: "La jornada que debía ser una fiesta expone en público el enfrentamiento entre la derecha y la izquierda peronista, una tensión que marcará todo el período.",
-    people: ["Juan Domingo Perón", "Derecha peronista", "Izquierda peronista"],
-    category: "violencia",
-    icon: "clash",
-  },
-  {
-    year: 1973,
-    date: "13 de julio de 1973",
-    title: "Renuncia de Cámpora",
-    text: "Cámpora y su vicepresidente renuncian. Raúl Lastiri asume interinamente y convoca nuevas elecciones.",
-    more: "La renuncia abre el camino a una nueva elección, esta vez con Perón como candidato.",
-    people: ["Héctor J. Cámpora", "Raúl Lastiri"],
-    category: "politica",
-    icon: "door",
-  },
-  {
-    year: 1973,
-    date: "23 de septiembre de 1973",
-    title: "Elecciones presidenciales",
-    text: "La fórmula Perón–Isabel Martínez gana las elecciones con aproximadamente el 62 % de los votos.",
-    more: "Perón vuelve al poder con un respaldo electoral todavía mayor que el obtenido por el FREJULI en marzo (cerca del 49,5 %).",
-    people: ["Juan Domingo Perón", "María Estela (Isabel) Martínez"],
-    category: "politica",
-    icon: "ballot",
-    stat: { value: "62 %", label: "de los votos" },
-  },
-  {
-    year: 1973,
-    date: "25 de septiembre de 1973",
-    title: "Asesinato de José Ignacio Rucci",
-    text: "El secretario general de la CGT es asesinado, profundizando las tensiones dentro del peronismo.",
-    more: "Ocurre solo dos días después del triunfo electoral de Perón: la violencia golpea al movimiento obrero en el momento de mayor respaldo popular.",
-    people: ["José Ignacio Rucci", "CGT"],
-    category: "violencia",
-    icon: "ribbon",
-  },
-  {
-    year: 1973,
-    date: "12 de octubre de 1973",
-    title: "Tercera presidencia de Perón",
-    text: "Juan Domingo Perón asume nuevamente la presidencia de Argentina.",
-    more: "Tras 18 años de exilio y una proscripción que le impedía ser candidato, Perón vuelve a gobernar, ahora con Isabel Martínez como vicepresidenta.",
-    people: ["Juan Domingo Perón", "María Estela (Isabel) Martínez"],
-    category: "politica",
-    icon: "sash",
-  },
-  {
-    year: 1974,
-    date: "Enero de 1974",
-    title: "Triple A",
-    text: "La Triple A, organización parapolicial de extrema derecha vinculada a José López Rega, comienza a operar clandestinamente.",
-    more: "La violencia política suma un actor clandestino de extrema derecha, lo que agrava el clima de enfrentamiento dentro y fuera del peronismo.",
-    people: ["José López Rega"],
-    category: "violencia",
-    icon: "shadow",
-  },
-  {
-    year: 1974,
-    date: "1 de mayo de 1974",
-    title: "Ruptura entre Perón y Montoneros",
-    text: "Durante el acto del Día del Trabajador en Plaza de Mayo, Perón critica a los sectores juveniles y los llama “imberbes”. Se produce una ruptura pública.",
-    more: "La tensión entre Perón y la izquierda peronista, visible desde Ezeiza, se convierte en una ruptura abierta, a la vista de todos.",
-    people: ["Juan Domingo Perón", "Montoneros"],
-    category: "sociedad",
-    icon: "split",
-  },
-  {
-    year: 1974,
-    date: "12 de junio de 1974",
-    title: "Último discurso público de Perón",
-    text: "Perón realiza uno de sus últimos discursos desde el balcón de la Casa Rosada.",
-    more: "Es una de sus últimas apariciones frente a la multitud, pocas semanas antes de su muerte.",
-    people: ["Juan Domingo Perón"],
-    category: "politica",
-    icon: "balcony",
-  },
-  {
-    year: 1974,
-    date: "1 de julio de 1974",
-    title: "Muerte de Perón",
-    text: "Juan Domingo Perón fallece y su vicepresidenta, María Estela Martínez de Perón, asume la presidencia.",
-    more: "Con su muerte desaparece la figura que sostenía el equilibrio entre los sectores del movimiento. Comienza una etapa de fuerte inestabilidad.",
-    people: ["Juan Domingo Perón", "María Estela Martínez de Perón"],
-    category: "politica",
-    icon: "candle",
-  },
-];
 
 const CATEGORY_LABELS = {
   politica: "Política",
@@ -188,53 +32,132 @@ const ICONS = {
 const $ = (sel, ctx = document) => ctx.querySelector(sel);
 const $$ = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
 const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const scrollBehavior = () => (prefersReducedMotion ? "auto" : "smooth");
 
-function escapeHTML(str) {
+function esc(str) {
   return String(str).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 }
+const fmtPct = (n) => n.toLocaleString("es-AR", { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + " %";
+const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
 
-/* ---------- Render de la línea de tiempo ---------- */
-function plateHTML(ev, index) {
+/* =========================================================
+   Capítulo 1 · Contexto
+   ========================================================= */
+function renderBackground() {
+  $("#backgroundList").innerHTML = BACKGROUND.map(
+    (b) => `
+      <li class="strip__item reveal">
+        <time>${esc(b.date)}</time>
+        <h3>${esc(b.title)}</h3>
+        <p>${esc(b.text)}</p>
+      </li>`
+  ).join("");
+}
+
+/* =========================================================
+   Capítulo 2 · Presidencias (barra de tiempo)
+   ========================================================= */
+function renderGantt() {
+  const start = new Date("1971-01-01").getTime();
+  const end = new Date("1975-01-01").getTime();
+  const pos = (d) => ((new Date(d).getTime() - start) / (end - start)) * 100;
+  const years = [1971, 1972, 1973, 1974];
+
+  const ticks = years
+    .map((y) => `<span class="gantt__tick" style="left:${pos(`${y}-01-01`)}%">${y}</span>`)
+    .join("");
+  const grid = years
+    .map((y) => `<span class="gantt__grid" style="left:${pos(`${y}-01-01`)}%"></span>`)
+    .join("");
+
+  const rows = PRESIDENTS.map((p) => {
+    const left = pos(p.from);
+    const width = Math.max(pos(p.to) - left, 1.2);
+    return `
+      <div class="gantt__row">
+        <div class="gantt__who">
+          <strong>${esc(p.name)}</strong>
+          <span>${esc(p.type)} · ${esc(p.label)}</span>
+        </div>
+        <div class="gantt__track">
+          ${grid}
+          <span class="gantt__bar gantt__bar--${p.tone}${p.open ? " gantt__bar--open" : ""}"
+                style="left:${left}%;width:${width}%"
+                tabindex="0"
+                data-tip="${esc(`${p.name} · ${p.label}`)}"></span>
+        </div>
+      </div>`;
+  }).join("");
+
+  $("#gantt").innerHTML = `
+    <div class="gantt__rows">${rows}</div>
+    <div class="gantt__axis"><div class="gantt__who" aria-hidden="true"></div><div class="gantt__ticks">${ticks}</div></div>
+    <figcaption class="gantt__legend">
+      <span><i class="gantt__key gantt__key--militar"></i>Gobierno militar</span>
+      <span><i class="gantt__key gantt__key--electo"></i>Gobierno constitucional</span>
+      <span><i class="gantt__key gantt__key--interino"></i>Presidencia interina</span>
+    </figcaption>`;
+}
+
+/* =========================================================
+   Capítulo 3 · Línea de tiempo
+   ========================================================= */
+function plateHTML(ev, number) {
   if (ev.image) {
     return `
       <figure class="plate plate--photo">
-        <img src="${escapeHTML(ev.image)}" alt="${escapeHTML(ev.title)}" loading="lazy" />
-        ${ev.credit ? `<figcaption>${escapeHTML(ev.credit)}</figcaption>` : ""}
+        <img src="${esc(ev.image)}" alt="${esc(ev.title)}" loading="lazy" />
+        ${ev.credit ? `<figcaption>${esc(ev.credit)}</figcaption>` : ""}
       </figure>`;
   }
-  const big = ev.stat ? ev.stat.value : String(ev.year).slice(2);
+  const big = ev.stat || String(ev.year).slice(2);
   return `
     <div class="plate plate--${ev.category}" aria-hidden="true">
-      <span class="plate__big">${escapeHTML(big)}</span>
+      <span class="plate__big">${esc(big)}</span>
       <svg class="plate__icon" viewBox="0 0 64 64">${ICONS[ev.icon] || ""}</svg>
-      <span class="plate__num">N.º ${String(index + 1).padStart(2, "0")}</span>
+      <span class="plate__num">N.º ${String(number).padStart(2, "0")}</span>
       <span class="plate__tag">Ilustración</span>
     </div>`;
 }
 
-function cardHTML(ev, index) {
-  const id = `ev-${index + 1}`;
-  const people = ev.people.map((p) => `<li>${escapeHTML(p)}</li>`).join("");
+function moreHTML(ev, id) {
+  const block = (label, text) => (text ? `<h4>${label}</h4><p>${esc(text)}</p>` : "");
+  const quote = ev.quote
+    ? `<blockquote class="quote"><p>“${esc(ev.quote.text)}”</p><cite>${esc(ev.quote.by)}</cite></blockquote>`
+    : "";
+  const note = ev.note ? `<p class="note"><strong>Dato:</strong> ${esc(ev.note)}</p>` : "";
+  const people = ev.people?.length
+    ? `<h4>Protagonistas</h4><ul class="people">${ev.people.map((p) => `<li>${esc(p)}</li>`).join("")}</ul>`
+    : "";
+  const link = ev.link ? `<a class="card__link" href="${esc(ev.link.href)}">${esc(ev.link.label)} →</a>` : "";
   return `
-    <article class="event reveal" data-year="${ev.year}" data-category="${ev.category}" id="${id}">
+    <div class="card__more" id="${id}-more" role="region" aria-label="Más información sobre ${esc(ev.title)}">
+      <div class="card__more-inner">
+        ${block("Contexto", ev.context)}
+        ${block("Qué pasó", ev.detail)}
+        ${block("Consecuencias", ev.impact)}
+        ${quote}
+        ${note}
+        ${people}
+        ${link}
+      </div>
+    </div>`;
+}
+
+function mainCardHTML(ev, number, id) {
+  return `
+    <article class="event event--main reveal" data-year="${ev.year}" data-kind="main" data-category="${ev.category}" id="${id}">
       <span class="event__node" aria-hidden="true"></span>
       <div class="card">
-        ${plateHTML(ev, index)}
+        ${plateHTML(ev, number)}
         <div class="card__body">
           <div class="card__meta">
-            <time class="card__date">${escapeHTML(ev.date)}</time>
+            <time class="card__date">${esc(ev.date)}</time>
             <span class="chip chip--${ev.category}">${CATEGORY_LABELS[ev.category]}</span>
           </div>
-          <h3 class="card__title">${escapeHTML(ev.title)}</h3>
-          <p class="card__text">${escapeHTML(ev.text)}</p>
-          <div class="card__more" id="${id}-more" role="region" aria-label="Más información sobre ${escapeHTML(ev.title)}">
-            <div class="card__more-inner">
-              <h4>Por qué importa</h4>
-              <p>${escapeHTML(ev.more)}</p>
-              <h4>Protagonistas</h4>
-              <ul class="people">${people}</ul>
-            </div>
-          </div>
+          <h3 class="card__title">${esc(ev.title)}</h3>
+          <p class="card__text">${esc(ev.text)}</p>
+          ${moreHTML(ev, id)}
           <button class="card__toggle" type="button" aria-expanded="false" aria-controls="${id}-more">
             <span>Ver más</span>
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
@@ -244,39 +167,384 @@ function cardHTML(ev, index) {
     </article>`;
 }
 
+function contextCardHTML(ev, id) {
+  return `
+    <article class="event event--context reveal" data-year="${ev.year}" data-kind="context" data-category="${ev.category}" id="${id}">
+      <span class="event__node" aria-hidden="true"></span>
+      <div class="card card--context">
+        <div class="card__body">
+          <div class="card__meta">
+            <span class="card__kicker">Hecho complementario</span>
+            <time class="card__date">${esc(ev.date)}</time>
+          </div>
+          <h3 class="card__title">${esc(ev.title)}</h3>
+          <p class="card__text">${esc(ev.text)}</p>
+        </div>
+      </div>
+    </article>`;
+}
+
 function renderTimeline() {
-  const timeline = $("#timeline");
   let html = "";
   let currentYear = null;
+  let mainNumber = 0;
   EVENTS.forEach((ev, i) => {
     if (ev.year !== currentYear) {
       currentYear = ev.year;
-      const count = EVENTS.filter((e) => e.year === ev.year).length;
+      const main = EVENTS.filter((e) => e.year === ev.year && e.kind === "main").length;
       html += `
         <div class="year-marker reveal" id="anio-${ev.year}" data-year="${ev.year}">
           <span class="year-marker__label">${ev.year}</span>
-          <span class="year-marker__count">${count} ${count === 1 ? "acontecimiento" : "acontecimientos"}</span>
+          <span class="year-marker__count">${plural(main, "acontecimiento", "acontecimientos")}</span>
         </div>`;
     }
-    html += cardHTML(ev, i);
+    const id = `ev-${i + 1}`;
+    if (ev.kind === "main") {
+      mainNumber += 1;
+      html += mainCardHTML(ev, mainNumber, id);
+    } else {
+      html += contextCardHTML(ev, id);
+    }
   });
-  timeline.insertAdjacentHTML("beforeend", html);
+  $("#timeline").insertAdjacentHTML("beforeend", html);
 }
 
-/* ---------- Tarjetas expandibles ---------- */
+/* Tarjetas expandibles */
+function setCardOpen(btn, open) {
+  btn.setAttribute("aria-expanded", String(open));
+  btn.closest(".card").classList.toggle("is-open", open);
+  btn.querySelector("span").textContent = open ? "Ver menos" : "Ver más";
+}
+
 function setupToggles() {
   $("#timeline").addEventListener("click", (e) => {
     const btn = e.target.closest(".card__toggle");
     if (!btn) return;
-    const card = btn.closest(".card");
-    const open = btn.getAttribute("aria-expanded") === "true";
-    btn.setAttribute("aria-expanded", String(!open));
-    card.classList.toggle("is-open", !open);
-    btn.querySelector("span").textContent = open ? "Ver más" : "Ver menos";
+    setCardOpen(btn, btn.getAttribute("aria-expanded") !== "true");
+    syncExpandAllLabel();
+  });
+
+  $("#expandAll").addEventListener("click", () => {
+    const btns = $$(".card__toggle");
+    const openAll = btns.some((b) => b.getAttribute("aria-expanded") !== "true");
+    btns.forEach((b) => setCardOpen(b, openAll));
+    syncExpandAllLabel();
+    requestAnimationFrame(updateScrollUI);
   });
 }
 
-/* ---------- Animaciones de aparición ---------- */
+function syncExpandAllLabel() {
+  const allOpen = $$(".card__toggle").every((b) => b.getAttribute("aria-expanded") === "true");
+  $("#expandAll").textContent = allOpen ? "Cerrar todas las tarjetas" : "Abrir todas las tarjetas";
+}
+
+/* Filtros por año y hechos complementarios */
+const state = { year: "all", context: true };
+
+function applyFilters() {
+  $$(".filter[data-filter]").forEach((b) => {
+    const on = b.dataset.filter === state.year;
+    b.classList.toggle("is-active", on);
+    b.setAttribute("aria-pressed", String(on));
+  });
+
+  $$(".event").forEach((el) => {
+    const yearOk = state.year === "all" || el.dataset.year === state.year;
+    const kindOk = state.context || el.dataset.kind === "main";
+    el.hidden = !(yearOk && kindOk);
+    if (!el.hidden) el.classList.remove("is-pending");
+  });
+  $$(".year-marker").forEach((el) => {
+    el.hidden = !(state.year === "all" || el.dataset.year === state.year);
+    if (!el.hidden) el.classList.remove("is-pending");
+  });
+
+  const visibleMain = $$(".event--main:not([hidden])").length;
+  const visibleCtx = $$(".event--context:not([hidden])").length;
+  const where = state.year === "all" ? "" : ` de ${state.year}`;
+  $("#filterStatus").textContent =
+    `Mostrando ${plural(visibleMain, "acontecimiento principal", "acontecimientos principales")}${where}` +
+    (state.context ? ` y ${plural(visibleCtx, "hecho complementario", "hechos complementarios")}.` : ".");
+
+  updateScrollUI();
+}
+
+function setupFilters() {
+  $$(".filter[data-filter]").forEach((btn) =>
+    btn.addEventListener("click", () => {
+      state.year = btn.dataset.filter;
+      applyFilters();
+      const target = state.year === "all" ? $("#timeline") : $(`#anio-${state.year}`);
+      const top = target?.getBoundingClientRect().top ?? 0;
+      if (top < 0 || top > window.innerHeight * 0.85) scrollToEl(target);
+    })
+  );
+  $("#toggleContext").addEventListener("change", (e) => {
+    state.context = e.target.checked;
+    applyFilters();
+  });
+}
+
+/* =========================================================
+   Capítulo 5 · Gráfico de elecciones
+   ========================================================= */
+const SERIES = {
+  frejuli: "FREJULI (peronismo)",
+  ucr: "UCR (radicalismo)",
+  otros: "Otras fuerzas",
+};
+
+function renderElections() {
+  const legend = Object.entries(SERIES)
+    .map(([k, label]) => `<li><i class="key key--${k}"></i>${label}</li>`)
+    .join("");
+
+  const bars = ELECTIONS.map((el) => {
+    const segs = el.rows
+      .map((r) => {
+        // Segmentos grandes: nombre y porcentaje. Medianos: solo porcentaje.
+        const label = r.value >= 30 ? `${esc(r.party)} <b>${fmtPct(r.value)}</b>` : `<b>${fmtPct(r.value)}</b>`;
+        const small = r.value < 20 ? " stack__seg--small" : "";
+        return `
+          <span class="stack__seg stack__seg--${r.series}${small}" style="flex-basis:${r.value}%"
+                tabindex="0" data-tip="${esc(`${r.party} · ${r.detail}: ≈ ${fmtPct(r.value)}`)}">
+            <span class="stack__label">${label}</span>
+          </span>`;
+      })
+      .join("");
+    return `
+      <div class="stack">
+        <div class="stack__head"><strong>${esc(el.label)}</strong><span>${esc(el.note)}</span></div>
+        <div class="stack__bar">${segs}</div>
+      </div>`;
+  }).join("");
+
+  const table = `
+    <details class="chart__table">
+      <summary>Ver los datos como tabla</summary>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th scope="col">Fuerza</th>${ELECTIONS.map((e) => `<th scope="col">${esc(e.label)}</th>`).join("")}</tr></thead>
+          <tbody>
+            ${Object.entries(SERIES)
+              .map(
+                ([k, label]) => `<tr><th scope="row">${label}</th>${ELECTIONS.map((e) => {
+                  const r = e.rows.find((x) => x.series === k);
+                  return `<td>≈ ${fmtPct(r.value)}<small>${esc(r.detail)}</small></td>`;
+                }).join("")}</tr>`
+              )
+              .join("")}
+          </tbody>
+        </table>
+      </div>
+    </details>`;
+
+  const frejuli = ELECTIONS.map((e) => e.rows.find((r) => r.series === "frejuli").value);
+  const delta = (frejuli[1] - frejuli[0]).toLocaleString("es-AR", { maximumFractionDigits: 1 });
+
+  $("#electionChart").innerHTML = `
+    <div class="chart__top">
+      <div class="chart__hero"><span>+${delta}</span><small>puntos ganó el peronismo entre marzo y septiembre</small></div>
+      <ul class="chart__legend" aria-label="Referencias">${legend}</ul>
+    </div>
+    ${bars}
+    ${table}`;
+}
+
+/* Tooltip compartido para gráficos */
+function setupTooltip() {
+  const tip = $("#tooltip");
+  const show = (el, x, y) => {
+    tip.textContent = el.dataset.tip;
+    tip.hidden = false;
+    const r = tip.getBoundingClientRect();
+    const left = Math.min(Math.max(8, x - r.width / 2), window.innerWidth - r.width - 8);
+    const top = y - r.height - 12 < 8 ? y + 16 : y - r.height - 12;
+    tip.style.transform = `translate(${left}px, ${top}px)`;
+  };
+  const hide = () => (tip.hidden = true);
+
+  document.addEventListener("pointermove", (e) => {
+    const el = e.target.closest("[data-tip]");
+    if (el) show(el, e.clientX, e.clientY);
+    else hide();
+  });
+  document.addEventListener("focusin", (e) => {
+    const el = e.target.closest("[data-tip]");
+    if (!el) return hide();
+    const r = el.getBoundingClientRect();
+    show(el, r.left + r.width / 2, r.top);
+  });
+  document.addEventListener("focusout", hide);
+  window.addEventListener("scroll", hide, { passive: true });
+}
+
+/* =========================================================
+   Capítulo 7 · Protagonistas
+   ========================================================= */
+function renderPeople() {
+  const groups = ["all", ...Object.keys(PEOPLE_GROUPS)];
+  $("#peopleFilters").innerHTML = groups
+    .map(
+      (g) =>
+        `<button class="filter${g === "all" ? " is-active" : ""}" type="button" data-group="${g}" aria-pressed="${g === "all"}">${
+          g === "all" ? "Todos" : PEOPLE_GROUPS[g]
+        }</button>`
+    )
+    .join("");
+
+  $("#peopleGrid").innerHTML = PEOPLE.map(
+    (p) => `
+      <article class="person reveal" data-group="${p.group}">
+        <span class="person__initials" aria-hidden="true">${esc(initials(p.name))}</span>
+        <div>
+          <h3>${esc(p.name)}</h3>
+          <p class="person__role">${esc(p.role)}</p>
+          <p>${esc(p.text)}</p>
+          <span class="person__group person__group--${p.group}">${PEOPLE_GROUPS[p.group]}</span>
+        </div>
+      </article>`
+  ).join("");
+
+  $("#peopleFilters").addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-group]");
+    if (!btn) return;
+    const g = btn.dataset.group;
+    $$("#peopleFilters .filter").forEach((b) => {
+      const on = b === btn;
+      b.classList.toggle("is-active", on);
+      b.setAttribute("aria-pressed", String(on));
+    });
+    $$(".person").forEach((card) => {
+      card.hidden = g !== "all" && card.dataset.group !== g;
+      card.classList.remove("is-pending");
+    });
+  });
+}
+
+function initials(name) {
+  const clean = name.replace(/\(.*?\)/g, "").trim();
+  if (/^[A-ZÁÉÍÓÚ]{2,}$/.test(clean.split(" ")[0])) return clean.split(" ")[0].slice(0, 3);
+  const parts = clean.split(/\s+/).filter((w) => /^[A-ZÁÉÍÓÚ]/.test(w));
+  return (parts[0][0] + (parts[parts.length - 1]?.[0] || "")).toUpperCase();
+}
+
+/* =========================================================
+   Capítulo 8 · Glosario
+   ========================================================= */
+const normalize = (s) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+
+function renderGlossary() {
+  const sorted = [...GLOSSARY].sort((a, b) => a.term.localeCompare(b.term, "es"));
+  $("#glossaryList").innerHTML = sorted
+    .map(
+      (g) => `
+        <div class="glossary__item" data-search="${esc(normalize(g.term + " " + g.def))}">
+          <dt>${esc(g.term)}</dt>
+          <dd>${esc(g.def)}</dd>
+        </div>`
+    )
+    .join("");
+
+  $("#glossarySearch").addEventListener("input", (e) => {
+    const q = normalize(e.target.value.trim());
+    let shown = 0;
+    $$(".glossary__item").forEach((item) => {
+      const match = !q || item.dataset.search.includes(q);
+      item.hidden = !match;
+      if (match) shown += 1;
+    });
+    $("#glossaryEmpty").hidden = shown > 0;
+  });
+}
+
+/* =========================================================
+   Capítulo 10 · Repaso
+   ========================================================= */
+const answered = new Map();
+
+function renderQuiz() {
+  const letters = ["A", "B", "C", "D"];
+  $("#quiz").innerHTML = QUIZ.map(
+    (item, qi) => `
+      <fieldset class="question reveal" data-q="${qi}">
+        <legend><span class="question__n">${qi + 1}</span>${esc(item.q)}</legend>
+        <div class="question__options">
+          ${item.options
+            .map(
+              (opt, oi) => `
+              <button class="option" type="button" data-q="${qi}" data-o="${oi}">
+                <span class="option__letter">${letters[oi]}</span>${esc(opt)}
+              </button>`
+            )
+            .join("")}
+        </div>
+        <p class="question__feedback" aria-live="polite"></p>
+      </fieldset>`
+  ).join("");
+
+  $("#quiz").addEventListener("click", (e) => {
+    const btn = e.target.closest(".option");
+    if (!btn) return;
+    const qi = Number(btn.dataset.q);
+    if (answered.has(qi)) return;
+    const oi = Number(btn.dataset.o);
+    const item = QUIZ[qi];
+    const ok = oi === item.answer;
+    answered.set(qi, ok);
+
+    const box = btn.closest(".question");
+    $$(".option", box).forEach((b) => {
+      b.disabled = true;
+      if (Number(b.dataset.o) === item.answer) b.classList.add("is-correct");
+    });
+    if (!ok) btn.classList.add("is-wrong");
+    box.classList.add(ok ? "is-right" : "is-missed");
+    $(".question__feedback", box).innerHTML = `<strong>${ok ? "¡Correcto!" : "No es esa."}</strong> ${esc(item.why)}`;
+    updateScore();
+  });
+
+  $("#quizReset").addEventListener("click", () => {
+    answered.clear();
+    $$(".question").forEach((box) => {
+      box.classList.remove("is-right", "is-missed");
+      $(".question__feedback", box).textContent = "";
+      $$(".option", box).forEach((b) => {
+        b.disabled = false;
+        b.classList.remove("is-correct", "is-wrong");
+      });
+    });
+    updateScore();
+    scrollToEl($("#quiz"));
+  });
+
+  updateScore();
+}
+
+function updateScore() {
+  const done = answered.size;
+  const right = [...answered.values()].filter(Boolean).length;
+  const total = QUIZ.length;
+  let msg = `Respondiste ${done} de ${total} preguntas.`;
+  if (done > 0) msg += ` Correctas: ${right}.`;
+  if (done === total) {
+    msg = `Terminaste: ${right} de ${total} correctas. ` +
+      (right === total ? "¡Excelente!" : right >= total * 0.6 ? "Muy bien. Repasá las que fallaste en la cronología." : "Volvé a recorrer la cronología y el Pacto Social, y probá otra vez.");
+  }
+  $("#quizScore").textContent = msg;
+  $("#quizReset").hidden = done === 0;
+}
+
+function renderExtras() {
+  $("#thinkList").innerHTML = THINK.map((t) => `<li>${esc(t)}</li>`).join("");
+  $("#sourcesList").innerHTML = SOURCES.map(
+    (s) => `<li><cite>${esc(s.title)}</cite>, ${esc(s.author)}. <span>${esc(s.note)}</span></li>`
+  ).join("");
+}
+
+/* =========================================================
+   Animaciones de aparición
+   ========================================================= */
 let revealObserver;
 function setupReveal() {
   if (prefersReducedMotion || !("IntersectionObserver" in window)) return;
@@ -289,7 +557,7 @@ function setupReveal() {
         }
       });
     },
-    { threshold: 0.12, rootMargin: "0px 0px -40px 0px" }
+    { threshold: 0.1, rootMargin: "0px 0px -40px 0px" }
   );
   // Lo visible al cargar queda quieto; solo lo que está más abajo se anima al llegar
   $$(".reveal").forEach((el) => {
@@ -300,130 +568,162 @@ function setupReveal() {
   });
 }
 
-/* ---------- Filtros por año ---------- */
-let activeFilter = "all";
-function applyFilter(filter) {
-  activeFilter = filter;
-  $$(".filter").forEach((b) => {
-    const on = b.dataset.filter === filter;
-    b.classList.toggle("is-active", on);
-    b.setAttribute("aria-pressed", String(on));
-  });
-  $$(".event, .year-marker").forEach((el) => {
-    const show = filter === "all" || el.dataset.year === filter;
-    el.hidden = !show;
-    if (show) el.classList.remove("is-pending");
-  });
-  const n = filter === "all" ? EVENTS.length : EVENTS.filter((e) => String(e.year) === filter).length;
-  $("#filterStatus").textContent =
-    filter === "all" ? `Mostrando los ${n} acontecimientos.` : `Mostrando ${n} ${n === 1 ? "acontecimiento" : "acontecimientos"} de ${filter}.`;
-  updateScrollUI();
+/* =========================================================
+   Navegación y desplazamiento
+   ========================================================= */
+function headerOffset() {
+  const yearbar = $("#yearbar");
+  const inChrono = yearbar && yearbar.classList.contains("is-stuck");
+  return $("#topbar").offsetHeight + (inChrono ? yearbar.offsetHeight : 0) + 12;
 }
 
-function setupFilters() {
-  $$(".filter").forEach((btn) =>
-    btn.addEventListener("click", () => {
-      const filter = btn.dataset.filter;
-      applyFilter(filter);
-      // Lleva la vista al comienzo de los resultados si quedaron fuera de pantalla
-      const target = filter === "all" ? $("#timeline") : $(`#anio-${filter}`);
-      if (target && target.getBoundingClientRect().top > window.innerHeight * 0.8) scrollToEl(target);
-      else if (target && target.getBoundingClientRect().top < 0) scrollToEl(target);
-    })
-  );
-}
-
-/* ---------- Navegación rápida y desplazamiento suave ---------- */
 function scrollToEl(el) {
   if (!el) return;
-  const offset = $("#topbar").offsetHeight + 16;
-  const top = el.getBoundingClientRect().top + window.scrollY - offset;
-  window.scrollTo({ top, behavior: prefersReducedMotion ? "auto" : "smooth" });
+  const top = el.getBoundingClientRect().top + window.scrollY - headerOffset();
+  window.scrollTo({ top, behavior: scrollBehavior() });
 }
 
 function setupNavigation() {
-  // Botón del hero
-  $("#exploreBtn").addEventListener("click", (e) => {
-    e.preventDefault();
-    scrollToEl($("#cronologia"));
-  });
-
-  // Saltos por año: si el año está oculto por un filtro, se vuelve a "Todos"
+  // Saltos por año: si el año quedó oculto por un filtro, se vuelve a "Todos"
   $$("[data-jump]").forEach((a) =>
     a.addEventListener("click", (e) => {
       e.preventDefault();
       const year = a.dataset.jump;
-      if (activeFilter !== "all" && activeFilter !== year) applyFilter("all");
-      scrollToEl($(`#anio-${year}`));
-    })
-  );
-
-  // Otros enlaces internos
-  $$('a[href^="#"]:not([data-jump]):not(#exploreBtn)').forEach((a) =>
-    a.addEventListener("click", (e) => {
-      const target = $(a.getAttribute("href"));
-      if (!target) return;
-      e.preventDefault();
-      if (target.id === "inicio") {
-        window.scrollTo({ top: 0, behavior: prefersReducedMotion ? "auto" : "smooth" });
-      } else {
-        scrollToEl(target);
+      if (state.year !== "all" && state.year !== year) {
+        state.year = "all";
+        applyFilters();
       }
+      const target = $(`#anio-${year}`);
+      const top = target.getBoundingClientRect().top + window.scrollY - $("#topbar").offsetHeight - $("#yearbar").offsetHeight - 12;
+      window.scrollTo({ top, behavior: scrollBehavior() });
     })
   );
 
-  $("#toTop").addEventListener("click", () => {
-    window.scrollTo({ top: 0, behavior: prefersReducedMotion ? "auto" : "smooth" });
+  // Enlaces internos (índice, menú, tarjetas)
+  document.addEventListener("click", (e) => {
+    const a = e.target.closest('a[href^="#"]:not([data-jump])');
+    if (!a) return;
+    const target = $(a.getAttribute("href"));
+    if (!target) return;
+    e.preventDefault();
+    if (target.id === "inicio") window.scrollTo({ top: 0, behavior: scrollBehavior() });
+    else scrollToEl(target);
   });
+
+  $("#toTop").addEventListener("click", () => window.scrollTo({ top: 0, behavior: scrollBehavior() }));
 }
 
-/* ---------- Progreso de lectura, año activo y botón "arriba" ---------- */
+/* =========================================================
+   Progreso de lectura, capítulo y año activos
+   ========================================================= */
+/* [id de la sección, enlace del menú que se marca] en orden de aparición */
+const SECTION_MAP = [
+  ["contexto", "contexto"],
+  ["gobiernos", "contexto"],
+  ["cronologia", "cronologia"],
+  ["pacto", "pacto"],
+  ["elecciones", "pacto"],
+  ["corrientes", "corrientes"],
+  ["protagonistas", "protagonistas"],
+  ["glosario", "glosario"],
+  ["final", null],
+  ["repaso", "repaso"],
+];
 let ticking = false;
+
 function updateScrollUI() {
   const doc = document.documentElement;
   const max = doc.scrollHeight - window.innerHeight;
   const pct = max > 0 ? Math.min(1, window.scrollY / max) : 0;
   $("#progressBar").style.transform = `scaleX(${pct})`;
 
+  const topbarH = $("#topbar").offsetHeight;
+  const viewMid = window.innerHeight * 0.55;
+
   // Relleno de la línea de tiempo
   const tl = $("#timeline");
   const rect = tl.getBoundingClientRect();
-  const viewMid = window.innerHeight * 0.55;
   const fill = Math.max(0, Math.min(1, (viewMid - rect.top) / rect.height));
   $("#timelineFill").style.transform = `scaleY(${fill})`;
 
-  // Año activo en la barra superior
-  let current = null;
+  // Barra de años: visible solo mientras se recorre la cronología
+  const yearbar = $("#yearbar");
+  const inTimeline = rect.top < topbarH + 60 && rect.bottom > viewMid;
+  yearbar.classList.toggle("is-stuck", inTimeline);
+
+  let currentYear = null;
   $$(".year-marker:not([hidden])").forEach((m) => {
-    if (m.getBoundingClientRect().top < viewMid) current = m.dataset.year;
+    if (m.getBoundingClientRect().top < viewMid) currentYear = m.dataset.year;
   });
-  if (rect.bottom < viewMid * 0.5) current = null;
-  $$("[data-jump]").forEach((a) => a.classList.toggle("is-current", a.dataset.jump === current));
+  if (!inTimeline) currentYear = null;
+  $$("[data-jump]").forEach((a) => a.classList.toggle("is-current", a.dataset.jump === currentYear));
+
+  // Capítulo activo en el menú
+  let currentSection = null;
+  SECTION_MAP.forEach(([id, navKey]) => {
+    const el = document.getElementById(id);
+    if (el && el.getBoundingClientRect().top < viewMid) currentSection = navKey;
+  });
+  $$(".topbar__nav a").forEach((a) => {
+    const on = a.dataset.section === currentSection;
+    a.classList.toggle("is-current", on);
+    if (on) a.setAttribute("aria-current", "true");
+    else a.removeAttribute("aria-current");
+  });
 
   $("#topbar").classList.toggle("is-solid", window.scrollY > 40);
   $("#toTop").classList.toggle("is-visible", window.scrollY > window.innerHeight * 0.8);
   ticking = false;
 }
 
+function keepCurrentNavVisible() {
+  const nav = $(".topbar__nav");
+  const current = $(".topbar__nav a.is-current");
+  if (!current || nav.scrollWidth <= nav.clientWidth) return;
+  const left = current.offsetLeft - nav.clientWidth / 2 + current.offsetWidth / 2;
+  nav.scrollTo({ left, behavior: scrollBehavior() });
+}
+
 function setupScroll() {
+  let lastSection = null;
   const onScroll = () => {
-    if (!ticking) {
-      ticking = true;
-      requestAnimationFrame(updateScrollUI);
-    }
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => {
+      updateScrollUI();
+      const cur = $(".topbar__nav a.is-current")?.dataset.section || null;
+      if (cur !== lastSection) {
+        lastSection = cur;
+        keepCurrentNavVisible();
+      }
+    });
   };
   window.addEventListener("scroll", onScroll, { passive: true });
   window.addEventListener("resize", onScroll);
   updateScrollUI();
 }
 
-/* ---------- Inicio ---------- */
-document.addEventListener("DOMContentLoaded", () => {
+/* =========================================================
+   Inicio
+   ========================================================= */
+function init() {
+  renderBackground();
+  renderGantt();
   renderTimeline();
+  renderElections();
+  renderPeople();
+  renderGlossary();
+  renderQuiz();
+  renderExtras();
+
   setupToggles();
-  setupReveal();
   setupFilters();
+  setupTooltip();
+  setupReveal();
   setupNavigation();
   setupScroll();
-  $("#filterStatus").textContent = `Mostrando los ${EVENTS.length} acontecimientos.`;
-});
+  applyFilters();
+}
+
+if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+else init();
